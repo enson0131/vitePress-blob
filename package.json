@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "vitepress dev docs",
     "build": "vitepress build docs",
-    "serve": "vitepress serve docs"
+    "serve": "vitepress serve docs",
+    "preview": "vitepress preview docs --port 8080"
   },
   "devDependencies": {
     "@types/node": "^20.6.0",
