@@ -6,6 +6,7 @@ const require = createRequire(import.meta.url);
 const pkg = require('vitepress/package.json')
 
 export default defineConfig({
+    base: '/vitePress-blob/',
     title: '前端知识库',
     description:
         '📝个人平时的学习工作的点点记录',
