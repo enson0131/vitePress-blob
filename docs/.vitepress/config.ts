@@ -147,8 +147,8 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         text: 'React 笔记',
         collapsed: false,
         items: [
-          { text: 'MPA Mode', link: 'mpa-mode' },
-          { text: 'Sitemap Generation', link: 'sitemap-generation' }
+          { text: 'React是什么', link: 'React/React是什么' },
+          { text: 'React 为什么要使用 JSX', link: 'React/React为什么要使用JSX' }
         ]
       },
       {
