@@ -158,6 +158,10 @@ export default class Test extends Component {
 ### React 18 版本
 在 React 18 版本所有的 setState 都是异步批量操作
 
+异步批量操作的原因是为了提高性能，减少重复渲染
+还有一个好处就是保持数据一致性，如果是同步更新的话，可能会出现数据不一致的情况（比如 state 更新了，但是 Fiber 还没有更新）
+还有一个好处就是 setState 异步更新可以平滑地过渡新老页面
+
 ### React 18以前的版本
 
 ![setState](./../../public/assets/2.png)
@@ -165,3 +169,9 @@ export default class Test extends Component {
 setState 同步还是异步取决于是否处于 batchUpdate 阶段，处于的话就是异步，否则就是同步
 
 在原生事件、setTimeout、setInterval 中属于同步更新的场景
+
+
+
+
+## 参考资料
+- https://github.com/facebook/react/issues/11527#
