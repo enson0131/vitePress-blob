@@ -151,6 +151,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'React 为什么要使用 JSX', link: 'React/React为什么要使用JSX' },
           { text: '如何设计 React 组件', link: 'React/如何设计React组件' },
           { text: 'setState 是同步还是异步', link: 'React/setState是同步还是异步的' },
+          { text: '什么是Fiber', link: 'React/什么是Fiber' },
           { text: 'React 是如何渲染的', link: 'React/React是如何渲染的' },
           { text: 'React 中的 Diff 算法', link: 'React/diff算法' },
           { text: 'React 中的事件机制', link: 'React/React中的事件机制' },
