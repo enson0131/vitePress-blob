@@ -197,9 +197,135 @@ root.render(
 );
 ```
 
+## 使用 Fragment 避免额外标记
+
+通过 Fragment 减少不必要的标签
+
+```jsx
+import React from 'react';
+
+// bad
+function App() {
+  return (
+    <div>
+      <div>1</div>
+      <div>2</div>
+    </div>
+  )
+}
+
+// good
+function App() {
+  return (
+    <>
+      <div>1</div>
+      <div>2</div>
+    </>
+  )
+}
+```
+
 
 ## 避免使用内联函数
 
+在 React 中每次 render 都会重新生成新的内联函数，导致在 diff 过程中，发现新旧函数不相等，又重新给组件挂载上新的函数，造成不必要的性能开销。
+
+```jsx
+
+// bad
+function App() {
+  const handleClick = () => {
+    console.log('click')
+  }
+
+  return <div onClick={() => handleClick()}> App </div>
+}
+
+// good
+function App() {
+  const handleClick = () => {
+    console.log('click')
+  }
+
+  return <div onClick={handleClick}> App </div>
+}
+```
+
+## 优化渲染条件
+对于频繁渲染的组件，可以通过 `display: none;` 进行组件的显示隐藏，避免不必要的性能开销。
+
+
+## 避免使用内联样式属性
+
+当使用内联 style 为元素添加样式时，内联 style 会被编译成 JavaScript 代码，通过 JavaScript 代码将样式规则映射到元素的身上，浏览器就会花费更多的时间执行脚本和渲染UI，从而增加了组件的渲染时间。
+
+```jsx
+
+function App() {
+  return <div style={{ backgroundColor: "skyblue" }}>App works</div>
+}
+
+```
+
+## 避免重复渲染
+在函数组件中，避免在函数体中更改状态
+在类组件中，避免在 render 函数内更改状态
+
+```jsx
+// bad
+export default class App extends React.Component {
+  constructor() {
+    super()
+    this.state = {name: "张三"}
+  }
+  render() {
+    this.setState({name: "李四"})
+    return <div>{this.state.name}</div>
+  }
+}
+
+
+// or
+// bad
+export default function App() {
+  const [count, setCount] = count(0)
+  setCount(count++)
+  return <div>{count}</div>
+}
+```
+
+## 为组件创建错误边界
+当组件发生错误时，可以通过错误边界捕获错误，从而避免整个组件树的崩溃。
+
+```jsx
+export default class ErrorBoundary extends React.Component {
+  constructor () {
+    super();
+    this.state = { hasError: false };
+  }
+  /**
+   * 此生命周期在后代组件引发错误后调用
+   * 返回的值会更新 state 状态
+   */
+  static getDerivedStateFromError() {
+    // 更新 state 使下一次渲染能够显示降级后的 UI
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // 捕获错误日志，将错误日志上报到服务器
+    console.log(error, errorInfo)
+  }
+
+  render () {
+    if (this.state.hasError) {
+      return <h1>Something went wrong.</h1>;
+    }
+
+    return this.props.children;
+  }
+}
+```
 
 
 # 参考文章
