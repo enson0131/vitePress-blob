@@ -4,15 +4,21 @@
 
 常见的性能优化手段有:
 
-- 使用 `useMemo` 缓存数据、使用 `useCallback` 缓存函数
-- 使用 `React.memo` 缓存组件
-- 合理的使用 Key
-- 在组件销毁的时候清除定时器/事件
-- 通过 Suspense 和 Lazy 拆分组件
-- 避免使用内联函数
+1. 使用 `useMemo` 缓存数据、使用 `useCallback` 缓存函数
+2. 使用 `React.memo` 缓存组件
+3. 合理的使用 Key
+4. 在组件销毁的时候清除定时器/事件
+5. 通过 Suspense 和 Lazy 拆分组件
+6. 使用 Fragment 避免额外标记
+7. 避免使用内联函数
+8. 避免使用内联样式
+9. 优化渲染条件
+10. 避免重复渲染
+11. 为组件创建错误边界
+  
 
 
-## 使用 useMemo 缓存数据、使用 useCallback 缓存函数
+## 1 使用 useMemo 缓存数据、使用 useCallback 缓存函数
 ```jsx
 /**
  * 使用 useMemo 缓存数据，类似于 Vue 的 computed 计算属性
@@ -56,7 +62,7 @@ function Case2() {
 ```
 
 
-## 使用 React.memo 缓存组件
+## 2 使用 React.memo 缓存组件
 React.memo 类似于 shouldComponentUpdate，当 props 没有变化时，不会重新渲染组件，从而提高性能。
 
 React.memo 返回 false 的时候，会重新渲染组件，返回 true 的时候，不会重新渲染组件。
@@ -91,7 +97,7 @@ function ObjectIs(value1, value2) {
 }
 ```
 
-## 合理的使用 Key
+## 3 合理的使用 Key
 
 在 For 循环中尽量使用唯一的标识id作为key，避免使用index作为key，方便复用组件。
 
@@ -131,7 +137,7 @@ export default Case3;
 
 ```
 
-## 在组件销毁的时候清除定时器/事件
+## 4 在组件销毁的时候清除定时器/事件
 
 组件卸载的时候清除相关事件、定时器
 
@@ -162,7 +168,7 @@ export default Case1;
 ```
 
 
-## 通过 Suspense 和 Lazy 异步加载组件
+## 5 通过 Suspense 和 Lazy 异步加载组件
 
 ```jsx
 import React, { lazy } from 'react';
@@ -197,7 +203,7 @@ root.render(
 );
 ```
 
-## 使用 Fragment 避免额外标记
+## 6 使用 Fragment 避免额外标记
 
 通过 Fragment 减少不必要的标签
 
@@ -226,7 +232,7 @@ function App() {
 ```
 
 
-## 避免使用内联函数
+## 7 避免使用内联函数
 
 在 React 中每次 render 都会重新生成新的内联函数，导致在 diff 过程中，发现新旧函数不相等，又重新给组件挂载上新的函数，造成不必要的性能开销。
 
@@ -251,11 +257,10 @@ function App() {
 }
 ```
 
-## 优化渲染条件
-对于频繁渲染的组件，可以通过 `display: none;` 进行组件的显示隐藏，避免不必要的性能开销。
 
 
-## 避免使用内联样式属性
+
+## 8 避免使用内联样式属性
 
 当使用内联 style 为元素添加样式时，内联 style 会被编译成 JavaScript 代码，通过 JavaScript 代码将样式规则映射到元素的身上，浏览器就会花费更多的时间执行脚本和渲染UI，从而增加了组件的渲染时间。
 
@@ -267,7 +272,10 @@ function App() {
 
 ```
 
-## 避免重复渲染
+## 9 优化渲染条件
+对于频繁渲染的组件，可以通过 `display: none;` 进行组件的显示隐藏，避免不必要的性能开销。
+
+## 10 避免重复渲染
 在函数组件中，避免在函数体中更改状态
 在类组件中，避免在 render 函数内更改状态
 
@@ -294,7 +302,7 @@ export default function App() {
 }
 ```
 
-## 为组件创建错误边界
+## 11 为组件创建错误边界
 当组件发生错误时，可以通过错误边界捕获错误，从而避免整个组件树的崩溃。
 
 ```jsx
