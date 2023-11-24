@@ -195,8 +195,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         text: 'Canvas 笔记',
         collapsed: false,
         items: [
-          { text: 'Redux 设计理念', link: 'redux/设计理念' },
-          { text: 'Redux 源码解读', link: 'redux/源码解读' },
+          { text: 'Canvas 尺寸与分辨率矫正 ', link: 'canvas/Canvas尺寸及分辨率矫正' },
         ]
       },
       { text: 'Config & API Reference', base: '/reference/', link: 'site-config' }

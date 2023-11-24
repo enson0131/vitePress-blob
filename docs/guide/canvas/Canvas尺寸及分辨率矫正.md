@@ -8,7 +8,7 @@ Canvas 的默认大小为 300 像素 ×150 像素（宽 × 高，像素的单位
 <canvas id="tutorial" width="150" height="150"></canvas>
 ```
 
-canvas 看起来和 img 元素很相像，唯一的不同就是它并没有 src 和 alt 属性。实际上，canvas 标签只有两个属性**——** width和height。
+canvas 看起来和 img 元素很相像，唯一的不同就是它并没有 src 和 alt 属性。实际上，canvas 标签只有两个属性： width 和 height。
 
 ## 正文
 ### 设置画布的 css 大小
