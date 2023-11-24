@@ -175,6 +175,30 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'Redux 源码解读', link: 'redux/源码解读' },
         ]
       },
+      {
+        text: 'webpack 笔记',
+        collapsed: false,
+        items: [
+          { text: 'Redux 设计理念', link: 'redux/设计理念' },
+          { text: 'Redux 源码解读', link: 'redux/源码解读' },
+        ]
+      },
+      {
+        text: 'Vite 笔记',
+        collapsed: false,
+        items: [
+          { text: 'Redux 设计理念', link: 'redux/设计理念' },
+          { text: 'Redux 源码解读', link: 'redux/源码解读' },
+        ]
+      },
+      {
+        text: 'Canvas 笔记',
+        collapsed: false,
+        items: [
+          { text: 'Redux 设计理念', link: 'redux/设计理念' },
+          { text: 'Redux 源码解读', link: 'redux/源码解读' },
+        ]
+      },
       { text: 'Config & API Reference', base: '/reference/', link: 'site-config' }
     ]
   }
