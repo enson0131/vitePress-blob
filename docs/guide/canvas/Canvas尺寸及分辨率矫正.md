@@ -95,6 +95,42 @@ canvas 可以使用CSS来定义大小，但在绘制时图像会伸缩以适应�
 当我们将 canvas 的尺寸乘上像素比后，再将 canvas 的尺寸缩小到原来的 css 尺寸，这样就可以保证 canvas 1px 绘制所需要的像素一致，从而保证绘制出来的图形不会模糊。
 
 
+### 监听 dpr 变化
+当用户进行页面切换或者将浏览器放置到其他屏幕时，dpr 可能会发生变化，因此我们需要监听 dpr 的变化，从而重新绘制 canvas。
+
+由于在下使用的技术栈是 React。因此通过监听 window 的 change 事件，从而重新调整 canvas 的尺寸。
+
+```js
+export function useDevicePixelRatio() {
+    const [dpr, setDpr] = useState(window.devicePixelRatio || 1);
+    useEffect(() => {
+        const update = () => {
+            setDpr(window.devicePixelRatio || 1);
+        };
+        window.addEventListener('change', update);
+        return () => {
+            window.removeEventListener('change', update);
+        };
+    }, [dpr]);
+}
+
+<canvas
+    width={width * dpr}
+    height={height * dpr}
+    style={{
+        width: `${width}px`,
+        height: `${height}px`,
+    }}
+></canvas>
+
+// 这时候我们还需要重新缩放 ctx
+const ctx = canvas.getContext('2d');
+ctx.setTransform(1, 0, 0, 1, 0, 0); // scale 前先恢复变换矩阵，不然会重复 scale
+ctx.scale(dpr, dpr);
+```
+
+
+
 ## 参考文档
 - https://developer.mozilla.org/zh-CN/docs/Web/API/Canvas_API/Tutorial
 - https://developer.mozilla.org/zh-CN/docs/Web/API/Canvas_API/Tutorial/Basic_usage
