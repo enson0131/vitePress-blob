@@ -86,13 +86,13 @@
             addPoint(e); // 将鼠标按下的点添加到points数组中
         });
 
-        canvas.addEventListener('pointermove', (e) => {
+        canvas.addEventListener('pointermove', ((e) => {
             console.log('e--->', e);
             if (!start) return; // 如果没有按下，则不绘制
             addPoint(e); // 将鼠标移动的点添加到points数组中
             render(ctx, points); // 绘制
             updatePointCounter(points.length);
-        });
+        }));
 
         canvas.addEventListener('pointerup', (e) => {
             start = false;
@@ -162,6 +162,17 @@
         function updatePointCounter(count) {
             pointCounter.textContent = `当前绘制元素的点数：${count}`;
         }
+
+        function throttle(fn, delay = 60 / 1000) {
+            let timer = null;
+            return function () {
+                if (timer) return;
+                timer = setTimeout(() => {
+                    fn.apply(this, arguments);
+                    timer = null;
+                }, delay);
+            }
+        }
     </script>
 </body>
 </html>
@@ -169,6 +180,32 @@
 
 ### 实现效果
 ![canvas](./../../public/assets/canvas/4.gif)
+
+### 性能优化
+从实现的效果以及逻辑中，我们不难发现，我们采集的点是比较密集的，当我们书写的点数越多时，性能就越差，这是因为我们每次都是将所有的点都重新绘制了一遍，这样的性能是很差的，那么我们如何优化这个性能呢？
+
+#### 点稀疏
+我们可以通过点稀疏的方式来优化性能，我们可以通过设置一个点的最小距离，当我们的点与上一个点的距离小于这个最小距离时，我们就不绘制这个点，这样就可以减少我们绘制的点数，从而提高性能。
+
+更加简单的实现方式就是通过节流
+
+```js
+  canvas.addEventListener('pointermove', throttle((e) => {
+      console.log('e--->', e);
+      if (!start) return; // 如果没有按下，则不绘制
+      addPoint(e); // 将鼠标移动的点添加到points数组中
+      render(ctx, points); // 绘制
+      updatePointCounter(points.length);
+  }));
+```
+之前绘制一条直线需要近 40 个点
+![canvas](./../../public/assets/canvas/6.png)
+
+通过点稀释，我们发现画一条直线只需要 8 个点就可以了，这样就大大提高了性能。
+![canvas](./../../public/assets/canvas/5.png)
+
+
+虽然点稀释可以减少绘制的点数，提高性能，但在绘制曲线的时候，我们会发现曲线的圆滑度不够，这是因为我们的点数太少了，我们可以通过贝塞尔曲线来优化我们的 Canvas 书写。
 
 
 ## 参考
