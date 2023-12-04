@@ -196,7 +196,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         collapsed: false,
         items: [
           { text: 'Canvas 尺寸与分辨率矫正', link: 'canvas/Canvas尺寸及分辨率矫正' },
-          { text: '实现一个自由绘制的 Canvas 画板', link: 'canvas/实现一个自由绘制的Canvas画板' },
+          { text: '实现一个自由绘制的 Canvas 画板', link: 'canvas/如何在Canvas画板上自由书写' },
           { text: '通过贝塞尔曲线优化 Canvas 书写性能', link: 'canvas/通过贝塞尔曲线优化Canvas书写性能' },
         ]
       },
