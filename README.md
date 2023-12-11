@@ -24,3 +24,6 @@ yarn dev
 - https://github1s.com/wfjsw/VP-StableDiffusionBook/tree/master
 - https://github1s.com/windicss/docs/blob/HEAD/.vitepress/config.ts
 - https://github1s.com/vuejs/vitepress/blob/HEAD/docs/.vitepress/config.ts#L2
+
+# 编写文章的注意事项
+编写文章需要有层次，最好是有总分总/总分的形式，便于阅读和理解，加深记忆
