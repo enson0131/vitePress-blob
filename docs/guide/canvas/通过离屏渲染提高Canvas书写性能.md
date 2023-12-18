@@ -187,3 +187,6 @@
 
 ## 实现的效果
 ![canvas](./../../public/assets/canvas/12.gif)
+
+## 具体代码
+https://github.com/enson0131/learn/blob/main/Canvas/%E7%99%BD%E6%9D%BF%E7%9B%B8%E5%85%B3/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E4%B9%8B%E7%A6%BB%E5%B1%8F%E6%B8%B2%E6%9F%93%E5%8F%8A%E7%BC%93%E5%AD%98.html
