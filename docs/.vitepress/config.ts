@@ -200,6 +200,8 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '通过贝塞尔曲线优化 Canvas 书写性能', link: 'canvas/通过贝塞尔曲线优化Canvas书写性能' },
           { text: '通过上下分层优化 Canvas 书写性能', link: 'canvas/通过上下分层优化Canvas书写性能' },
           { text: '通过离屏渲染提高Canvas书写性能', link: 'canvas/通过离屏渲染提高Canvas书写性能' },
+          { text: '可视区域内渲染提高Canvas书写性能', link: 'canvas/可视区域内渲染提高Canvas书写性能' },
+          { text: '基于offScreenCanvas+web worker提高Canvas书写性能', link: 'canvas/基于offScreenCanvas+web worker提高Canvas书写性能' },
         ]
       },
       { text: 'Config & API Reference', base: '/reference/', link: 'site-config' }
