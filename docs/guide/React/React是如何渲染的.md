@@ -1,6 +1,12 @@
 # React 是如何渲染的
 
+## 概要
+React 的渲染过程可以分成 2 大阶段, 分别是调和阶段和提交阶段。
+调和阶段可以分成 beginWork 阶段、 completeWork 阶段。
+在 beginWork 阶段中，React 会根据新生成的 ReactElement 对象和旧的 Fiber 节点进行对比，判断是否可以复用旧的 Fiber 节点并对 Fiber 进行标记。
+在 completeWork 节点中，会自底向上构建副作用链表，用来记录需要更新的节点，生成的 DOM 节点会挂载在 Fiber 的 stateNode 属性上。
 
+提交阶段主要分成：操作 DOM 前阶段、操作 DOM 阶段、操作 DOM 后阶段。
 
 ## React 16 以前
 在浏览器中 js 线程与渲染线程是互斥的，如果 js 线程长期占用着浏览器的主线程，那么界面将长时间不更新，在动画等一些场景下会造成卡顿效果。
