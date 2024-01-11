@@ -107,10 +107,11 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         text: 'JavaScript 笔记',
         collapsed: false,
         items: [
-          { text: 'JavaScript 基础', link: 'javaScript相关/JavaScript基础' },
-          { text: 'Getting Started', link: 'javaScript相关/index' },
-          { text: 'Routing', link: 'javaScript相关/index' },
-          { text: 'Deploy', link: 'javaScript相关/index' }
+          { text: '知识图谱', link: 'javaScript相关/index' },
+          { text: '定义', link: 'javaScript相关/定义' },
+          { text: '数据类型', link: 'javaScript相关/数据类型' },
+          { text: '基础概念', link: 'javaScript相关/基础概念' },
+          { text: 'ES6 相关', link: 'javaScript相关/ES6相关' }
         ]
       },
       {
