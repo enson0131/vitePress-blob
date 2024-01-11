@@ -107,7 +107,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         text: 'JavaScript 笔记',
         collapsed: false,
         items: [
-          { text: 'JavaScript 基础', link: 'javaScript相关/index' },
+          { text: 'JavaScript 基础', link: 'javaScript相关/JavaScript基础' },
           { text: 'Getting Started', link: 'javaScript相关/index' },
           { text: 'Routing', link: 'javaScript相关/index' },
           { text: 'Deploy', link: 'javaScript相关/index' }
