@@ -111,6 +111,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '定义', link: 'javaScript相关/定义' },
           { text: '数据类型', link: 'javaScript相关/数据类型' },
           { text: '基础概念', link: 'javaScript相关/基础概念' },
+          { text: '继承相关', link: 'javaScript相关/继承相关' },
           { text: 'ES6 相关', link: 'javaScript相关/ES6相关' }
         ]
       },
