@@ -181,8 +181,14 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         text: 'webpack 笔记',
         collapsed: false,
         items: [
-          { text: 'Redux 设计理念', link: 'redux/设计理念' },
-          { text: 'Redux 源码解读', link: 'redux/源码解读' },
+          { text: '构建流程', link: 'webpack/构建流程' },
+          { text: '简易实现', link: 'webpack/构建流程' },
+          { text: '源码分析', link: 'webpack/构建流程' },
+          { text: 'Tapable', link: 'webpack/构建流程' },
+          { text: 'Compiler', link: 'webpack/构建流程' },
+          { text: 'Compilation', link: 'webpack/构建流程' },
+          { text: 'Loader 机制', link: 'webpack/构建流程' },
+          { text: 'Plugin 机制', link: 'webpack/构建流程' },
         ]
       },
       {
