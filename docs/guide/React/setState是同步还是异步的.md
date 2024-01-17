@@ -55,6 +55,16 @@ var ReactDefaultBatchingStrategy = {
 异步批量操作的原因是为了提高性能，减少重复渲染 (减少 re-render 次数)
 还有一个好处就是保持内部数据一致性，如果是同步更新的话，可能会出现数据不一致的情况（比如 state 更新了，但是还没有执行 render 方法，可能导致 state 和 作为其他组件的props 数据不一致的情况）
 
+```js
+// 如果不想异步可以使用flushSync()
+import { flushSync } from 'react-dom'
+function handleClick(){
+  flushSync(()=>{
+    setCounter((count)=> count + 1)
+  })
+}
+```
+
 ### React 18以前的版本
 
 setState 同步还是异步取决于是否处于 isBatchUpdates 字段，true 的话就是异步，否则就是同步
