@@ -115,7 +115,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'ES6 相关', link: 'javaScript相关/ES6相关' },
           { text: 'Promise 相关', link: 'javaScript相关/Promise' },
           { text: '事件循环机制', link: 'javaScript相关/事件循环机制' },
-          { text: 'DOM 相关', link: 'javaScript相关/DOM 相关' },
+          { text: 'DOM 相关', link: 'javaScript相关/DOM相关' },
           { text: 'JavaScript编译机制', link: 'javaScript相关/JavaScript编译机制' },
           { text: 'JavaScript执行机制', link: 'javaScript相关/JavaScript执行机制' },
           { text: '垃圾回收机制', link: 'javaScript相关/垃圾回收机制' },
