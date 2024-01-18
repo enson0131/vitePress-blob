@@ -23,9 +23,10 @@
   
 
 ## 箭头函数和普通函数的区别
-1 箭头函数比普通函数更加简洁
+1 箭头函数没有 arguments
 
-2 箭头函数没有自己的 this，继承父级作用域的 this 指向
+2 箭头函数没有自己的 this
+  this 由定义的所在父级上下文决定
 
 3 箭头函数继承来的 this 不会改变 
   call、apply、bind 方法不能改变箭头函数的 this 指向
@@ -67,10 +68,7 @@ fun1.bind({ id: 'call' })(); // global
 4 箭头函数不能作为构造函数
   因为没有 prototype 属性
 
-5 箭头函数没有 arguments 对象
-  可以使用 rest 参数代替
-
-6 箭头函数不能作为 Generator 函数，不能使用 yield 关键字
+5 箭头函数不能作为 Generator 函数，不能使用 yield 关键字
 
 ## Proxy
 用来代理对象

@@ -112,7 +112,12 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '数据类型', link: 'javaScript相关/数据类型' },
           { text: '基础概念', link: 'javaScript相关/基础概念' },
           { text: '继承相关', link: 'javaScript相关/继承相关' },
-          { text: 'ES6 相关', link: 'javaScript相关/ES6相关' }
+          { text: 'ES6 相关', link: 'javaScript相关/ES6相关' },
+          { text: 'Promise 相关', link: 'javaScript相关/Promise' },
+          { text: '事件循环机制', link: 'javaScript相关/事件循环机制' },
+          { text: 'JavaScript编译机制', link: 'javaScript相关/JavaScript编译机制' },
+          { text: 'JavaScript执行机制', link: 'javaScript相关/JavaScript执行机制' },
+          { text: '垃圾回收机制', link: 'javaScript相关/垃圾回收机制' },
         ]
       },
       {
