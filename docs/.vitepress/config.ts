@@ -133,6 +133,18 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         ]
       },
       {
+        text: '浏览器笔记',
+        collapsed: false,
+        items: [
+          { text: '概要', link: '浏览器相关/概要' },
+          { text: '浏览器进程架构', link: '浏览器相关/浏览器进程架构' },
+          { text: '浏览器渲染流程', link: '浏览器相关/浏览器渲染流程' },
+          { text: '浏览器安全', link: '浏览器相关/浏览器安全' },
+          { text: '浏览器缓存', link: '浏览器相关/浏览器缓存' },
+          { text: '浏览器内核', link: '浏览器相关/浏览器内核' },
+        ]
+      },
+      {
         text: '网络笔记',
         collapsed: false,
         items: [
@@ -141,14 +153,6 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'Build-Time Data Loading', link: 'data-loading' },
           { text: 'SSR Compatibility', link: 'ssr-compat' },
           { text: 'Connecting to a CMS', link: 'cms' }
-        ]
-      },
-      {
-        text: '浏览器笔记',
-        collapsed: false,
-        items: [
-          { text: 'MPA Mode', link: 'mpa-mode' },
-          { text: 'Sitemap Generation', link: 'sitemap-generation' }
         ]
       },
       {
