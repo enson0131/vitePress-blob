@@ -148,10 +148,12 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         text: '网络笔记',
         collapsed: false,
         items: [
-          { text: 'Using a Custom Theme', link: 'custom-theme' },
-          { text: 'Extending the Default Theme', link: 'extending-default-theme' },
-          { text: 'Build-Time Data Loading', link: 'data-loading' },
-          { text: 'SSR Compatibility', link: 'ssr-compat' },
+          { text: '概要', link: '网络相关/概要' },
+          { text: 'GET 请求和 POST 请求的区别', link: '网络相关/GET请求和POST请求的区别' },
+          { text: '请求报文', link: '网络相关/请求报文' },
+          { text: '响应报文', link: '网络相关/响应报文' },
+          { text: 'HTTP', link: '网络相关/HTTP' },
+          { text: 'HTTPS', link: '网络相关/HTTPS' },
           { text: 'Connecting to a CMS', link: 'cms' }
         ]
       },
