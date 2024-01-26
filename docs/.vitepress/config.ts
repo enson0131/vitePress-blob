@@ -60,14 +60,20 @@ export default defineConfig({
 function nav(): DefaultTheme.NavItem[] {
   return [
     {
-      text: 'Guide',
+      text: '首页',
+      link: '/',
+      activeMatch: '^/$'
+    },
+    {
+      text: '笔记',
       link: '/guide/javaScript相关/index',
       activeMatch: '/guide/'
     },
     {
-      text: 'Reference',
-      link: '/reference/site-config',
-      activeMatch: '/reference/'
+      text: '关于我',
+      link: 'https://github.com/enson0131',
+      target: '_blank',
+      rel: 'sponsored'
     },
   ]
 }
@@ -197,7 +203,6 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '通过 OffscreenCanvas + Worker 提高书写性能', link: 'canvas/通过 OffscreenCanvas + Worker 提高书写性能' },
         ]
       },
-      { text: 'Config & API Reference', base: '/reference/', link: 'site-config' }
     ]
   }
   
