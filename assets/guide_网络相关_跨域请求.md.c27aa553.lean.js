@@ -1,1 +1,0 @@
-import{_ as e,o as t,c as a}from"./chunks/framework.b6910bb2.js";const m=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"guide/网络相关/跨域请求.md","filePath":"guide/网络相关/跨域请求.md","lastUpdated":1706504773000}'),r={name:"guide/网络相关/跨域请求.md"};function o(s,c,d,n,_,i){return t(),a("div")}const f=e(r,[["render",o]]);export{m as __pageData,f as default};
