@@ -155,14 +155,14 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'React 中的性能优化', link: 'React/React中的性能优化' },
         ]
       },
-      {
-        text: 'Vue 笔记',
-        collapsed: false,
-        items: [
-          { text: 'MPA Mode', link: 'mpa-mode' },
-          { text: 'Sitemap Generation', link: 'sitemap-generation' }
-        ]
-      },
+      // {
+      //   text: 'Vue 笔记',
+      //   collapsed: false,
+      //   items: [
+      //     { text: 'MPA Mode', link: 'mpa-mode' },
+      //     { text: 'Sitemap Generation', link: 'sitemap-generation' }
+      //   ]
+      // },
       {
         text: 'Redux 笔记',
         collapsed: false,
@@ -185,14 +185,14 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'Plugin 机制', link: 'webpack/构建流程' },
         ]
       },
-      {
-        text: 'Vite 笔记',
-        collapsed: false,
-        items: [
-          { text: 'Redux 设计理念', link: 'redux/设计理念' },
-          { text: 'Redux 源码解读', link: 'redux/源码解读' },
-        ]
-      },
+      // {
+      //   text: 'Vite 笔记',
+      //   collapsed: false,
+      //   items: [
+      //     { text: 'Redux 设计理念', link: 'redux/设计理念' },
+      //     { text: 'Redux 源码解读', link: 'redux/源码解读' },
+      //   ]
+      // },
       {
         text: 'Canvas 笔记',
         collapsed: false,
@@ -206,6 +206,15 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '通过 OffscreenCanvas + Worker 提高书写性能', link: 'canvas/通过 OffscreenCanvas + Worker 提高书写性能' },
         ]
       },
+      {
+        text: 'Node 笔记',
+        collapsed: false,
+        items: [
+          { text: '概要', link: 'Node相关/概要' },
+          { text: '基本概念', link: 'Node相关/基本概念' },
+        ]
+
+      }
     ]
   }
   
