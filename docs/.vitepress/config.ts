@@ -136,7 +136,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'DNS', link: '网络相关/DNS' },
           { text: 'CDN', link: '网络相关/CDN' },
           { text: '跨域请求', link: '网络相关/跨域请求'},
-          { text: '常见的问题', link: '网络相关/常见的问题'}
+          // { text: '常见的问题', link: '网络相关/常见的问题'}
         ]
       },
       {
