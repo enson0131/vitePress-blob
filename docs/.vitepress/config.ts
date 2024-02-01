@@ -104,8 +104,8 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         text: 'CSS 笔记',
         collapsed: false,
         items: [
-          { text: 'Markdown Extensions', link: 'markdown' },
-          { text: 'Asset Handling', link: 'asset-handling' },
+          { text: 'display', link: 'css相关/display' },
+          { text: 'position', link: 'css相关/position' },
           { text: 'Frontmatter', link: 'frontmatter' },
           { text: 'Using Vue in Markdown', link: 'using-vue' },
           { text: 'Internationalization', link: 'i18n' }
