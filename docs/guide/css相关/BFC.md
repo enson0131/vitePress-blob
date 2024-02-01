@@ -4,7 +4,7 @@
 
 ## 条件
 
-1. 根元素 (<html>)
+1. 根元素 (html)
 2. 浮动元素
 3. position 为绝对定位元素 （absolute/fixed）
 4. display: inline-block、inline-flex等
@@ -21,6 +21,7 @@
 
 
 ## 作用
+
 1. 清除浮动带来的高度塌陷问题
 2. 解决俩个元素的 margin 重叠问题
 3. 创建自适应的俩栏布局
