@@ -107,9 +107,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '概要', link: 'css相关/概要' },
           { text: 'display', link: 'css相关/display' },
           { text: 'position', link: 'css相关/position' },
-          { text: 'Frontmatter', link: 'frontmatter' },
-          { text: 'Using Vue in Markdown', link: 'using-vue' },
-          { text: 'Internationalization', link: 'i18n' }
+          { text: 'BFC', link: 'css相关/BFC' },
         ]
       },
       {
