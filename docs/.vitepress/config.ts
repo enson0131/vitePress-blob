@@ -104,6 +104,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         text: 'CSS 笔记',
         collapsed: false,
         items: [
+          { text: '概要', link: 'css相关/概要' },
           { text: 'display', link: 'css相关/display' },
           { text: 'position', link: 'css相关/position' },
           { text: 'Frontmatter', link: 'frontmatter' },
