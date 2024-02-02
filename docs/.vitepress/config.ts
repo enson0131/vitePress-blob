@@ -110,7 +110,9 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'BFC', link: 'css相关/BFC' },
           { text: '隐藏元素的方法', link: 'css相关/隐藏元素的方法' },
           { text: 'display、visibility、opacity区别', link: 'css相关/display、visibility、opacity区别' },
-          { text: 'display、float、position的关系', link: 'css相关/display、float、position的关系'}
+          { text: 'display、float、position的关系', link: 'css相关/display、float、position的关系'},
+          { text: '对 line-height 的理解及其赋值方式', link: 'css相关/对 line-height 的理解及其赋值方式'},
+          { text: 'link和import的区别', link: 'css相关/link和import的区别'}
         ]
       },
       {
