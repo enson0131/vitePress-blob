@@ -278,6 +278,7 @@ function shootGuide(): DefaultTheme.SidebarItem[] {
       items: [
         { text: '如何拍花的黑背景', link: '实战技巧/如何拍花的黑背景' },
         { text: '如何拍雨丝', link: '实战技巧/如何拍雨丝' },
+        { text: '拍摄梦幻光斑', link: '实战技巧/拍摄梦幻光斑' },
       ]
     },
   ]
