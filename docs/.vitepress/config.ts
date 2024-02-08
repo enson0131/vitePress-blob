@@ -42,6 +42,7 @@ export default defineConfig({
     
         sidebar: {
           '/guide/': { base: '/guide/', items: sidebarGuide() },
+          '/shoot/': { base: '/shoot/', items: shootGuide()},
           '/reference/': { base: '/reference/', items: sidebarReference() }
         },
     
@@ -65,9 +66,14 @@ function nav(): DefaultTheme.NavItem[] {
       activeMatch: '^/$'
     },
     {
-      text: '笔记',
+      text: '前端笔记',
       link: '/guide/javaScript相关/index',
       activeMatch: '/guide/'
+    },
+    {
+      text: '摄影笔记',
+      link: '/shoot/基础概念/光圈',
+      activeMatch: '/shoot/'
     },
     {
       text: '关于我',
@@ -220,9 +226,9 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
 
       }
     ]
-  }
+}
   
-  function sidebarReference(): DefaultTheme.SidebarItem[] {
+function sidebarReference(): DefaultTheme.SidebarItem[] {
     return [
       {
         text: 'Reference',
@@ -253,4 +259,25 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         ]
       }
     ]
-  }
+}
+
+function shootGuide(): DefaultTheme.SidebarItem[] {
+  return [
+    {
+      text: '基础概念',
+      collapsed: false,
+      items: [
+        { text: '光圈', link: '基础概念/光圈' },
+        { text: '快门速度', link: '基础概念/快门速度' },
+        { text: 'ISO 感光度', link: '基础概念/ISO感光度' },
+      ]
+    },
+    {
+      text: '实战技巧',
+      collapsed: false,
+      items: [
+        { text: '如何拍花的黑背景', link: '实战技巧/如何拍花的黑背景' },
+      ]
+    },
+  ]
+}

@@ -31,7 +31,7 @@ layout: doc
 #     title: Ship Fast Sites
 #     details: Fast initial load with static HTML, fast post-load navigation with client-side routing.
 ---
-### 前端知识库
+### 个人知识库
 
 👋 欢迎来到我的博客，这里是我记录学习和生活的地方，希望能帮助到你
 
