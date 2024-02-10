@@ -273,6 +273,13 @@ function shootGuide(): DefaultTheme.SidebarItem[] {
       ]
     },
     {
+      text: '构图形式',
+      collapsed: false,
+      items: [
+        { text: '如何拍花的黑背景', link: '实战技巧/如何拍花的黑背景' },
+      ]
+    },
+    {
       text: '实战技巧',
       collapsed: false,
       items: [
@@ -281,6 +288,15 @@ function shootGuide(): DefaultTheme.SidebarItem[] {
         { text: '拍摄梦幻光斑', link: '实战技巧/拍摄梦幻光斑' },
         { text: '逆光人像', link: '实战技巧/逆光人像' },
         { text: '暗调人像', link: '实战技巧/暗调人像' },
+      ]
+    },
+    {
+      text: '自己的实战总结',
+      collapsed: false,
+      items: [
+        { text: '拍摄烟花', link: '自我实战总结/拍摄烟花' },
+        { text: '拍摄星空', link: '自我实战总结/拍摄星空' },
+        { text: '拍摄月亮', link: '自我实战总结/拍摄月亮' },
       ]
     },
   ]
