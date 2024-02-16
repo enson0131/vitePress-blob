@@ -186,7 +186,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         collapsed: false,
         items: [
           { text: '构建流程', link: 'webpack/构建流程' },
-          { text: '简易实现', link: 'webpack/构建流程' },
+          { text: 'Loader 相关', link: 'webpack/Loader' },
           { text: '源码分析', link: 'webpack/构建流程' },
           { text: 'Tapable', link: 'webpack/构建流程' },
           { text: 'Compiler', link: 'webpack/构建流程' },
