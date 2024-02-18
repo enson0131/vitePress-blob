@@ -187,12 +187,8 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         items: [
           { text: '构建流程', link: 'webpack/构建流程' },
           { text: 'Loader 相关', link: 'webpack/Loader' },
-          { text: '源码分析', link: 'webpack/构建流程' },
-          { text: 'Tapable', link: 'webpack/构建流程' },
-          { text: 'Compiler', link: 'webpack/构建流程' },
-          { text: 'Compilation', link: 'webpack/构建流程' },
-          { text: 'Loader 机制', link: 'webpack/构建流程' },
-          { text: 'Plugin 机制', link: 'webpack/构建流程' },
+          { text: '模块联邦', link: 'webpack/模块联邦' },
+          { text: '实现一个 mini-webpack', link: 'webpack/mini-webpack' },
         ]
       },
       // {
