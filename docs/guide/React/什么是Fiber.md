@@ -1,21 +1,13 @@
-# 什么是 Fiber
-
-## Fiber 是什么
-- 从计算机领域来看: Fiber 是比线程还要纤细的一个过程, 也就是所谓的 “纤程”
-
-- 从架构角度上看: Fiber是对 React 核心算法的重写，将 React16以前的 Stack Reconciler 替换成了异步可中断的 Fiber Reconciler
-
-- 从编码的角度上看: Fiber 是 React 内部定义的数据结构，每一个节点都是一个 FiberNode 对象，用来存储组件的各种状态
-
-- 从工作流的角度上看: Fiber 节点保存了组件需要更新的状态和副作用, 便于更新与复用
+# 对 Fiber 的理解
 
 
-Fiber 架构应用的目的是为了实现任务可中断、可恢复、并赋予任务优先级，从而实现时间切片，让出主线程，让主线程有时间去处理其他任务，从而提升用户体验。
+在 React 15 中通过 `递归` 的形式进行对比，找到需要更新的节点，并同步更新它，在这段时间一直占据着浏览器主线程，可能会给用户带来卡顿的感受（在渲染进程中，`js线程和渲染线程是互斥的`）
 
-## Fiber 之间的关系图
+在 React 15 以后引入了 Fiber 架构，将对比的过程变成了`异步可中断`的过程，让出浏览器的使用权，让浏览器处理更高优先级的事情
 
-- 通过 child 可以获取子节点
-- 通过 sibling 可以获取兄弟节点
-- 通过 return 可以获取父节点
 
-![Fiber 之间的关系图](./../../public/assets/10.png)
+Fiber 的调和过程（Reconciler）由分成了 `beginWork` 阶段 和 `completeUnitOfWork` 阶段。
+
+`beginWork` 阶段自顶向下，根据当前工作的 Fiber 节点最新的 React Element 子元素与旧 Fiber 节点进行对比，决定是否需要复用旧 Fiber 节点并标记 Fiber 节点是否有副作用。
+
+`compeleteUnitOfWork` 阶段自底向上构建副作用链表，生成的 DOM 节点挂在 Fiber 的 stateNode 属性
