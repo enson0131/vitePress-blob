@@ -293,6 +293,7 @@ function shootGuide(): DefaultTheme.SidebarItem[] {
         { text: '拍摄烟花', link: '自我实战总结/拍摄烟花' },
         { text: '拍摄星空', link: '自我实战总结/拍摄星空' },
         { text: '拍摄月亮', link: '自我实战总结/拍摄月亮' },
+        { text: '延迟摄影', link: '自我实战总结/延迟摄影' },
       ]
     },
   ]
