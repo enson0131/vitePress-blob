@@ -213,6 +213,13 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         ]
       },
       {
+        text: 'Fabric 笔记',
+        collapsed: false,
+        items: [
+          { text: '如何调试 Fabric.js', link: 'Fabric.js/如何调试Fabric' },
+        ]
+      },
+      {
         text: 'Node 笔记',
         collapsed: false,
         items: [
