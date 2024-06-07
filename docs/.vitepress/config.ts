@@ -213,6 +213,13 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         ]
       },
       {
+        text: 'AI 笔记',
+        collapsed: false,
+        items: [
+          { text: '什么是 LangChain', link: 'AI系列/什么是 LangChain' },
+        ]
+      },
+      {
         text: 'Fabric 笔记',
         collapsed: false,
         items: [
