@@ -219,6 +219,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         items: [
           { text: '什么是 LangChain', link: 'ai/什么是langchain' },
           { text: 'LangChain 快速入门', link: 'ai/langchain快速入门' },
+          { text: '构建可复用的 Prompt Template', link: 'ai/构建可复用的PromptTemplate' },
         ]
       },
       {
