@@ -1,1 +1,0 @@
-import{_ as e,o as t,c as a}from"./chunks/framework.b6910bb2.js";const m=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"guide/ai/获取AI服务.md","filePath":"guide/ai/获取AI服务.md","lastUpdated":1718097893000}'),r={name:"guide/ai/获取AI服务.md"};function o(s,i,c,d,n,_){return t(),a("div")}const f=e(r,[["render",o]]);export{m as __pageData,f as default};
