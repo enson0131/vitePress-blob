@@ -217,6 +217,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         collapsed: false,
         items: [
           { text: '什么是 LangChain', link: 'AI系列/什么是 LangChain' },
+          { text: 'LangChain 快速入门', link: 'AI系列/LangChain快速入门' },
         ]
       },
       {
