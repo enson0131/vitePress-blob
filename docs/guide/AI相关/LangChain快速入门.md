@@ -145,6 +145,14 @@ LCEL 从底层设计的目标就是支持 **从原型到生产** 完整流程不
 - streamLog 流式返回结果，并返回中间的运行结果
 
 
+### invoke
+
+
+```js
+
+```
+
+
 # 参考文章
 - https://juejin.cn/post/7359082665276440627
 - https://js.langchain.com/v0.2/docs/how_to/

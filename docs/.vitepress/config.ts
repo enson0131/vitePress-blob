@@ -13,6 +13,7 @@ export default defineConfig({
 
     lastUpdated: true,
     cleanUrls: true,
+    ignoreDeadLinks: true,
 
     lang: 'zh-CN',
     
@@ -216,8 +217,8 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         text: 'AI 笔记',
         collapsed: false,
         items: [
-          { text: '什么是 LangChain', link: 'AI系列/什么是 LangChain' },
-          { text: 'LangChain 快速入门', link: 'AI系列/LangChain快速入门' },
+          { text: '什么是 LangChain', link: 'ai相关/什么是langchain' },
+          { text: 'LangChain 快速入门', link: 'ai相关/langchain快速入门' },
         ]
       },
       {
