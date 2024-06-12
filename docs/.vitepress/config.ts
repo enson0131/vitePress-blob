@@ -221,7 +221,11 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'LangChain 快速入门', link: 'ai/langchain快速入门' },
           { text: '构建可复用的 Prompt Template', link: 'ai/构建可复用的PromptTemplate' },
           { text: 'outputParser格式化输出构建内容', link: 'ai/OutputParser构建格式化输出' },
-          { text: 'RAG 检索增强生成的原理和流程', link: 'ai/RAG 检索增强生成的原理和流程' },
+          { text: 'RAG 检索增强生成的流程', link: 'ai/RAG 检索增强生成的流程' },
+          { text: 'RAG之加载数据', link: 'ai/RAG之加载数据' },
+          { text: 'RAG之拆分数据', link: 'ai/RAG之拆分数据' },
+          { text: 'RAG之embeding', link: 'ai/RAG之embeding' },
+          { text: 'RAG之向量数据库', link: 'ai/RAG之向量数据库' },
           { text: 'Retriever 常见的优化方式', link: 'ai/Retriever 常见的优化方式' },
         ]
       },
