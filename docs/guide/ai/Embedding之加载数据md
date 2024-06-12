@@ -1,4 +1,4 @@
-# RAG 之加载数据
+# Embedding 之加载数据
 
 因为 RAG 本质是给 Chat Bot 额外挂在数据源，而数据源存在的形式是多种多样的，有可能是文件/网页/数据库/代码等等其情况。
 
@@ -101,7 +101,6 @@ const searchRes = await searchLoader.load();
 输出结果如下：👇
 
 ![输出结果](./../../public/assets/ai/8.png)
-
 
 
 # 参考文档

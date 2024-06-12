@@ -222,10 +222,9 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '构建可复用的 Prompt Template', link: 'ai/构建可复用的PromptTemplate' },
           { text: 'outputParser格式化输出构建内容', link: 'ai/OutputParser构建格式化输出' },
           { text: 'RAG 检索增强生成的流程', link: 'ai/RAG 检索增强生成的流程' },
-          { text: 'RAG之加载数据', link: 'ai/RAG之加载数据' },
-          { text: 'RAG之拆分数据', link: 'ai/RAG之拆分数据' },
-          { text: 'RAG之embeding', link: 'ai/RAG之embeding' },
-          { text: 'RAG之向量数据库', link: 'ai/RAG之向量数据库' },
+          { text: 'Embedding之加载数据', link: 'ai/Embedding之加载数据' },
+          { text: 'Embedding之拆分数据', link: 'ai/Embedding之拆分数据' },
+          { text: 'Retriever之向量数据库', link: 'ai/Retriever之向量数据库' },
           { text: 'Retriever 常见的优化方式', link: 'ai/Retriever 常见的优化方式' },
         ]
       },
