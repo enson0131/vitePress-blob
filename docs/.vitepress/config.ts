@@ -223,7 +223,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'outputParser格式化输出构建内容', link: 'ai/OutputParser构建格式化输出' },
           { text: 'RAG 检索增强生成的流程', link: 'ai/RAG 检索增强生成的流程' },
           { text: 'Embedding之加载数据', link: 'ai/Embedding之加载数据' },
-          { text: 'Embedding之拆分数据', link: 'ai/Embedding之拆分数据' },
+          { text: 'Embedding之大规模数据拆分', link: 'ai/Embedding之大规模数据拆分' },
           { text: 'Retriever之向量数据库', link: 'ai/Retriever之向量数据库' },
           { text: 'Retriever 常见的优化方式', link: 'ai/Retriever 常见的优化方式' },
         ]
