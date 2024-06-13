@@ -51,6 +51,3 @@ console.log(splitDocs);
 
 ![输出结果](./../../public/assets/ai/9.png)
 
-
-
-##  
