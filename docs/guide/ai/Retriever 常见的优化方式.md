@@ -62,7 +62,45 @@ console.log(`res`, res);
 MultiQueryRetriever 的意义就是，找出这句话所有可能的意义，然后用这些可能的意义去检索，避免因为歧义导致检索错误。
 
 
-## Document Compressor
+## ContextualCompressionRetriever
+
+Retriever 另一个问题是，如果我们设置了 K 值（每次检索返回的文档数量）较小，那么返回的结果可能并不是最佳的效果，就想搜索引擎第一条结果并不一定是问题最高质量的结果一样。
+
+而如果 K 值设置过大，可能返回的结果会有很多，撑爆了 LLM 的上下文大小。
+
+因此，我们可以通过 `ContextualCompressionRetriever` 通过 LLM 去压缩检索结果，然后再返回给用户。
+
+```js
+ const model = new ChatOpenAI();
+ const compressor = LLMChainExtractor.fromLLM(model);
+ const retriever = new ContextualCompressionRetriever({
+    baseCompressor: compressor,
+    baseRetriever: vectorstore.asRetriever(2),
+ });
+```
+
+![输出结果](./../../public/assets/ai/12.png)
+
+通过结果可以看到，通过 LLM 去压缩检索结果，然后再返回给用户。
+
+## ScoreThresholdRetriever
+
+前面我们提到了，K 值的设置可能会导致检索结果不准确，不同的数据中 K 值不一定是固定的，而通过 ScoreThresholdRetriever 可以动态调整 K 值。
+
+```js
+const retriever = ScoreThresholdRetriever.fromVectorStore(vectorstore, {
+    minSimilarityScore: 0.4, // 相似度
+    maxK: 5, // 最大 K 值
+    kIncrement: 1, // K 值每次增加的步长
+});
+```
+
+![输出结果](./../../public/assets/ai/13.png)
+
+# 参考文章
+- https://js.langchain.com/v0.1/docs/modules/data_connection/retrievers/similarity-score-threshold-retriever/#usage
+- https://js.langchain.com/v0.1/docs/modules/data_connection/retrievers/contextual_compression/
+
 
 
 
