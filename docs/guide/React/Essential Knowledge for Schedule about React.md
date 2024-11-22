@@ -11,6 +11,7 @@ The screen refresh rate is the number of times the screen is updated per second.
 In The browser, it will try to match the screen refresh rate with the frame rate of the web page.
 
 If the frame rate is higher than 60HZ, the browser will skip some frames.
+
 If the frame rate is lower than the screen refresh rate, the browser will render the same frame multiple times, which will cause the screen to block.
 
 The budgeted time what is rendering per frame is 16.66 ms (1 second /60), so when writing code, be careful to take lower than 16ms of work per frame. Within each frame, the browser does the following:
@@ -247,14 +248,21 @@ In the above example, the browser will block because control is returned to the 
 
 `requestAnimationFrame`、`requestIdleCallback`、`setTimeout`、`MessageChannel` can used to schedule tasks in the browser, becaus they are returning control to the browser after the task is executed.
 
-However, `Promise`、`MutationObserver` are MicroTask, Control is returned to the browser only after the microtask is executed.
+However, `Microtasks` are continuously executed until the microtask queue on the event loop is empty which means a higher-pri task such as one for user interaction would be blocked by React.
 
 ## QA
 
 ### Why is requestAnimationFrame unsuitable for React Sheduler?
 
-requestAnimationFrame calls are paused in most browsers when running in background tabs or hidden iframes, in order to improve performance and battery life.
+- Instability: requestAnimationFrame is executed before the next repaint, which means unexpected behavior in lower frame rates. However, others posts a message event and performs a small amount of work (5ms) before returning control to the browser. At the end of the event, if there's work left over, it posts another message event.
+  
+- Not trigger: requestAnimationFrame calls are paused in most browsers when running in background tabs or hidden iframes, in order to improve performance and battery life.
 
+### Why is webwork unsuitable for React Sheduler?
+
+Browser layout is currently only available from the main thread.
+
+### 
 
 ## Reference
 - [React Sheduler](https://github.com/lizuncong/mini-react/blob/master/docs/schedule/%E5%93%AA%E4%BA%9BAPI%E9%80%82%E5%90%88%E7%94%A8%E4%BA%8E%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6.md)
@@ -262,5 +270,12 @@ requestAnimationFrame calls are paused in most browsers when running in backgrou
 - [requestIdleCallback](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/requestIdleCallback)
 - [setTimeout](https://developer.mozilla.org/zh-CN/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout)
 - [MessageChannel](https://developer.mozilla.org/zh-CN/docs/Web/API/MessageChannel)
-- [MutationObserver](https://developer.mozilla.org/zh-CN/docs/Web/API/MutationObserver)、
+- [MutationObserver](https://developer.mozilla.org/zh-CN/docs/Web/API/MutationObserver)
+- [React Issue](https://github.com/facebook/react/pull/16214)
+- [React Issue](https://github.com/facebook/react/issues/3092)
+
+
+
+The demo corresponding to this section can be found [here](https://github.com/enson0131/mini-react/commit/82e916799703c097a96e88ca8765f4b392e6a1b5).
+
 
