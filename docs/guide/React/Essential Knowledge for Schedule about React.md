@@ -240,8 +240,6 @@ function rafCallback(timestamp) {
 window.requestAnimationFrame(rafCallback);
 ```
 
-![Frame](./../../public/assets/react/9.png)
-
 In the above example, the browser will block because control is returned to the browser only after the microtask is executed.
 
 

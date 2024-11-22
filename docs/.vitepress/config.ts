@@ -164,6 +164,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'React 中的事件机制', link: 'React/React中的事件机制' },
           { text: 'React 中的异常机制', link: 'React/React中的异常机制' },
           { text: 'React 中的性能优化', link: 'React/React中的性能优化' },
+          { text: 'Essential Knowledge for Schedule about React', link: 'React/Essential Knowledge for Schedule about React' },
         ]
       },
       // {
