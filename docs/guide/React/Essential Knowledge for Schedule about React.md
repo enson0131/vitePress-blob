@@ -1,5 +1,7 @@
 # [React Scheduler] Essential Knowledge for Scheduling API
 
+![Frame](./../../public/assets/react/9.png)
+
 ## Introduction
 
 This article summarizes key points about Scheduling API (e.g., requestAnimationFrame, requestIdleCallback, setTimeout, MessageChannel, microTask ( Promise, MutationObserver )). 
