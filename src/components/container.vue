@@ -34,6 +34,10 @@ defineProps({
   height: 1000px;
 }
 
+::-webkit-scrollbar {
+        display: none;
+}
+
 .sc-gtssRu {
   display: none;
 }

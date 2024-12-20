@@ -234,6 +234,9 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         collapsed: false,
         items: [
           { text: '如何调试 Fabric.js', link: 'Fabric.js/如何调试Fabric' },
+          { text: '基本概念', link: 'Fabric.js/基本概念' },
+          { text: '内部设计', link: 'Fabric.js/内部设计' },
+          { text: '如何实现漫游', link: 'Fabric.js/如何实现漫游' },
         ]
       },
       {
