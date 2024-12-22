@@ -235,8 +235,10 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         items: [
           { text: '如何调试 Fabric.js', link: 'Fabric.js/如何调试Fabric' },
           { text: '基本概念', link: 'Fabric.js/基本概念' },
-          { text: '内部设计', link: 'Fabric.js/内部设计' },
+          { text: '内部结构概述', link: 'Fabric.js/内部结构概述' },
+          { text: '如何绘制一个图形', link: 'Fabric.js/如何绘制一个图形' },
           { text: '如何实现漫游', link: 'Fabric.js/如何实现漫游' },
+          { text: '如何实现点选', link: 'Fabric.js/如何实现点选' },
         ]
       },
       {
