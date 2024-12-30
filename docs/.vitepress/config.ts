@@ -237,7 +237,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '基本概念', link: 'Fabric.js/基本概念' },
           { text: '内部结构概述', link: 'Fabric.js/内部结构概述' },
           { text: '如何绘制一个图形', link: 'Fabric.js/如何绘制一个图形' },
-          { text: '如何实现漫游', link: 'Fabric.js/如何实现漫游' },
+          { text: '如何实现元素的平移、旋转、缩放', link: 'Fabric.js/如何实现元素的平移、旋转、缩放' },
           { text: '如何实现点选', link: 'Fabric.js/如何实现点选' },
         ]
       },
