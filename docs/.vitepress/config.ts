@@ -239,8 +239,8 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '如何绘制一个图形', link: 'Fabric.js/如何绘制一个图形' },
           { text: '如何实现元素的平移、旋转、缩放', link: 'Fabric.js/如何实现元素的平移、旋转、缩放' },
           { text: '如何实现点选', link: 'Fabric.js/如何实现点选物体' },
-          { text: '如何实现框选', link: 'Fabric.js/如何实现框选物体'},
-          { text: 'Fabric 中的性能优化', link: 'Fabric 中的性能优化'}
+          { text: '如何实现框选', link: 'Fabric.js/如何实现框选'},
+          { text: 'Fabric 中的性能优化', link: 'Fabric.js/Fabric 中的性能优化'}
         ]
       },
       {
