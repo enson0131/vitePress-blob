@@ -250,7 +250,6 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '概要', link: 'Node相关/概要' },
           { text: '基本概念', link: 'Node相关/基本概念' },
         ]
-
       }
     ]
 }
