@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="root">
+        <button id="target"><span>target 按钮</span></button>
+    </div>
+    <script>
+        /*
+         * 验证 event.target 与 event.currentTarget 的区别
+         * event.target 是触发事件的元素，这儿常用于事件代理
+         * event.currentTarget 是绑定事件的元素
+         * 对于 React 来说可以通过 React.nativeTarget 判断 React 代理了哪个事件
+         */
+        const target = document.getElementById('target');
+        const root = document.getElementById('root');
+
+        target.addEventListener('click', (event) => {
+            console.log(`target --- event.target===>`, event.target);
+            console.log(`target --- event.currentTarget===>`, event.currentTarget);
+        })
+
+        root.addEventListener('click', (event) => {
+            console.log(`root --- event.target===>`, event.target);
+            console.log(`root --- event.currentTarget===>`, event.currentTarget);
+        });
+    </script>
+</body>
+</html>

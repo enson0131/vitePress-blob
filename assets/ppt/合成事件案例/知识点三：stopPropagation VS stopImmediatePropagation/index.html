@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="root">
+        <button id="target">target 按钮</button>
+    </div>
+    <script>
+        /*
+          stopPropagation VS stopImmediatePropagation
+          stopPropagation 会阻止冒泡
+          stopImmediatePropagation 不仅会阻止冒泡，还会阻止监听对目标元素的监听事件
+         */
+        const target = document.getElementById('target');
+        const root = document.getElementById('root');
+
+        target.addEventListener('click', (event) => {
+           console.log(`target 触发了1`); // ？会不会
+        })
+
+        target.addEventListener('click', (event) => {
+           console.log(`target 触发了0`);
+            // event.stopImmediatePropagation();
+            // event.stopPropagation();
+        })
+        target.addEventListener('mousedown', (event) => {
+           console.log(`target mousedown 触发了2`);
+            event.stopImmediatePropagation();
+            // event.stopPropagation();
+        })
+        target.addEventListener('click', (event) => {
+           console.log(`target 触发了3`);
+            event.stopImmediatePropagation();
+            // event.stopPropagation();
+        })
+
+       
+
+
+        root.addEventListener('click', (event) => {
+            console.log(`root 触发了`);
+        });
+    </script>
+</body>
+</html>

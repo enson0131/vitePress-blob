@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="root">
+        <button id="target">target 按钮</button>
+    </div>
+    <script>
+        /*
+        验证事件机制: 捕获 -> 目标元素 -> 冒泡
+        addEventListener 的第三个参数如果为 true 或者 { capture } capture 为 true时, 表示在捕获阶段触发。
+        */
+        target.addEventListener('click', (event) => {
+            console.log(`target 按钮触发捕获事件`);
+        }, true)
+        target.addEventListener('click', (event) => {
+            console.log(`target 按钮触发冒泡事件`);
+        }, false)
+
+        root.addEventListener('click', (event) => {
+            console.log(`root 元素触发捕获事件`);
+        }, true);
+
+        root.addEventListener('click', (event) => {
+            console.log(`root 元素触发冒泡事件`);
+        }, false);
+
+        /*
+            执行结果:
+            root 元素触发捕获事件
+            target 按钮触发捕获事件
+            target 按钮触发冒泡事件
+            root 元素触发冒泡事件
+        */
+    </script>
+</body>
+</html>

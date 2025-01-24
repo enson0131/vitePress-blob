@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="root">
+        <div id="children1">children01</div>
+        <div id="children2">children02</div>
+        <div id="children3">children03</div>
+        <div id="children4">children04</div>
+        <div id="children5">children05</div>
+    </div>
+    <script>
+        /*
+         事件代理是通过事件冒泡，父节点捕获到事件后，然后进行处理。其优点在于减少内存的开销和动态绑定事件
+         */
+        const root = document.getElementById('root');
+
+        root.addEventListener('click', (event) => {
+            console.log(`event ===>`, event);
+            console.log(`event.target===>`, event.target); // 触发事件的元素
+            console.log(`event.currentTarget ===>`, event.currentTarget); // 绑定事件的元素
+        })
+    </script>
+</body>
+</html>
