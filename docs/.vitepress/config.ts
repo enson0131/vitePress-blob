@@ -244,6 +244,14 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         ]
       },
       {
+        text: '踩坑笔记',
+        collapsed: false,
+        items: [
+          { text: '项目中没有 package-lock.json', link: '踩坑笔记/项目中没有 package-lock.json' },
+          { text: 'egg 使用 egg-static 插件将 index 文件设置了静态缓存', link: '踩坑笔记/egg 使用 egg-static 插件将 index 文件设置了静态缓存' },
+        ]
+      },
+      {
         text: 'Node 笔记',
         collapsed: false,
         items: [
