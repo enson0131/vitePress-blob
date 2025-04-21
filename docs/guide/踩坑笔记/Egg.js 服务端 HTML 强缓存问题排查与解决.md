@@ -89,7 +89,7 @@ export interface FileMeta {
 
 ```
 
-在源码中，会先执行 loadFile 方法，获取文件的配置，然后根据配置返回文件内容。（LoadFile --> 获取文件配置项 --> 根据配置返回文件内容）
+在源码中，会先执行 loadFile 方法，根据文件名称从 files 中获取文件的配置，然后返回文件配置内容。（LoadFile --> 获取文件配置项 --> 根据配置返回文件内容）
 
 ![踩坑笔记](./../../public/assets/踩坑笔记/13.png)
 
@@ -97,7 +97,7 @@ export interface FileMeta {
 
 
 
-基于此，可以配置 `files` 配置，将 HTML 文件的 `maxAge` 设置为 0，去除强缓存。
+基于此，恰好 koa-static-cache 暴露了 可以配置 `files` 对象的参数，当配置 HTML 文件的 `maxAge` 设置为 0 时，可去除强缓存。
 
 
 ![踩坑笔记](./../../public/assets/踩坑笔记/14.png)
