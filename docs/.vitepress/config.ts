@@ -248,7 +248,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         collapsed: false,
         items: [
           { text: '项目中没有 package-lock.json', link: '踩坑笔记/项目中没有 package-lock.json' },
-          { text: 'egg 使用 egg-static 插件将 index 文件设置了静态缓存', link: '踩坑笔记/egg 使用 egg-static 插件将 index 文件设置了静态缓存' },
+          { text: 'Egg.js 服务端 HTML 强缓存问题排查与解决', link: '踩坑笔记/Egg.js 服务端 HTML 强缓存问题排查与解决' },
         ]
       },
       {
