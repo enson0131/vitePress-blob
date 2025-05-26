@@ -243,12 +243,27 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'Fabric 中的性能优化', link: 'Fabric.js/Fabric 中的性能优化'}
         ]
       },
+      // {
+      //   text: '协同',
+      //   collapsed: false,
+      //   items: [
+      //     { text: '解决冲突', link: '协同/解决冲突' },
+      //   ]
+      // },
+      // {
+      //   text: '低代码平台',
+      //   collapsed: false,
+      //   items: [
+      //     { text: '低代码平台', link: '低代码平台/低代码平台' },
+      //   ]
+      // },
       {
         text: '踩坑笔记',
         collapsed: false,
         items: [
           { text: '项目中没有 package-lock.json', link: '踩坑笔记/项目中没有 package-lock.json' },
           { text: 'Egg.js 服务端 HTML 强缓存问题排查与解决', link: '踩坑笔记/Egg.js 服务端 HTML 强缓存问题排查与解决' },
+          { text: 'Electron 黑屏问题排查与解决', link: '踩坑笔记/Electron 黑屏问题排查与解决' },
         ]
       },
       {
