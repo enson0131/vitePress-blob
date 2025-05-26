@@ -148,7 +148,7 @@ PS: `$INSTDIR`是一个 nsis 内置变量，表示安装目录。
 
 ## 总结
 
-至此，小 C 通过 `crashReporter` 收集崩溃信息，并生成 .dmp 文件。通过 Visual Studio (C++ 编辑器) 打开 .dmp 文件，获取崩溃信息。通过 `MSVCP140.dll` 文件是 Visual C++ Redistributable Packages的一部分，需要下载并重装来修复该问题。
+至此，小 C 通过 `crashReporter` 收集崩溃信息，并生成 .dmp 文件。通过 Visual Studio (C++ 编辑器) 打开 .dmp 文件，获取崩溃信息。由于 `MSVCP140.dll` 文件是 Visual C++ Redistributable Packages的一部分，则在 安装应用的过程中，集成所需要的环境，即可解决该问题。
 
 
 ## 参考文章
