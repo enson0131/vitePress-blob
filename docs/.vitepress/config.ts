@@ -273,6 +273,20 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '概要', link: 'Node相关/概要' },
           { text: '基本概念', link: 'Node相关/基本概念' },
         ]
+      },
+      {
+        text: '算法笔记',
+        collapsed: false,
+        items: [
+          { text: '动态规划', link: '算法相关/动态规划' },
+          { text: '回溯算法', link: '算法相关/回溯算法' },
+          // { text: '贪心算法', link: '算法相关/贪心算法' },
+          // { text: '分治算法', link: '算法相关/分治算法' },
+          // { text: '分支限界算法', link: '算法相关/分支限界算法' },
+          // { text: '模拟退火算法', link: '算法相关/模拟退火算法' },
+          // { text: '遗传算法', link: '算法相关/遗传算法' },
+          // { text: '蚁群算法', link: '算法相关/蚁群算法' },
+        ]
       }
     ]
 }

@@ -64,7 +64,7 @@ DevTools was disconnected from the page.（DevTools 与页面断开连接） Onc
 传入 --enable-logging 将导致日志打印到 stderr。 传递 --enable-logging=file 将导致日志被保存到指定的文件内, 通过 --log-file=指定目录, 或者如果用户数据目录 --log-file 没有指定则直接存放到 electron_debug.log.
 
 
-### crashReporter 收集主进程、渲染进程奔溃 
+### crashReporter 收集主进程、渲染进程崩溃
 
 通过 `crashReporter` 可以收集崩溃信息，并发送给开发者。
 
