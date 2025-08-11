@@ -1,0 +1,1 @@
+import{o as t,c as l}from"./framework.b6910bb2.js";const a=["src"],i={__name:"container",props:{url:String},setup(e){return(r,n)=>(t(),l("iframe",{src:e.url.endsWith("#m")?e.url:`${e.url}#m`,id:"iframe-container",frameborder:"0",allowfullscreen:"true",onLoad:n[0]||(n[0]=(...o)=>r.load&&r.load(...o))},null,40,a))}};export{i as _};
