@@ -287,6 +287,13 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           // { text: '遗传算法', link: '算法相关/遗传算法' },
           // { text: '蚁群算法', link: '算法相关/蚁群算法' },
         ]
+      },
+      {
+        text: 'webGL笔记',
+        collapsed: false,
+        items: [
+          { text: 'webGL 基础知识', link: 'webGL/webGL基础知识' },
+        ]
       }
     ]
 }

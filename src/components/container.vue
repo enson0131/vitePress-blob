@@ -6,7 +6,7 @@ defineProps({
 </script>
 
 <template>
-  <iframe :src="url" id="iframe-container" frameborder="0" allowfullscreen="true" @load="load"></iframe>
+  <iframe :src="url.endsWith('#m') ? url : `${url}#m`" id="iframe-container" frameborder="0" allowfullscreen="true" @load="load"></iframe>
 </template>
 
 <style>
