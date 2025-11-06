@@ -243,13 +243,14 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'Fabric 中的性能优化', link: 'Fabric.js/Fabric 中的性能优化'}
         ]
       },
-      // {
-      //   text: '协同',
-      //   collapsed: false,
-      //   items: [
-      //     { text: '解决冲突', link: '协同/解决冲突' },
-      //   ]
-      // },
+      {
+        text: '二进制',
+        collapsed: false,
+        items: [
+          { text: '数值运算中的应用', link: '二进制/数值运算中的应用' },
+          { text: '文件对象之间的相互转化', link: '二进制/文件对象之间的相互转化' },
+        ]
+      },
       // {
       //   text: '低代码平台',
       //   collapsed: false,
