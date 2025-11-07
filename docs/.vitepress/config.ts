@@ -247,6 +247,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         text: '二进制',
         collapsed: false,
         items: [
+          { text: '编码字符集', link: '二进制/编码字符集' },
           { text: '数值运算中的应用', link: '二进制/数值运算中的应用' },
           { text: '文件对象之间的相互转化', link: '二进制/文件对象之间的相互转化' },
         ]
