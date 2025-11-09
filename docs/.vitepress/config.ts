@@ -248,8 +248,10 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         collapsed: false,
         items: [
           { text: '编码字符集', link: '二进制/编码字符集' },
+          { text: '大小端存储', link: '二进制/大小端存储' },
           { text: '数值运算中的应用', link: '二进制/数值运算中的应用' },
           { text: '文件对象之间的相互转化', link: '二进制/文件对象之间的相互转化' },
+          { text: 'zip 包解析原理', link: '二进制/zip 包解析原理' },
         ]
       },
       // {
