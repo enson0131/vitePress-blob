@@ -199,10 +199,10 @@ offset of start of central directory with respect to the starting disk number: 4
 
 综上，我们大概了解了 zip 包协议的内容，并根据协议的内容读取了 案例文件 对应数据。
 
-解析来我们看看 [JSzip](https://stuk.github.io/jszip/documentation/api_jszip.html) 是怎么 “读懂” 这段数据的。
+接下来，我们看看 [JSzip](https://stuk.github.io/jszip/documentation/api_jszip.html) 是怎么 “读懂” 这段数据的。
 
 
-## jsZip 是如何解析的？
+## JSZip 是如何解析的？
 
 依旧以 当前的案例文件 为准。
 
