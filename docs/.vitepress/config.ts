@@ -298,6 +298,13 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         items: [
           { text: 'webGL 基础知识', link: 'webGL/webGL基础知识' },
         ]
+      },
+      {
+        text: '业务实战',
+        collapsed: false,
+        items: [
+          { text: '登录业务开发', link: '业务实战/登录业务' },
+        ]
       }
     ]
 }
