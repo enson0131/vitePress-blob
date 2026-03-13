@@ -227,6 +227,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'Embedding之大规模数据拆分', link: 'ai/Embedding之大规模数据拆分' },
           { text: 'Retriever之向量数据库', link: 'ai/Retriever之向量数据库' },
           { text: 'Retriever 常见的优化方式', link: 'ai/Retriever 常见的优化方式' },
+          { text: 'Claude Code 技术全景概览', link: 'ai/Claude Code 技术全景概览' },
         ]
       },
       {
