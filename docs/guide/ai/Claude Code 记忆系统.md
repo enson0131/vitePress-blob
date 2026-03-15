@@ -51,6 +51,9 @@ Claude：好的，让我重新写...
 进入对话，所有规则生效
 ```
 
+![Claude Code 记忆系统与 CLAUDE.md](./../../public/assets/ai/16.png)
+  
+
 就像新员工的入职手册一样，Claude Code 每次对话时都会完成上述初始化加载，确保它始终"记得"你的项目上下文。
 
 ## 五层记忆架构
@@ -70,6 +73,9 @@ Claude：好的，让我重新写...
 │  本地级    ./CLAUDE.local.md     │  优先级最低
 └─────────────────────────────────┘
 ```
+
+![Claude Code 记忆系统与 CLAUDE.md](./../../public/assets/ai/17.png)
+
 
 ### 企业策略
 
@@ -145,7 +151,7 @@ Claude：好的，让我重新写...
 
 示例：`.claude/rules/testing.md`
 
-````markdown
+```markdown
 ---
 paths:
   - "src/**/*.test.ts"
@@ -182,7 +188,7 @@ describe('OrderService', () => {
 - 业务逻辑: > 80%
 - 工具函数: > 90%
 - 路由/控制器: 可以较低
-````
+```
 
 `paths` 字段让这个规则**只在编辑测试文件时生效**，不会浪费其他场景的上下文空间。
 
@@ -204,12 +210,14 @@ describe('OrderService', () => {
 
 ## 小结
 
-| 层级 | 路径 | 作用域 | 是否提交 Git |
-|------|------|--------|-------------|
-| 企业策略 | `/etc/claude-code/CLAUDE.md` | 全公司 | — |
-| 用户级 | `~/.claude/CLAUDE.md` | 个人全局 | — |
-| 项目级 | `./CLAUDE.md` | 整个项目 | ✅ |
-| 项目规则 | `.claude/rules/*.md` | 条件加载 | ✅ |
-| 本地级 | `./CLAUDE.local.md` | 个人本地 | ❌ |
+
+| 层级   | 路径                           | 作用域  | 是否提交 Git |
+| ---- | ---------------------------- | ---- | -------- |
+| 企业策略 | `/etc/claude-code/CLAUDE.md` | 全公司  | —        |
+| 用户级  | `~/.claude/CLAUDE.md`        | 个人全局 | —        |
+| 项目级  | `./CLAUDE.md`                | 整个项目 | ✅        |
+| 项目规则 | `.claude/rules/*.md`         | 条件加载 | ✅        |
+| 本地级  | `./CLAUDE.local.md`          | 个人本地 | ❌        |
+
 
 CLAUDE.md 的本质是**将隐性的项目知识显性化**。你越早为项目建立这份手册，Claude Code 就越能像一位真正熟悉项目的团队成员一样工作，而不是每次都需要你从头介绍。

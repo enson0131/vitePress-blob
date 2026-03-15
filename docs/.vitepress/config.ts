@@ -228,7 +228,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'Retriever之向量数据库', link: 'ai/Retriever之向量数据库' },
           { text: 'Retriever 常见的优化方式', link: 'ai/Retriever 常见的优化方式' },
           { text: 'Claude Code 技术全景概览', link: 'ai/Claude Code 技术全景概览' },
-          { text: 'Claude Code 记忆系统与 CLAUDE.md', link: 'ai/Claude Code 记忆系统与 CLAUDE.md' },
+          { text: 'Claude Code 记忆系统与 CLAUDE.md', link: 'ai/Claude Code 记忆系统' },
           { text: 'Claude Code 中的 SubAgent', link: 'ai/Claude Code 中的 SubAgent' },
           { text: 'Claude Code 中的 SKILL', link: 'ai/Claude Code 中的 SKILL' },
         ]
