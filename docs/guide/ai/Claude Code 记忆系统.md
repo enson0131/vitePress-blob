@@ -1,5 +1,12 @@
 # Claude Code 记忆系统与 CLAUDE.md
 
+## 前言
+
+上一讲我们介绍了 Claude Code 的技术全景概览，大体了解了 Claude Code 的架构与组成。
+
+本讲我们主要介绍 Claude Code 的记忆系统与 CLAUDE.md，并给出一些写好 CLAUDE.md 的建议。
+
+
 ## 痛点
 
 案例：
@@ -42,7 +49,7 @@ Claude：好的，让我重新写...
 加载项目级    ./CLAUDE.md 或 ./claude/CLAUDE.md
        │
        ▼
-加载项目规则  .claude/rules/*.md（条件加载）
+加载项目规则  .claude/rules/*.md
        │
        ▼
 加载本地级    ./CLAUDE.local.md
@@ -134,7 +141,7 @@ Claude：好的，让我重新写...
 ### 项目规则
 
 - **存放位置**：`.claude/rules/*.md`
-- **使用场景**：支持条件作用域，适用于规则文件过长、不同文件类型需要不同规范、前后端分离等场景
+- **使用场景**：支持条件作用域，适用于 CLAUDE.md 变得太长时、不同文件类型需要不同规范、前后端分离等场景
 
 当 CLAUDE.md 内容越来越多，开始影响上下文效率时，可以将规则拆分到独立文件中：
 
@@ -167,7 +174,7 @@ paths:
 ## 结构
 使用 Arrange-Act-Assert 模式：
 
-```typescript
+
 describe('OrderService', () => {
   describe('createOrder', () => {
     it('should create order when stock is available', async () => {
@@ -182,7 +189,7 @@ describe('OrderService', () => {
     });
   });
 });
-```
+
 
 ## 覆盖率要求
 - 业务逻辑: > 80%
@@ -190,7 +197,8 @@ describe('OrderService', () => {
 - 路由/控制器: 可以较低
 ```
 
-`paths` 字段让这个规则**只在编辑测试文件时生效**，不会浪费其他场景的上下文空间。
+> **提示**：`paths` 字段让这个规则只在编辑测试文件(*.test.ts、tests/**/*.ts)时生效，不会浪费其他场景的上下文空间。
+
 
 ### 个人本地级
 
@@ -208,16 +216,118 @@ describe('OrderService', () => {
 - Redis: localhost:6379
 ```
 
+## 如何写好 CLAUDE.md
+
+### 1. less is more
+
+CLAUDE.md 的每一行，都会在每一次对话开始时被自动注入上下文。 所以保持 精简 是十分重要的。
+
+
+### 2. 具体优于泛泛
+
+先来看一个非常常见、但几乎没有任何效果的写法。
+
+```
+# 项目规范
+## 代码质量
+请写出高质量的代码。
+代码应该是可读的。
+使用有意义的变量名。
+保持代码整洁。遵循最佳实践。
+不要写重复的代码。
+```
+这些话虽然没有错，但其实 Claude 模型本身就知道这些。应该明确告诉 Claude ，你希望它具体做什么。
+
+```
+# 项目规范
+## TypeScript
+- 使用 `interface` 定义对象结构，`type` 用于联合类型
+- 禁止 `any`，使用 `unknown` + 类型守卫
+- 函数参数 > 3 个时，使用对象参数
+
+## 错误处理
+```typescript
+// 业务错误
+throw new BusinessError('ORDER_NOT_FOUND', '订单不存在');
+
+// 验证错误（Zod 自动抛出）
+const data = orderSchema.parse(input);
+
+// controller 中不要 try-catch
+// 由全局错误中间件统一处理
+```
+
+
+### 3. 关键三问题 WHY / WHAT / HOW
+
+通过关键三问题 WHY / WHAT / HOW ，可以更好地指导 Claude 
+
+#### WHY - 为什么要这样做？
+
+```
+## 为什么使用 Zod？
+- TypeScript 只有编译时类型检查
+- API 输入需要运行时验证
+- Zod 可以同时生成 TS 类型和验证逻辑
+- 错误信息自动生成，对用户友好
+```
+
+这一部分的作用，不是让 Claude “记住一个库”，而是让它理解背后的决策逻辑。当 Claude 明白了为什么，它在面对相似但不完全相同的场景时，才更可能做出一致的判断。
+
+#### WHAT - 具体要做什么，不要做什么？
+
+```
+## 秒杀系统的原则
+- 请求报文、响应报文尽可能小
+- 请求数量尽可能少
+- 请求链路尽可能短
+- 依赖服务尽可能少
+- 应用服务不要单点
+```
+
+这一部分的重点是边界。什么是允许的，什么是禁止的，决策应该发生在哪一层？
+对 Claude 来说，这比“最佳实践”四个字重要得多。
+
+#### HOW - 怎么做？
+
+```
+## 创建新 API 端点
+
+1. 在 `src/schemas/` 创建请求/响应 Zod schema
+2. 在 `src/routes/` 添加路由定义
+3. 在 `src/controllers/` 实现请求处理
+4. 在 `src/services/` 实现业务逻辑
+5. 在 `tests/` 添加测试用例
+
+示例参考: `src/routes/orders.ts`
+```
+
+明确路径、步骤清晰，让 Claude 才会稳定复用同一套工作流，而不是每次自由发挥。
+
+
+### 4：渐进式披露：不要把一切都塞进 CLAUDE.md
+
+**CLAUDE.md 定义默认决策，而不是承载全部知识**
+ 
+对于非核心、但可能被用到的内容，正确的做法是引用。
+
+```
+# 项目规范
+
+## 核心
+[精简的核心规范]
+
+## 详细文档
+- 数据库设计: 见 `docs/database.md`
+- API 规范: 见 `docs/api-spec.md`
+- 部署流程: 见 `docs/deployment.md`
+```
+
+这样做有两个好处：
+1. CLAUDE.md 保持精简
+2. 当 Claude 需要进一步的细节信息时，可以按需读取引用文件
+3. 
+
 ## 小结
 
-
-| 层级   | 路径                           | 作用域  | 是否提交 Git |
-| ---- | ---------------------------- | ---- | -------- |
-| 企业策略 | `/etc/claude-code/CLAUDE.md` | 全公司  | —        |
-| 用户级  | `~/.claude/CLAUDE.md`        | 个人全局 | —        |
-| 项目级  | `./CLAUDE.md`                | 整个项目 | ✅        |
-| 项目规则 | `.claude/rules/*.md`         | 条件加载 | ✅        |
-| 本地级  | `./CLAUDE.local.md`          | 个人本地 | ❌        |
-
-
-CLAUDE.md 的本质是**将隐性的项目知识显性化**。你越早为项目建立这份手册，Claude Code 就越能像一位真正熟悉项目的团队成员一样工作，而不是每次都需要你从头介绍。
+CLAUDE.md 的本质是**将隐性的项目知识显性化**。你越早为项目建立这份手册，Claude Code 就越能像一位真正熟悉项目的团队成员一样工作并决策，而不是每次都需要你从头介绍。
