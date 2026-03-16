@@ -4,7 +4,7 @@
 
 上一讲我们介绍了 Claude Code 的技术全景概览，大体了解了 Claude Code 的架构与组成。
 
-本讲我们主要介绍 Claude Code 的记忆系统与 CLAUDE.md，并给出一些写好 CLAUDE.md 的建议。
+本讲我们主要介绍 Claude Code 的记忆系统，并给出一些如何写好 CLAUDE.md 的个人建议。
 
 
 ## 痛点
