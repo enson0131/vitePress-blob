@@ -12,12 +12,16 @@
 SubAgent 主要解决单一 Agent 在上下文、权限、职责无法无限膨胀的问题。
 
 
+
 例如某天，你让 Claude Code 帮你跑一个测试套件，结果输出了 500 行日志；然后你想让它分析一下代码结构，又输出了 200 行；接着你想让它改一个 bug，丢给它上千行的日志信息，你的对话上下文已经被各种“中间过程”塞满了，真正重要的信息被淹没在茫茫的输出海洋里。
 
 此时，如果你觉得 Claude Code 越用越“健忘”，并不是模型退化了，而是你的对话上下文，已经被一次次中间过程污染了，稀释了真正重要的信息，这正是子代理要解决的核心问题。
 
 而 SubAgent 的出现，可以做到隔离上下文、权限、职责，从而避免单一 Agent 在上下文过渡膨胀，导致无法聚焦核心任务。
 
+基于这个思想，开源社区也出现了三省六部制的设计理念。
+
+例如👉 : [三省六部制 Agent 设计理念](https://github.com/openai/openai-cookbook/blob/main/examples/agent_architecture/three_offices_six_ministries.ipynb)
 
 
 
