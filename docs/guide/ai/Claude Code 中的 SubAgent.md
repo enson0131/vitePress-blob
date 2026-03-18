@@ -250,9 +250,29 @@ hooks:
 
 ![并行场景编排](./../../public/assets/ai/23.png)
 
+三个 SubAgent 并行处理，最后将结果返回给主 Agent 进行整合。
+
+![并行场景编排](./../../public/assets/ai/25.png)
+
+
+> 并行探索的隐含前提：各子代理的探索任务之间不能有信息依赖
+
 
 ## 串行场景: 修复 Bug 流水线
 
+在修复 bug 过程中，我们会经历以下几个阶段：
+1. 定位问题
+2. 分析问题
+3. 解决问题
+4. 验证问题
+   
+基于此，我们可以将修复 bug 过程拆分成多个子任务，每个子任务由一个 SubAgent 完成。例如👇
+
+![串行场景编排](./../../public/assets/ai/24.png)
+
+四个 SubAgent 分别处理，每一个 SubAgent 的输出后，将结果返回给主 Agent 进行整合，主 Agent 再派发下一个 SubAgent 进行处理。
+
+如果全部由主 Agent 处理，上下文膨胀，注意力分散，可能导致无法聚焦核心任务，从而影响任务完成效率。
 
 ## 并行 vs 流水线：什么时候用什么模式
 
@@ -260,6 +280,8 @@ hooks:
 ## 组合模型
 
 例如 串行后有并行、并行后又串行 等等，这种组合模式需要根据业务场景进行设计。
+
+## subAgent Team: 团队协作
 
 
 ## 从 SubAgents 到 Multi-Agent
@@ -349,3 +371,10 @@ hooks:
 ## 总结
 
 如今市面上会有很多创建 SubAgent 的工具，SKILL 也好模版也好，但如何判断这个 SubAgent 是否好，不仅需要有大量的实践经验，也需要有我们对 SubAgent有体系化的认知，有自己的判断标准。
+
+
+## 参考
+- [SubAgent 官方文档](https://code.claude.com/docs/zh-CN/sub-agents)
+- [Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+- [Multi-Agent Architecture in AI Agent Engineering](https://www.anthropic.com/engineering/multi-agent-architecture-in-ai-agent-engineering)
+- [SubAgent Team](https://code.claude.com/docs/zh-CN/agent-teams)
