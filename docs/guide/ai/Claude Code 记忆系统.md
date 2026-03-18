@@ -309,7 +309,7 @@ const data = orderSchema.parse(input);
 
 **CLAUDE.md 定义默认决策，而不是承载全部知识**
  
-对于非核心、但可能被用到的内容，正确的做法是引用。
+对于非核心、但可能被用到的内容，正确的做法是引用，例如使用 @import 指令引用其他文件。
 
 ```
 # 项目规范
@@ -318,9 +318,9 @@ const data = orderSchema.parse(input);
 [精简的核心规范]
 
 ## 详细文档
-- 数据库设计: 见 `docs/database.md`
-- API 规范: 见 `docs/api-spec.md`
-- 部署流程: 见 `docs/deployment.md`
+- 数据库设计: @import `docs/database.md`
+- API 规范: @import `docs/api-spec.md`
+- 部署流程: @import `docs/deployment.md`
 ```
 
 这样做有两个好处：
