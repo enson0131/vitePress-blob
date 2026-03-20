@@ -1,4 +1,4 @@
-# Claude Code 中的 子任务 Agent
+# Claude Code 中的 SubAgent
 
 ## 前言
 
@@ -274,15 +274,73 @@ hooks:
 
 如果全部由主 Agent 处理，上下文膨胀，注意力分散，可能导致无法聚焦核心任务，从而影响任务完成效率。
 
+![串行场景编排](./../../public/assets/ai/26.png)
+
+
 ## 并行 vs 流水线：什么时候用什么模式
 
+核心判断标准是：
+- 任务之间独立吗？→ 并行
+- 任务之间有依赖吗？→ 流水线
 
-## 组合模型
+![并行 vs 流水线](./../../public/assets/ai/27.png)
 
-例如 串行后有并行、并行后又串行 等等，这种组合模式需要根据业务场景进行设计。
+
+在实际的业务场景中，可能并不是单纯的串行 或者 并行，可能是串行后有并行、并行后又串行等等，这种组合模式需要根据业务场景进行设计。
 
 ## subAgent Team: 团队协作
 
+聪明的同学可能已经发现了，在编排 SubAgent 时，因 SubAgent 之间无法直接通信，可能会遗漏一些关键信息，导致任务无法完成。
+
+因此，我们可以通过 subAgent Team 来解决这个问题。
+
+### 案例
+你的系统出现了一个奇怪 bug——用户登录后偶尔会话丢失，没有明确的规律。你怀疑可能是：
+- 假设 A：JWT token 过期时间计算有问题
+- 假设 B：Redis session 存储的竞态条件
+- 假设 C：负载均衡器的 sticky session 配置
+  
+如果用子代理，情况可能是这样。👇
+
+
+![subAgent Team](./../../public/assets/ai/28.png)
+
+如果子代理 B 能看到子代理 C 的发现，它可能会说：等等，Redis 连接数上限问题可能是因为 sticky session 5 分钟后切换了服务器，导致新的 Redis 连接被创建。这正是 Agent Teams 要解决的问题——让代理之间能够直接交流、互相挑战、协作推进。
+
+![subAgent Team](./../../public/assets/ai/29.png)
+
+
+### 如何启用 subAgent Team
+
+
+Agent Teams 默认是关闭的，启用方式是在 settings.json 中设置环境变量：
+
+```
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}
+```
+
+
+启用后，用自然语言告诉 Claude 创建团队并描述任务：
+
+```
+创建一个 agent team 从不同角度探索这个问题：
+一个 teammate 负责 UX，一个负责技术架构（用最好的模型），一个扮演审评质疑者（用普通模型）。
+```
+
+Claude 会建团队，生成指定的 Teammates 让它们探索问题，然后综合各方发现，完成后清理团队。团队成功创建后，一个 Agent Team 由以下组件构成:
+
+![subAgent Team 组成](./../../public/assets/ai/30.png)
+
+团队和任务相关的数据会存储在本地。
+
+- 团队配置：~/.claude/teams/{team-name}/config.json
+- 任务列表：~/.claude/tasks/{team-name}/
+  
+团队配置包含  members  数组，记录每个 Teammate 的名称、agent ID 和类型。Teammates 可以读取这个文件来发现其他团队成员。这些都是 Claude Code 自行搞定的，不需要我们操心去存放。
 
 ## 从 SubAgents 到 Multi-Agent
 
