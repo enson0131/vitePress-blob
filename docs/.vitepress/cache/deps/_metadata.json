@@ -1,60 +1,57 @@
 {
-  "hash": "e17e16c5",
-  "browserHash": "a034acc0",
+  "hash": "efa53d76",
+  "browserHash": "4755eebf",
   "optimized": {
     "vue": {
       "src": "../../../../node_modules/vue/dist/vue.runtime.esm-bundler.js",
       "file": "vue.js",
-      "fileHash": "efbf6887",
+      "fileHash": "eeb95666",
       "needsInterop": false
     },
     "vitepress > @vue/devtools-api": {
       "src": "../../../../node_modules/@vue/devtools-api/lib/esm/index.js",
       "file": "vitepress___@vue_devtools-api.js",
-      "fileHash": "69cff405",
+      "fileHash": "d7f385b3",
       "needsInterop": false
     },
     "@braintree/sanitize-url": {
       "src": "../../../../node_modules/@braintree/sanitize-url/dist/index.js",
       "file": "@braintree_sanitize-url.js",
-      "fileHash": "402334a9",
+      "fileHash": "b55b941c",
       "needsInterop": true
     },
     "dayjs": {
       "src": "../../../../node_modules/dayjs/dayjs.min.js",
       "file": "dayjs.js",
-      "fileHash": "c933d9bf",
+      "fileHash": "361ea54a",
       "needsInterop": true
     },
     "debug": {
       "src": "../../../../../../../node_modules/debug/src/browser.js",
       "file": "debug.js",
-      "fileHash": "2468c609",
+      "fileHash": "2d25434c",
       "needsInterop": true
     },
     "cytoscape-cose-bilkent": {
       "src": "../../../../node_modules/cytoscape-cose-bilkent/cytoscape-cose-bilkent.js",
       "file": "cytoscape-cose-bilkent.js",
-      "fileHash": "2da5281d",
+      "fileHash": "8b13d6c5",
       "needsInterop": true
     },
     "cytoscape": {
       "src": "../../../../node_modules/cytoscape/dist/cytoscape.esm.mjs",
       "file": "cytoscape.js",
-      "fileHash": "cbea9094",
+      "fileHash": "25a37b30",
       "needsInterop": false
     },
-    "@theme/index": {
-      "src": "../../../../node_modules/vitepress/dist/client/theme-default/index.js",
-      "file": "@theme_index.js",
-      "fileHash": "52276536",
+    "medium-zoom": {
+      "src": "../../../../node_modules/medium-zoom/dist/medium-zoom.esm.js",
+      "file": "medium-zoom.js",
+      "fileHash": "6702d05b",
       "needsInterop": false
     }
   },
   "chunks": {
-    "chunk-V634PGSD": {
-      "file": "chunk-V634PGSD.js"
-    },
     "chunk-76J2PTFD": {
       "file": "chunk-76J2PTFD.js"
     }
