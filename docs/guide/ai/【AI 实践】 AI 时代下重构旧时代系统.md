@@ -304,7 +304,7 @@ View 层 (client/src/pages/)             → React 组件（observer + memo）
 常见可以通过询问大模型、观察日志输出的记录，也可以通过运行 /memory（或类似命令）查看当前自动记忆的规则。
 
 
-## 核心理念3: Harness
+## 核心理念3: 可观测
 
 
 
