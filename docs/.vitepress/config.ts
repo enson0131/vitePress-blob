@@ -1,11 +1,12 @@
 import { createRequire } from 'module'
 import { defineConfig, type DefaultTheme } from 'vitepress'
+import { withMermaid } from 'vitepress-plugin-mermaid'
 
 console.log(`import.meta.url--->`, import.meta.url);
 const require = createRequire(import.meta.url);
 const pkg = require('vitepress/package.json')
 
-export default defineConfig({
+export default withMermaid(defineConfig({
     base: '/vitePress-blob/',
     title: '个人知识库',
     description:
@@ -56,7 +57,7 @@ export default defineConfig({
           { icon: 'github', link: 'https://github.com/enson0131/vitePress-blob' }
         ],
       }
-})
+}))
 
 
 function nav(): DefaultTheme.NavItem[] {
