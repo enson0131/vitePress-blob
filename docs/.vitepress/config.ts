@@ -91,6 +91,26 @@ function nav(): DefaultTheme.NavItem[] {
 function sidebarGuide(): DefaultTheme.SidebarItem[] {
     return [
       {
+        text: 'AI 笔记',
+        collapsed: false,
+        items: [
+          { text: '什么是 LangChain', link: 'ai/什么是langchain' },
+          { text: 'LangChain 快速入门', link: 'ai/langchain快速入门' },
+          { text: '构建可复用的 Prompt Template', link: 'ai/构建可复用的PromptTemplate' },
+          { text: 'outputParser格式化输出构建内容', link: 'ai/OutputParser构建格式化输出' },
+          { text: 'RAG 检索增强生成的流程', link: 'ai/RAG 检索增强生成的流程' },
+          { text: 'Embedding之加载数据', link: 'ai/Embedding之加载数据' },
+          { text: 'Embedding之大规模数据拆分', link: 'ai/Embedding之大规模数据拆分' },
+          { text: 'Retriever之向量数据库', link: 'ai/Retriever之向量数据库' },
+          { text: 'Retriever 常见的优化方式', link: 'ai/Retriever 常见的优化方式' },
+          { text: 'Claude Code 技术全景概览', link: 'ai/Claude Code 技术全景概览' },
+          { text: 'Claude Code 记忆系统与 CLAUDE.md', link: 'ai/Claude Code 记忆系统' },
+          { text: 'Claude Code 中的 SubAgent', link: 'ai/Claude Code 中的 SubAgent' },
+          { text: 'Claude Code 中的 SKILL', link: 'ai/Claude Code 中的 SKILL' },
+          { text: '【AI 实践】 AI 时代下重构旧时代系统.md', link: 'ai/【AI 实践】 AI 时代下重构旧时代系统' },
+        ]
+      },
+      {
         text: 'JavaScript 笔记',
         collapsed: false,
         items: [
@@ -213,26 +233,6 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '通过离屏渲染提高Canvas书写性能', link: 'canvas/通过离屏渲染提高Canvas书写性能' },
           { text: '可视区域内渲染提高Canvas书写性能', link: 'canvas/可视区域内渲染提高Canvas书写性能' },
           { text: '通过 OffscreenCanvas + Worker 提高书写性能', link: 'canvas/通过 OffscreenCanvas + Worker 提高书写性能' },
-        ]
-      },
-      {
-        text: 'AI 笔记',
-        collapsed: false,
-        items: [
-          { text: '什么是 LangChain', link: 'ai/什么是langchain' },
-          { text: 'LangChain 快速入门', link: 'ai/langchain快速入门' },
-          { text: '构建可复用的 Prompt Template', link: 'ai/构建可复用的PromptTemplate' },
-          { text: 'outputParser格式化输出构建内容', link: 'ai/OutputParser构建格式化输出' },
-          { text: 'RAG 检索增强生成的流程', link: 'ai/RAG 检索增强生成的流程' },
-          { text: 'Embedding之加载数据', link: 'ai/Embedding之加载数据' },
-          { text: 'Embedding之大规模数据拆分', link: 'ai/Embedding之大规模数据拆分' },
-          { text: 'Retriever之向量数据库', link: 'ai/Retriever之向量数据库' },
-          { text: 'Retriever 常见的优化方式', link: 'ai/Retriever 常见的优化方式' },
-          { text: 'Claude Code 技术全景概览', link: 'ai/Claude Code 技术全景概览' },
-          { text: 'Claude Code 记忆系统与 CLAUDE.md', link: 'ai/Claude Code 记忆系统' },
-          { text: 'Claude Code 中的 SubAgent', link: 'ai/Claude Code 中的 SubAgent' },
-          { text: 'Claude Code 中的 SKILL', link: 'ai/Claude Code 中的 SKILL' },
-          { text: '【AI 实践】 AI 时代下重构旧时代系统.md', link: 'ai/【AI 实践】 AI 时代下重构旧时代系统' },
         ]
       },
       {
