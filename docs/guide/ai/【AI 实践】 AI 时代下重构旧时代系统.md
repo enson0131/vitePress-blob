@@ -108,6 +108,42 @@ View 层 (client/src/pages/)             → React 组件（observer + memo）
 
 ```mermaid
 graph LR
+  subgraph After["✅ 重构后"]
+    direction TB
+
+    subgraph AView["View 层 (pages/)"]
+      AP["页面组件\nobserver + memo"]
+    end
+
+    subgraph AVM["ViewModel 层 ✨"]
+      AV["4 个 VM\n585 行"]
+    end
+
+    subgraph AModel["Model 层 ✨"]
+      AM["17 个模块 · 2709 行\nmakeAutoObservable"]
+    end
+
+    subgraph AAPI["API 层"]
+      AA["14 模块\n106 函数"]
+    end
+
+    subgraph AHooks["Hooks"]
+      AH["hooks/"]
+    end
+
+    subgraph AComp["Components"]
+      AC["components/"]
+    end
+
+    AP -->|"4 处 useMemo"| AV
+    AP -->|"62 处 observer ✅"| AM
+    AV -->|"5 处 ✅"| AM
+    AM -->|"17 处 ✅"| AA
+    AH -->|"8 处 ✅"| AM
+    AP -->|"40 处"| AH
+    AP -->|"177 处"| AC
+  end
+
   subgraph Before["❌ 重构前"]
     direction TB
 
@@ -144,41 +180,7 @@ graph LR
     BS -.->|"无 Model 层"| BA
   end
 
-  subgraph After["✅ 重构后"]
-    direction TB
-
-    subgraph AView["View 层 (pages/)"]
-      AP["页面组件\nobserver + memo"]
-    end
-
-    subgraph AVM["ViewModel 层 ✨"]
-      AV["4 个 VM\n585 行"]
-    end
-
-    subgraph AModel["Model 层 ✨"]
-      AM["17 个模块 · 2709 行\nmakeAutoObservable"]
-    end
-
-    subgraph AAPI["API 层"]
-      AA["14 模块\n106 函数"]
-    end
-
-    subgraph AHooks["Hooks"]
-      AH["hooks/"]
-    end
-
-    subgraph AComp["Components"]
-      AC["components/"]
-    end
-
-    AP -->|"4 处 useMemo"| AV
-    AP -->|"62 处 observer ✅"| AM
-    AV -->|"5 处 ✅"| AM
-    AM -->|"17 处 ✅"| AA
-    AH -->|"8 处 ✅"| AM
-    AP -->|"40 处"| AH
-    AP -->|"177 处"| AC
-  end
+  Before ~~~ After
 
   classDef removed fill:#ff4d4f,stroke:#cf1322,color:white
   classDef added fill:#52c41a,stroke:#389e0d,color:white

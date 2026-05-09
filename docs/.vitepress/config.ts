@@ -69,7 +69,7 @@ function nav(): DefaultTheme.NavItem[] {
     },
     {
       text: '前端笔记',
-      link: '/guide/javaScript相关/index',
+      link: '/guide/ai/什么是langchain',
       activeMatch: '/guide/'
     },
     {
