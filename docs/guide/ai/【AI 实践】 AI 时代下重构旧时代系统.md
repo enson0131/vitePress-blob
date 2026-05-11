@@ -21,7 +21,7 @@
 接下来，在下将以 重构旧时代系统 为例，去思考在 AI 时代下，我们应该如何去构建一个系统，来对抗熵增，让系统保持有序。
 
 
-## 核心理念1: SDD （Specification Driven Development，规范驱动开发）驱动重构系统
+## 阻尼机制1: SDD （Specification Driven Development，规范驱动开发）驱动重构系统
 
 SDD 典型工作流示例
 
@@ -212,7 +212,7 @@ View 层 (client/src/pages/)             → React 组件（observer + memo）
 
 在重构系统时，还需要明确按什么顺序改，在方案设计过程中，在下自上而下确认了业务痛点，围绕业务痛点进行架构设计，但在实践过程中，应自下而上修改，优先改 Model 层，确保数据模型的定义和数据访问的正确性，然后改 ViewModel 层，确保业务逻辑的处理和数据的转换的正确性，最后改 View 层，确保 UI 的展示和用户交互的正确性。
 
-## 核心理念2: 规则约束
+## 阻尼机制2: 规则约束
 
 ### 为什么需要规则约束
 
@@ -304,7 +304,11 @@ View 层 (client/src/pages/)             → React 组件（observer + memo）
 常见可以通过询问大模型、观察日志输出的记录，也可以通过运行 /memory（或类似命令）查看当前自动记忆的规则。
 
 
-## 核心理念3: 可观测
+## 阻尼机制3: 验证循环
+
+
+LangChain 他们仅仅通过改变包裹大语言模型的底层架构——模型没变，参数没变——就让系统在 TerminalBench 2.0 （一个衡量 AI 智能体处理命令行任务能力的权威基准测试） 上的排名从 30 名开外飙升到了第 5 名。另一项研究则通过让大语言模型自己去优化这套架构，实现了 76.4% 的通过率，甚至超过了人类精心设计的系统。
+
 
 
 
@@ -405,4 +409,28 @@ graph LR
 
 
 
-## 展望
+## 总结与展望
+
+这次的 AI 重构实践，本质是一场通过 Harness 的工程实践来「对抗熵增」，我们通过 SDD 规范驱动开发、规则约束、验证循环等阻尼机制，让 AI 在面对无序的需求时，生成有序的代码，从而提升了系统的可维护性和复用率。
+
+本文的实践只是 Harness 的冰山一角，回顾 AI 时代下的系统构建，我们可以将其分为三个层次：
+
+- 提示词工程 (Prompt engineering)：精心设计模型接收到的指令和输出格式
+- 上下文工程 (Context engineering)：管理模型渐进式披露上下文。
+- Harness 工程 (Harness engineering)：涵盖了上述两者，再加上整个应用架构：包括工具编排、状态持久化、错误恢复、验证循环、安全执行以及生命周期管理。
+
+![image.png](./../../public/assets/ai/46.png)
+
+而当下一个生产级的智能体 Harness 工程化应包含 12 个核心组件 （编排循环、工具、记忆、上下文管理、提示词构建、输出解析、状态管理、错误处理、护栏与安全、验证循环、子智能体编排、大模型）
+
+![image.png](./../../public/assets/ai/45.png)
+
+
+基于此，我们可以生成一个类似于 Claude Design 的 Coding Agent，传送门: https://www.notion.so/claude/A-Coding-Agent-Design-Document-Template-9e7c8a1b9c5b4e5d8f8b0c8e4d8e4d8
+
+https://claude.ai/blog/claude-design-document-template
+
+
+## 参考
+- https://mp.weixin.qq.com/s/yOX1QZTHs54J-CBg-rKUig
+- 
