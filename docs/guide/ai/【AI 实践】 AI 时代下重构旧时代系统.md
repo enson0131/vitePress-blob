@@ -529,11 +529,9 @@ graph LR
 ![image.png](./../../public/assets/ai/45.png)
 
 
-基于此，我们可以生成一个类似于 Claude Design 的 Coding Agent，传送门: https://www.notion.so/claude/A-Coding-Agent-Design-Document-Template-9e7c8a1b9c5b4e5d8f8b0c8e4d8e4d8
+基于此，我们可以生成一个类似于 Claude Design 的 Coding Agent，传送门: https://github.com/enson0131/mini-claude-design
 
-https://claude.ai/blog/claude-design-document-template
 
 
 ## 参考
 - https://mp.weixin.qq.com/s/yOX1QZTHs54J-CBg-rKUig
-- 
