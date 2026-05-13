@@ -2,9 +2,11 @@
 
 > 本文以 Mini Claude Design 项目为例，深入剖析如何利用大语言模型的 Function Calling 能力，构建一个"对话即设计"的 AI 应用。全文围绕 Agent Loop、工具系统、流式通信、上下文管理四大核心模块展开。
 
-项目地址: [mini-claude-design](https://github.com/enson0131/mini-claude-design)
+
+
+项目地址: [mini-claude-design](https://github.com/enson0131/mini-claude-design)          
+
 在线体验: [体验地址](https://mini-claude-design.vercel.app/)
----
 
 ## 一、项目概览
 
@@ -46,13 +48,15 @@
 
 ### 1.3 技术选型
 
-| 层级 | 选型 | 理由 |
-|------|------|------|
-| 框架 | Next.js 15 (App Router) | Edge Runtime、API Routes 一体化 |
-| 语言 | TypeScript | 类型安全，对复杂 Agent 逻辑至关重要 |
-| AI API | 智谱 AI (GLM) | 国内可用，支持 Function Calling |
-| 流式通信 | SSE (Server-Sent Events) | 大模型标准输出方式，用户体验好 |
-| 样式 | Tailwind CSS 4 | 快速构建 UI |
+
+| 层级     | 选型                       | 理由                          |
+| ------ | ------------------------ | --------------------------- |
+| 框架     | Next.js 15 (App Router)  | Edge Runtime、API Routes 一体化 |
+| 语言     | TypeScript               | 类型安全，对复杂 Agent 逻辑至关重要       |
+| AI API | 智谱 AI (GLM)              | 国内可用，支持 Function Calling    |
+| 流式通信   | SSE (Server-Sent Events) | 大模型标准输出方式，用户体验好             |
+| 样式     | Tailwind CSS 4           | 快速构建 UI                     |
+
 
 ---
 
@@ -125,7 +129,7 @@ export async function runAgent(
 
 Agent Loop 本质上是一个状态机，消息列表是唯一的状态，每轮操作都是对消息列表的追加。while 循环让状态变化清晰可见，比递归更易于调试。
 
-**`MAX_TURNS` 限制的必要性**
+`**MAX_TURNS` 限制的必要性**
 
 LLM 有时会陷入"工具调用死循环"——反复读取同一个文件或反复修改同一行代码。MAX_TURNS 是安全阀，确保 Agent 最终会停下来。
 
@@ -445,6 +449,7 @@ System Prompt
 > 理解需求 → 规划文件结构 → 先写 CSS → 再写 HTML → 最后写 JS → read_file 自检 → 交付
 
 这个顺序确保：
+
 - CSS Design Tokens 先于 HTML 写入，避免样式缺失
 - 自检步骤让 AI 验证产出是否符合规范
 - 鼓励并发写入多个文件，提高效率
@@ -455,13 +460,15 @@ System Prompt
 
 ### 7.1 关键技术收获
 
-| 技术点 | 核心理解 |
-|--------|---------|
+
+| 技术点              | 核心理解                         |
+| ---------------- | ---------------------------- |
 | Function Calling | LLM 不只是生成文本，而是生成"意图"，由宿主环境执行 |
-| Agent Loop | LLM + Tool + Loop = 自主决策的行动者 |
-| 流式 SSE | 不是优化，而是必须——用户无法等待 30 秒的黑盒 |
-| System Prompt | 不只是"角色设定"，而是一套可执行的规范系统 |
-| 上下文管理 | 上下文窗口是稀缺资源，需要精心管理 |
+| Agent Loop       | LLM + Tool + Loop = 自主决策的行动者 |
+| 流式 SSE           | 不是优化，而是必须——用户无法等待 30 秒的黑盒    |
+| System Prompt    | 不只是"角色设定"，而是一套可执行的规范系统       |
+| 上下文管理            | 上下文窗口是稀缺资源，需要精心管理            |
+
 
 ### 7.2 可以改进的方向
 
@@ -469,3 +476,4 @@ System Prompt
 2. **错误恢复**：Agent 中途出错时保留对话状态
 3. **并发处理**：Agent 运行时允许用户继续操作
 4. **预览安全**：iframe sandbox 的 `allow-same-origin` 需要重新评估
+
