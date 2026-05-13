@@ -107,8 +107,8 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'Claude Code 记忆系统与 CLAUDE.md', link: 'ai/Claude Code 记忆系统' },
           { text: 'Claude Code 中的 SubAgent', link: 'ai/Claude Code 中的 SubAgent' },
           { text: 'Claude Code 中的 SKILL', link: 'ai/Claude Code 中的 SKILL' },
-          { text: '【AI 实践】 AI 时代下重构旧时代系统.md', link: 'ai/【AI 实践】 AI 时代下重构旧时代系统' },
-          { text: '【AI 实践】 从零构建一个基于大模型 Function Calling 的 AI 设计助手.md', link: 'ai/【AI 实践】从零构建一个基于大模型 Function Calling 的 AI 设计助手' },
+          { text: '【AI 实践】 AI 时代下重构旧时代系统', link: 'ai/【AI 实践】 AI 时代下重构旧时代系统' },
+          { text: '【AI 实践】 从零构建一个类 Claude Design 的 AI 设计助手', link: 'ai/【AI 实践】从零构建一个类 Claude Design 的 AI 设计助手' },
         ]
       },
       {

@@ -1,4 +1,4 @@
-# 从零构建一个基于大模型 Function Calling 的 AI 设计助手
+# 从零构建一个类 Claude Design 的 AI 设计助手
 
 > 本文以 Mini Claude Design 项目为例，深入剖析如何利用大语言模型的 Function Calling 能力，构建一个"对话即设计"的 AI 应用。全文围绕 Agent Loop、工具系统、流式通信、上下文管理四大核心模块展开。
 
