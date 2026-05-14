@@ -581,16 +581,10 @@ flowchart TB
         E1["权限校验"] ~~~ E2["数据脱敏加密"] ~~~ E3["安全审计监控"]
     end
 
-    subgraph D7["⑦ 多智能体编排"]
-        direction LR
-        F1["按模块 / 领域分工"] ~~~ F2["独立上下文管理"]
-    end
-
     D2 --> Apply
     D3 --> Apply
     D4 --> Verify
     D5 --> Apply
-    D7 --> Core
 
     Archive --> Output(["✅ 有序的代码\n可维护 · 可复用 · 可交付"])
 
