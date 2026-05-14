@@ -16,7 +16,9 @@
 
 重构的系统是一个企业级的管理系统，有多个客户对其进行了定制化开发，导致系统功能复杂、代码质量参差不齐，维护成本高。
 
-业务诉求：最近遇到了一个需求，因新的客户需求与旧系统功能有部分重合，但又有一些新的功能诉求（同时这些功能未来需要同步到其他客户），视图交互完全不同，导致无法直接在旧系统上进行功能开发，只能选择重构旧系统。
+业务诉求：最近遇到了一个需求，因新的客户需求与旧系统功能有部分重合，但又有一些新的功能诉求，其视图交互完全不同，但这些功能未来需要同步到其他客户。
+
+因此需要在不破坏现有功能的前提下，对系统进行重构，以满足新的客户需求，同时保持满足后续客户的复用和维护。
 
 接下来，在下将以 重构旧时代系统 为例，去思考在 AI 时代下，我们应该如何去构建一个系统，来对抗熵增，让系统保持有序。
 
@@ -417,6 +419,7 @@ Claude Code 的创造者 Boris Cherny 指出，让模型能够验证自己的工
 
 ## 收益
 
+
 ```mermaid
 graph LR
   subgraph After["✅ 重构后"]
@@ -504,7 +507,6 @@ graph LR
 ```
 
 
-
 **维度一：架构指标（全部可测量）**
 
 | 指标 | 重构前（eab9d50） | 重构后（当前） | 变化 |
@@ -541,6 +543,63 @@ graph LR
 
 
 
+
+## 研发流程总图
+
+```mermaid
+flowchart TB
+    Input(["📋 无序的需求\n业务诉求 / 功能迭代"])
+
+    Input --> Explore
+
+    subgraph Core["🔄 SDD 核心研发循环"]
+        direction LR
+        Explore["① Explore\n调研 · 脑暴"] --> Propose
+        Propose["② Propose\n生成 SDD 设计文档"] --> Apply
+        Apply["③ Apply Change\nAI 辅助编码"] --> Verify
+        Verify{"④ Verify Change\n多层验证"} -->|"✅ 通过"| Archive["⑤ Archive\n归档收尾"]
+        Verify -->|"❌ 不通过"| Apply
+    end
+
+    subgraph D2["② 规则约束"]
+        direction LR
+        A1["架构层"] ~~~ A2["示范层"] ~~~ A3["视觉层"] ~~~ A4["约束层"]
+    end
+
+    subgraph D3["③ 提示词构建"]
+        direction LR
+        B1["场景层"] --> B2["目标层"] --> B3["规则层"] --> B4["反馈层"]
+    end
+
+    subgraph D4["④ 可验证"]
+        direction LR
+        C1["Code Review\n多模型评审"] ~~~ C2["UI 视觉验证\nPlaywright 对比"] ~~~ C3["测试用例验证"]
+    end
+
+    subgraph D5["⑤ 护栏与安全"]
+        direction LR
+        E1["权限校验"] ~~~ E2["数据脱敏加密"] ~~~ E3["安全审计监控"]
+    end
+
+    subgraph D7["⑦ 多智能体编排"]
+        direction LR
+        F1["按模块 / 领域分工"] ~~~ F2["独立上下文管理"]
+    end
+
+    D2 --> Apply
+    D3 --> Apply
+    D4 --> Verify
+    D5 --> Apply
+    D7 --> Core
+
+    Archive --> Output(["✅ 有序的代码\n可维护 · 可复用 · 可交付"])
+
+    classDef inputOutput fill:#1890ff,stroke:#096dd9,color:white,rx:20
+    classDef mechanism fill:#f6ffed,stroke:#52c41a,color:#135200
+    classDef loop fill:#fff7e6,stroke:#fa8c16,color:#612500
+
+    class Input,Output inputOutput
+```
 
 ## 总结与展望
 
