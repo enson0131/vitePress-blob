@@ -198,7 +198,6 @@ graph TB
 通过明确的分层架构，AI 在生成代码时就有了清晰的职责划分，知道每一层应该做什么，从而生成符合架构规范的代码，同时也方便了后续的复用。
 
 ```
-API 层 (client/src/api/)               → 定义 MethodsAPI 常量 + callAPI 调用函数
 Model 层 (client/src/models/)           → MobX 业务状态模型（makeAutoObservable 单例）
 ViewModel 层 (client/src/view-models/)  → 页面级 UI 交互逻辑 (可选)
 View 层 (client/src/pages/)             → React 组件（observer + memo）
