@@ -6,6 +6,10 @@ title: "03 · Transformer 与 Attention：ChatGPT 为什么能理解上下文？
 
 > 第一阶段：AI 与大模型基础｜阅读约 12–15 分钟
 
+<script setup>
+import AiCourseLab from '../../../.vitepress/theme/components/AiCourseLab.vue'
+</script>
+
 ## 1. 为什么仅有 Embedding 不够？
 
 比较「我今天吃了一个苹果」与「苹果发布了新款 iPhone」。如果「苹果」对应相同 Token ID，初始 Token Embedding 相同，但语境不同。
@@ -20,6 +24,8 @@ Self-Attention 让一个 Token 在计算新表示时，从序列中其他允许�
 
 注意力权重不等于模型推理的完整解释，模型还有多层网络和其他变换。
 
+<AiCourseLab type="attention" />
+
 ## 3. Q、K、V 的含义
 
 | 名称 | 全称 | 直观理解 |
@@ -30,15 +36,15 @@ Self-Attention 让一个 Token 在计算新表示时，从序列中其他允许�
 
 输入隐藏状态矩阵 X 经过三组可训练线性变换：
 
-```math
+$$
 Q=XW_Q,\quad K=XW_K,\quad V=XW_V
-```
+$$
 
 ## 4. Attention 的公式
 
-```math
+$$
 \operatorname{Attention}(Q,K,V)=\operatorname{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
-```
+$$
 
 四步理解：
 
@@ -64,9 +70,9 @@ Q=XW_Q,\quad K=XW_K,\quad V=XW_V
 
 多个注意力头各自拥有投影参数，能够学习不同的关联模式，输出拼接后再经线性投影：
 
-```math
+$$
 \operatorname{MultiHead}=\operatorname{Concat}(head_1,\ldots,head_h)W_O
-```
+$$
 
 不同头不一定有明确固定的语法或语义标签。
 
@@ -95,6 +101,8 @@ GPT 类自回归模型通常使用因果掩码，当前位置只能关注自身�
 | AI | ✓ | ✓ | ✓ | ✓ |
 
 未来位置的分数在 Softmax 前被屏蔽。**生成时不会偷看尚未生成的答案**。
+
+<AiCourseLab type="mask" />
 
 ## 7. Transformer Block 还有什么？
 
