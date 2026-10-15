@@ -61,8 +61,8 @@ function pick(i:number,j:number){answers.value=[...answers.value];answers.value[
   position: number,
   dimension: number
 ): number[] {
-  if (!Number.isInteger(position) || position < 0 ||
-      !Number.isInteger(dimension) || dimension <= 0 ||
+  if (!Number.isInteger(position) || position &lt; 0 ||
+      !Number.isInteger(dimension) || dimension &lt;= 0 ||
       dimension % 2 !== 0) {
     throw new Error("位置必须非负，维度必须是正偶数");
   }
