@@ -44,6 +44,7 @@ export default withMermaid(defineConfig({
     
         sidebar: {
           '/guide/': { base: '/guide/', items: sidebarGuide() },
+          '/guide/ai-chatbot/': { base: '/guide/ai-chatbot/', items: sidebarChatbot() },
           '/shoot/': { base: '/shoot/', items: shootGuide()},
           '/reference/': { base: '/reference/', items: sidebarReference() }
         },
@@ -71,6 +72,11 @@ function nav(): DefaultTheme.NavItem[] {
       text: '前端笔记',
       link: '/guide/ai/什么是langchain',
       activeMatch: '/guide/'
+    },
+    {
+      text: 'AI 聊天机器人教程',
+      link: '/guide/ai-chatbot/',
+      activeMatch: '/guide/ai-chatbot/'
     },
     {
       text: '摄影笔记',
@@ -389,4 +395,12 @@ function shootGuide(): DefaultTheme.SidebarItem[] {
       ]
     },
   ]
+}
+function sidebarChatbot(): DefaultTheme.SidebarItem[] {
+  return [{ text: 'AI 聊天机器人：原理与工程实践', collapsed: false, items: [
+    { text: '教程目录', link: '' },
+    { text: '01 · ChatGPT 如何回答问题', link: '01-how-chatgpt-works' },
+    { text: '02 · Token 与 Embedding', link: '02-token-and-embedding' },
+    { text: '03 · Transformer 与 Attention', link: '03-transformer-attention' }
+  ] }]
 }
