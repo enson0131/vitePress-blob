@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AiCourseLab from './AiCourseLab.vue'
+import LessonQuiz from './LessonQuiz.vue'
 </script>
 <template><article class="lesson">
 <div class="meta"><span class="tag">第 03 / 40 篇</span><span>第一阶段：AI 与大模型基础</span><span>阅读约 12–15 分钟</span></div>
@@ -79,7 +80,8 @@ console.log(response.choices[0].message.content);</code></pre>
 <tr><td>Messages</td><td>应用层提供多轮上下文</td></tr>
 </tbody></table>
 <h2>学习疑问与解答</h2><h3>Q1：Self-Attention 是否根据上下文动态赋予每个 Token 语义？</h3><p>提问日期：2026-10-15</p><p><strong>更准确地说，Self-Attention 动态聚合上下文信息并更新 Token 的向量表示，而不是直接分配语义标签。</strong></p><p>同一个 Token 的初始 Embedding 可以相同，但多层 Transformer 计算后隐藏状态不同。GPT 的因果掩码还限制了当前位置能够访问的上下文。</p><p>复习要点：动态更新的是表示，不是直接给 Token 打标签。</p>
-<h2>十、课后练习</h2><ol>
+<h2>十、课后练习</h2>
+<LessonQuiz :chapter="3" /><ol>
 <li>Self-Attention 与 Token Embedding 有什么区别？</li>
 <li>Q、K、V 分别负责什么？为什么需要 Softmax？</li>
 <li>如果 GPT 没有 Causal Mask，训练时会出现什么问题？</li>
