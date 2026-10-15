@@ -80,6 +80,16 @@ console.log(response.choices[0].message.content);</code></pre>
 <tr><td>Messages</td><td>应用层提供多轮上下文</td></tr>
 </tbody></table>
 <h2>学习疑问与解答</h2><h3>Q1：Self-Attention 是否根据上下文动态赋予每个 Token 语义？</h3><p>提问日期：2026-10-15</p><p><strong>更准确地说，Self-Attention 动态聚合上下文信息并更新 Token 的向量表示，而不是直接分配语义标签。</strong></p><p>同一个 Token 的初始 Embedding 可以相同，但多层 Transformer 计算后隐藏状态不同。GPT 的因果掩码还限制了当前位置能够访问的上下文。</p><p>复习要点：动态更新的是表示，不是直接给 Token 打标签。</p>
+<h3>Q2：Q、K、V 分别代表什么？为什么要分成三个向量？</h3>
+<p>提问日期：2026-10-15</p>
+<p><strong>Q = Query（查询向量），K = Key（键向量），V = Value（值向量）。</strong>可以记成：Q 负责「寻找什么」，K 负责「是否匹配」，V 负责「提供什么信息」。三者不是字符串或数据库字段，而是由同一个输入隐藏状态通过不同的可学习投影得到的数值向量。</p>
+<div class="formula">Q = XW<sub>Q</sub>，K = XW<sub>K</sub>，V = XW<sub>V</sub></div>
+<p>例如「小明买了一台电脑，因为它运行速度很快」：为了更新「它」的表示，可以把「它」的 Query 看作查询需求，把「电脑」「小明」等位置的 Key 看作匹配特征，再按照匹配权重聚合对应的 Value。注意：这只是帮助理解的类比，注意力权重不能直接证明代词指代关系。</p>
+<div class="visual"><strong>交互实验：Q 与 K 的匹配分数如何影响 Value 聚合？</strong><AiCourseLab type="attention"/><p>实验中改变注意力分数，可以观察 Softmax 后各位置的权重变化。真正的注意力输出是这些权重对 Value 向量的加权和，而不是简单选中一个词。</p></div>
+<div class="formula">Attention(Q,K,V) = softmax(QKᵀ / √dₖ) V</div>
+<p>第一步，Q 与各个 K 的点积计算匹配分数；第二步，缩放并根据需要加入 Causal Mask，再用 Softmax 计算权重；第三步，用权重对各个 V 加权求和，生成新的上下文表示。</p>
+<p><strong>为什么不是一个向量？</strong>匹配特征与被传递的信息是不同职责。独立的 W<sub>Q</sub>、W<sub>K</sub>、W<sub>V</sub> 允许模型分别学习查询、匹配和信息传递的表示，多头注意力还能从不同表示子空间聚合信息。</p>
+<p><strong>复习要点：</strong>Q 负责提问，K 负责匹配，V 负责提供信息；Attention 是加权聚合，不是数据库检索。</p>
 <h2>十、课后练习</h2>
 <LessonQuiz :chapter="3" /><ol>
 <li>Self-Attention 与 Token Embedding 有什么区别？</li>
