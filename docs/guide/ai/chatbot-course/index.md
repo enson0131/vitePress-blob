@@ -11,6 +11,7 @@ title: AI 聊天机器人学习教程
 1. [第 01 篇：ChatGPT 如何回答问题](./01-how-chatgpt-works)
 2. [第 02 篇：Token 与 Embedding](./02-token-and-embedding)
 3. [第 03 篇：Transformer 与 Attention](./03-transformer-attention)
+4. [第 04 篇：位置编码与 RoPE](./04-position-encoding)
 
 ## 学习路线
 

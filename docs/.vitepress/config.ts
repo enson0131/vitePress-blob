@@ -104,6 +104,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '01 · ChatGPT 如何回答问题', link: 'ai/chatbot-course/01-how-chatgpt-works' },
           { text: '02 · Token 与 Embedding', link: 'ai/chatbot-course/02-token-and-embedding' },
           { text: '03 · Transformer 与 Attention', link: 'ai/chatbot-course/03-transformer-attention' },
+          { text: '04 · 位置编码与 RoPE', link: 'ai/chatbot-course/04-position-encoding' },
         ]
       },
       {
