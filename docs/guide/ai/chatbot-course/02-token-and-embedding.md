@@ -43,9 +43,9 @@ Embedding 将离散的 Token ID 映射为连续的高维向量。
 
 ## 4. 余弦相似度
 
-```math
+$
 \operatorname{sim}(A,B)=\frac{A\cdot B}{\|A\|\|B\|}
-```
+$
 
 非零向量的余弦相似度范围为 -1 到 1。越接近 1，方向越一致，但不保证事实正确。
 
@@ -59,6 +59,12 @@ function cosine(a: number[], b: number[]): number {
   return dot / (na * nb);
 }
 ```
+
+<script setup>
+import AiCourseLab from '../../../.vitepress/theme/components/AiCourseLab.vue'
+</script>
+
+<AiCourseLab type="cosine" />
 
 ## 5. 工程案例：Embedding API 与 RAG
 
@@ -100,6 +106,8 @@ flowchart TD
 
 这是假设价格，并非实时定价。多轮聊天若重复传入历史消息，会增加输入 Token 用量。
 
+<AiCourseLab type="cost" />
+
 ## 7. Embedding 与 Transformer 的关系
 
 ```mermaid
@@ -126,6 +134,8 @@ Embedding 提供初始向量，Transformer 结合上下文更新隐藏表示，�
 - 不同投影可能突出不同关系，也可能丢失信息。因此二维图中靠近，不保证原始高维空间中同样靠近。
 
 **复习类比：** 一个三维物体从正面和侧面看轮廓不同，但物体本身并没有改变。
+
+<AiCourseLab type="quiz" />
 
 ## 复习题
 
