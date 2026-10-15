@@ -85,7 +85,43 @@ console.log(positionalEncoding(10, 8));</code></pre>
 <div class="visual"><div v-for="(q,i) in quiz" :key="i" class="question"><strong>{{i+1}}. {{q.q}}</strong><label v-for="(o,j) in q.opts" :key="j" class="option"><input type="radio" :name="'q4-'+i" :checked="answers[i]===j" @change="pick(i,j)"/>{{o}}</label><p v-if="submitted" class="feedback">{{answers[i]===q.a?'✓ 回答正确':'正确答案：'+q.opts[q.a]}}。{{q.ex}}</p></div>
 <div class="buttons"><button :disabled="quiz.some((_,i)=>answers[i]===undefined)" @click="submitted=true">提交答案</button><button @click="answers=[];submitted=false">重新作答</button></div><div v-if="submitted" class="score">得分：{{score}} / {{quiz.length}}</div></div>
 <h3>工程思考题</h3><p>如果聊天机器人要处理超过原始训练长度的文档，为什么不能简单修改 API 的上下文长度参数？</p>
-<h2>学习疑问与解答</h2><p>目前暂无新增学习疑问。后续将按问题、结论、解释与复习要点持续补充。</p>
+<h2>学习疑问与解答</h2>
+<h3>Q1：为什么 Transformer 需要位置编码？</h3>
+<p><strong>答案：因为普通 Self-Attention 本身没有显式的 Token 顺序信息。</strong></p>
+<p>例如「小明喜欢小红」和「小红喜欢小明」使用相同的词，但词序和语义不同。没有位置机制的普通 Self-Attention 对输入排列具有等变性，交换输入位置，输出也会相应交换，无法凭空识别原始顺序。</p>
+<p>位置编码用于提供顺序或位置关系信息。GPT 的因果掩码也引入一定顺序结构，但通常不能完全替代位置机制。</p>
+<p><strong>复习要点：</strong>位置编码告诉模型「Token 在哪里」。</p>
+<h3>Q2：经典正弦位置编码如何与 Token Embedding 结合？</h3>
+<p><strong>答案：逐元素相加。</strong></p>
+<div class="formula">Xᵢ = Eᵢ + Pᵢ</div>
+<p>Eᵢ 是 Token Embedding，Pᵢ 是位置向量，Xᵢ 是融合后的输入表示。</p>
+<pre><code>Token Embedding = [0.2, 0.5, 0.8, 0.1]
+Position Encoding = [0.1, 0.3, 0.2, 0.4]
+融合后的表示 = [0.3, 0.8, 1.0, 0.5]</code></pre>
+<p>这是经典绝对位置编码的方案，不是 RoPE 的实现方式。</p>
+<p><strong>复习要点：</strong>经典位置编码 = Token Embedding + Position Encoding。</p>
+<h3>Q3：RoPE 通常对哪些向量进行旋转？</h3>
+<p><strong>答案：Query（Q）和 Key（K），通常不旋转 Value（V）。</strong></p>
+<p>Self-Attention 使用 Q、K 的点积计算匹配分数。RoPE 对 Q、K 的成对维度施加位置相关旋转，使注意力分数能够体现两个 Token 的相对位置。</p>
+<div class="visual"><strong>RoPE 在注意力中的位置</strong><div class="step">输入隐藏状态 X</div><div class="arrow">↓ 线性投影</div><div class="three"><div class="step">Query<small>RoPE 旋转</small></div><div class="step">Key<small>RoPE 旋转</small></div><div class="step">Value<small>通常不旋转</small></div></div><div class="arrow">↓</div><div class="step">Attention 计算</div></div>
+<div class="formula">(Rₘq)ᵀ(Rₙk) = qᵀRₙ₋ₘk</div>
+<p>其中 n−m 是相对位置差。</p>
+<p><strong>复习要点：</strong>RoPE 旋转 Q、K，让 Attention 感知相对位置。</p>
+<h3>Q4：Causal Mask 的作用是什么？</h3>
+<p><strong>答案：禁止当前位置直接访问未来 Token。</strong></p>
+<p>例如「我 → 喜欢 → 学习 → AI」，处理「学习」时，可以关注「我」「喜欢」「学习」，但不能关注未来的「AI」。</p>
+<table><thead><tr><th>当前 Token</th><th>我</th><th>喜欢</th><th>学习</th><th>AI</th></tr></thead><tbody><tr><td>我</td><td>✓</td><td>×</td><td>×</td><td>×</td></tr><tr><td>喜欢</td><td>✓</td><td>✓</td><td>×</td><td>×</td></tr><tr><td>学习</td><td>✓</td><td>✓</td><td>✓</td><td>×</td></tr><tr><td>AI</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr></tbody></table>
+<p>GPT 是自回归生成模型。如果训练时可以直接看到未来的目标 Token，就可能产生信息泄漏，破坏预测目标。</p>
+<p><strong>复习要点：</strong>Causal Mask 决定「哪些 Token 可以看」。</p>
+<h3>四个概念的联系</h3>
+<table><thead><tr><th>机制</th><th>核心作用</th></tr></thead><tbody>
+<tr><td>Token Embedding</td><td>将 Token 转换为向量</td></tr>
+<tr><td>Position Encoding</td><td>注入位置信息</td></tr>
+<tr><td>RoPE</td><td>通过旋转 Q/K 体现相对位置</td></tr>
+<tr><td>Causal Mask</td><td>屏蔽未来位置</td></tr>
+<tr><td>Self-Attention</td><td>聚合上下文信息</td></tr>
+</tbody></table>
+<p><strong>总结：</strong>Embedding 负责表示，位置编码负责顺序，Causal Mask 负责访问限制，Self-Attention 负责上下文信息聚合。RoPE 是位置编码的一种，不是必须与传统相加式位置编码同时使用。</p>
 <footer><a href="./03-transformer-attention">← 第 03 篇</a><span>第 04 / 40 篇</span></footer>
 </article></template>
 <style scoped>
