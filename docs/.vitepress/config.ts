@@ -73,6 +73,11 @@ function nav(): DefaultTheme.NavItem[] {
       activeMatch: '/guide/'
     },
     {
+      text: 'AI 聊天机器人教程',
+      link: '/guide/ai/chatbot-course/',
+      activeMatch: '/guide/ai/chatbot-course/'
+    },
+    {
       text: '摄影笔记',
       link: '/shoot/基础概念/光圈',
       activeMatch: '/shoot/'
@@ -91,9 +96,20 @@ function nav(): DefaultTheme.NavItem[] {
 function sidebarGuide(): DefaultTheme.SidebarItem[] {
     return [
       {
+        text: 'AI 聊天机器人学习教程',
+        collapsed: false,
+        items: [
+          { text: '教程总览', link: 'ai/chatbot-course/' },
+          { text: '01 · ChatGPT 如何回答问题', link: 'ai/chatbot-course/01-how-chatgpt-works' },
+          { text: '02 · Token 与 Embedding', link: 'ai/chatbot-course/02-token-and-embedding' },
+          { text: '03 · Transformer 与 Attention', link: 'ai/chatbot-course/03-transformer-attention' },
+        ]
+      },
+      {
         text: 'AI 笔记',
         collapsed: false,
         items: [
+          { text: 'AI 聊天机器人教程（40 篇）', link: 'ai/chatbot-course/' },
           { text: '什么是 LangChain', link: 'ai/什么是langchain' },
           { text: 'LangChain 快速入门', link: 'ai/langchain快速入门' },
           { text: '构建可复用的 Prompt Template', link: 'ai/构建可复用的PromptTemplate' },
