@@ -17,6 +17,7 @@ export default withMermaid(defineConfig({
     ignoreDeadLinks: true,
 
     lang: 'zh-CN',
+    markdown: { math: true },
     
     head: [
         ['link', { rel: 'icon', href: '/assets/logo.jpg' }],
