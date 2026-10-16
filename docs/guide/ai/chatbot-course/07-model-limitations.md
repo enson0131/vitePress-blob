@@ -3,6 +3,11 @@ title: "07 · 大模型的能力边界：上下文窗口、幻觉与推理限制
 outline: deep
 ---
 
+<script setup>
+import ContextBudget from "../../../.vitepress/theme/components/ContextBudget.vue"
+import Lesson07Quiz from "../../../.vitepress/theme/components/Lesson07Quiz.vue"
+</script>
+
 # 第 07 篇：大模型的能力边界——上下文窗口、幻觉与推理限制
 > 第 07 / 40 篇 · 第一阶段：AI 与大模型基础 · 阅读约 15 分钟
 
@@ -145,3 +150,6 @@ console.log(result);
 
 ---
 [← 第 06 篇](./06-inference) · [返回课程目录](./)
+<style scoped>
+.visual{border:1px solid var(--vp-c-divider);border-radius:14px;padding:18px;margin:20px 0}.visual strong{display:block;margin-bottom:12px}.visual small{display:block;color:var(--vp-c-text-2);font-size:12px}.budget{display:flex;min-height:44px;border-radius:8px;overflow:hidden}.budget span{display:flex;justify-content:center;align-items:center;color:white;font-size:10px;text-align:center;min-width:0}.visual svg{display:block;width:100%;max-width:440px;margin:auto}.step{background:var(--vp-c-bg-soft);border-radius:8px;padding:12px;text-align:center}.arrow{text-align:center;padding:8px;color:var(--vp-c-text-2)}
+</style>
