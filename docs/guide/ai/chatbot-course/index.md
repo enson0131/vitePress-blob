@@ -14,6 +14,7 @@ title: AI 聊天机器人学习教程
 4. [第 04 篇：位置编码与 RoPE](./04-position-encoding)
 5. [第 05 篇：大语言模型是如何训练出来的？](./05-llm-training)
 6. [第 06 篇：模型推理与 KV Cache](./06-inference)
+7. [第 07 篇：大模型的能力边界](./07-model-limitations)
 
 ## 学习路线
 
