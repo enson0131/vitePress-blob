@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+const ttft = ref(4.9)
+const tps = ref(50)
+const tokens = ref(500)
+const estimatedDuration = computed(() => ttft.value + (tokens.value - 1) / tps.value)
 const temperature = ref(1)
 const probabilities = computed(() => {
  const logits=[2.5,1.8,0.9,0.1]
@@ -54,32 +58,251 @@ function reset(){selected.value=[];submitted.value=false}
 <p><strong>Temperature</strong> 改变候选 Token 的概率分布；<strong>Top-p（核采样）</strong> 则通常按照概率从高到低排列，只保留累计概率达到阈值 p 的最小候选集合，再从中采样。</p>
 <table><thead><tr><th>参数</th><th>主要作用</th></tr></thead><tbody><tr><td>Temperature</td><td>调整概率分布的集中程度</td></tr><tr><td>Top-p</td><td>限制参与采样的候选集合</td></tr><tr><td>Max output tokens</td><td>限制最大生成长度</td></tr></tbody></table>
 <p>这些参数不会直接让模型学到新知识，也不能保证消除幻觉。很多 API 建议优先调整 Temperature 或 Top-p 中的一个，而不是同时大幅修改。</p>
-<h2>七、TTFT、TPS：为什么聊天机器人有时很慢？</h2>
-<table><thead><tr><th>指标</th><th>含义</th></tr></thead><tbody><tr><td>TTFT</td><td>Time to First Token，首个输出 Token 的等待时间</td></tr><tr><td>TPS</td><td>Tokens Per Second，每秒生成 Token 数</td></tr><tr><td>端到端延迟</td><td>从发起请求到完整回答结束的时间</td></tr></tbody></table>
-<p>TTFT 受到排队、网络、Prefill 等因素影响；TPS 受到 Decode、硬件、并发、缓存和模型大小影响。实际产品还应观察 P95/P99 延迟，而不只是平均值。</p>
-<h2>八、TypeScript：如何实现流式聊天？</h2>
-<p>在 Node.js 后端调用支持流式输出的模型 API，前端可以逐步渲染内容，而不必等完整回答结束。以下使用 OpenAI Chat Completions 风格的示例：</p>
-<pre><code>import OpenAI from 'openai'
-const client = new OpenAI()
+<h2>七、推理性能：TTFT、TPS 与延迟</h2>
+<h3>7.2 为什么输出到一半时可能变慢？</h3>
+<p>首先要理解一个关键区别：</p>
+<p><strong>Prefill 通常更偏向计算密集型，而 Decode 在很多部署场景下更容易受到内存带宽限制。</strong></p>
+<p>这是因为在 Decode 阶段，模型通常需要逐 Token 执行前向计算，并访问模型权重和 KV Cache。</p>
+<p>假设：</p>
+<pre><code>用户提问
+   ↓
+Prefill：处理 2,000 Tokens
+   ↓
+Decode：生成 1,000 Tokens</code></pre>
+<p>Decode 需要执行多轮生成。而且随着生成长度增加，KV Cache 也可能不断增长。</p>
+<p>但这里有个容易误解的地方：</p>
+<p><strong>生成越往后，并不意味着 TPS 一定持续下降。</strong></p>
+<p>真实推理性能还受到批处理策略、注意力实现、硬件、服务端负载以及缓存管理方式影响。</p>
+<h3>7.3 如何计算生成速度？</h3>
+<p>假设模型在首 Token 之后，用 8 秒生成了 400 个额外 Token。</p>
+<p>那么：</p><div class="formula">TPS = 400 / 8 = 50</div>
+<p>即每秒生成 50 Tokens。</p>
+<p>你可以通过下面的实验理解 TTFT 和 TPS 对用户体验的影响。</p>
+<div class="visual"><strong>交互实验：推理延迟计算器</strong>
+<label for="ttft-slider">TTFT（首 Token 延迟）：{{ttft.toFixed(1)}} 秒</label>
+<input id="ttft-slider" v-model.number="ttft" type="range" min="0.1" max="10" step="0.1"/>
+<label for="tps-slider">后续生成速度：{{tps}} Tokens/s</label>
+<input id="tps-slider" v-model.number="tps" type="range" min="10" max="200" step="10"/>
+<label for="tokens-slider">总输出 Token 数量：{{tokens}}</label>
+<input id="tokens-slider" v-model.number="tokens" type="range" min="100" max="2000" step="100"/>
+<div class="metrics"><div class="step"><small>首 Token 等待</small><b>{{ttft.toFixed(1)}}s</b></div><div class="step"><small>预计总耗时</small><b>{{estimatedDuration.toFixed(1)}}s</b></div></div>
+<small>简化估算：总耗时 ≈ TTFT + (输出 Token 数 − 1) / 后续 TPS，假设生成速度恒定。</small></div>
+<p>从这个实验可以得出两个工程结论：</p>
+<ul><li>如果用户一直看不到第一个字，应该重点排查 TTFT。</li><li>如果已经开始输出，但生成非常缓慢，应该重点关注 Decode 吞吐量。</li></ul>
+<h2>八、TypeScript：如何实现 ChatGPT 式流式聊天？</h2>
+<p>这是本篇最重要的工程实践。</p>
+<p>假设你的技术栈是：</p>
+<ul><li>React：聊天界面。</li><li>Node.js：后端服务。</li><li>OpenAI SDK：调用大语言模型。</li><li>HTTP Streaming：增量传输。</li></ul>
+<h3>8.1 整体架构</h3>
+<div class="visual"><strong>流式聊天系统架构</strong>
+<div class="step"><b>React Chat UI</b><small>用户输入 / 实时渲染 / 停止生成</small></div><div class="arrow">↓</div>
+<div class="step blue"><b>Node.js API</b><small>鉴权 / 组装 Messages / 流式转发</small></div><div class="arrow">↓</div>
+<div class="step green"><b>LLM API</b><small>Prefill → Decode → 增量事件</small></div><div class="arrow">↕</div>
+<div class="step"><b>HTTP 流式响应返回浏览器</b></div></div>
+<h3>8.2 Node.js 后端示例</h3>
+<p>首先安装：</p>
+<pre><code>npm install openai express
+npm install -D @types/express typescript tsx</code></pre>
+<p>创建 server.ts：</p>
+<pre><code>import express from "express";
+import OpenAI from "openai";
 
-const stream = await client.chat.completions.create({
-  model: 'gpt-4.1-mini',
-  messages: [
-    { role: 'user', content: '解释什么是 KV Cache' }
-  ],
-  stream: true
-})
+const app = express();
+const client = new OpenAI();
 
-for await (const chunk of stream) {
-  const text = chunk.choices[0]?.delta?.content
-  if (text) process.stdout.write(text)
+app.use(express.json());
+
+app.post("/api/chat", async (req, res) => {
+  const message = req.body?.message;
+
+  if (typeof message !== "string" ||
+      !message.trim() ||
+      message.length > 10000) {
+    res.status(400).json({
+      error: "Invalid message"
+    });
+    return;
+  }
+
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  res.setHeader("Cache-Control", "no-cache");
+  res.flushHeaders();
+
+  const controller = new AbortController();
+
+  res.on("close", () => {
+    if (!res.writableEnded) controller.abort();
+  });
+
+  try {
+    const stream = await client.chat.completions.create(
+      {
+        model: "gpt-4.1-mini",
+        messages: [
+          { role: "user", content: message }
+        ],
+        stream: true
+      },
+      { signal: controller.signal }
+    );
+
+    for await (const chunk of stream) {
+      if (controller.signal.aborted) break;
+
+      const content =
+        chunk.choices[0]?.delta?.content;
+
+      if (content) res.write(content);
+    }
+
+    if (!res.writableEnded) res.end();
+  } catch (error) {
+    console.error(error);
+    if (!res.writableEnded) res.end();
+  }
+});
+
+app.listen(3000);</code></pre>
+<p>这个示例使用原始文本流，方便理解原理，并不是严格的 SSE 事件格式。</p>
+<p>在生产环境中，还需要增加用户鉴权、请求限流、错误事件协议、日志和持久化等机制。</p>
+<p>尤其需要注意：响应头已经发送后，不能再像普通 JSON API 一样随意修改 HTTP 状态码。</p>
+<h3>8.3 React 前端实现流式渲染</h3>
+<p>接下来，我们使用 Fetch API 的 ReadableStream 读取响应。</p>
+<pre><code>import { useRef, useState } from "react";
+
+export function Chat() {
+  const [message, setMessage] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const controllerRef =
+    useRef&lt;AbortController | null&gt;(null);
+
+  async function sendMessage() {
+    if (!message.trim() || loading) return;
+
+    const controller = new AbortController();
+    controllerRef.current = controller;
+
+    setLoading(true);
+    setAnswer("");
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message }),
+        signal: controller.signal
+      });
+
+      if (!response.ok || !response.body) {
+        throw new Error("Request failed");
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) break;
+
+        const text = decoder.decode(value, {
+          stream: true
+        });
+
+        setAnswer(prev => prev + text);
+      }
+
+      const tail = decoder.decode();
+      if (tail) setAnswer(prev => prev + tail);
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        console.error(error);
+      }
+    } finally {
+      setLoading(false);
+      controllerRef.current = null;
+    }
+  }
+
+  function stopGeneration() {
+    controllerRef.current?.abort();
+  }
+
+  return (
+    &lt;div&gt;
+      &lt;textarea
+        value={message}
+        onChange={e => setMessage(e.target.value)}
+      /&gt;
+
+      &lt;button onClick={sendMessage}&gt;
+        发送
+      &lt;/button&gt;
+
+      &lt;button onClick={stopGeneration}&gt;
+        停止生成
+      &lt;/button&gt;
+
+      &lt;div&gt;{answer}&lt;/div&gt;
+    &lt;/div&gt;
+  );
 }</code></pre>
-<p>这个示例在 Node.js 终端输出增量文本。真实聊天应用还需要把流传给浏览器，处理用户取消、超时、错误、内容审核和消息持久化。<strong>流式显示不等于模型一次性生成整段回答。</strong></p>
-<h2>九、工程实践：如何优化推理体验？</h2>
-<p>首先区分首 Token 慢还是持续生成慢。前者可以检查输入上下文长度、请求排队与 Prefill；后者检查 Decode 性能、并发和输出长度。对于业务系统，还可以采用流式渲染、合理的上下文裁剪、提示词缓存和模型分级路由。</p>
-<p>优化前应建立基线：记录 TTFT、TPS、错误率、每请求 Token 用量与实际费用，避免只凭体感判断性能。</p>
+<p>这里最重要的代码是：</p>
+<pre><code>const reader = response.body.getReader();</code></pre>
+<p>它允许前端逐块读取响应数据。</p>
+<p>每收到一块数据，就更新 React 状态：</p>
+<pre><code>setAnswer(prev => prev + text);</code></pre>
+<p>因此，用户可以看到文字逐步出现。</p>
+<p>但有一个非常重要的区别：</p>
+<p><strong>网络 Chunk 不等于 Token。</strong></p>
+<p>一次网络 Chunk 可能包含多个 Token，也可能只包含一个 Token 的部分 UTF-8 字节。</p>
+<p>这也是为什么我们使用 TextDecoder 并开启 stream: true。</p>
+<h2>九、生产级 AI 聊天机器人应该如何优化？</h2>
+<p>当用户规模增加后，除了让聊天机器人能够回答问题，还需要关注延迟、成本、并发和稳定性。</p>
+<h3>9.1 常见性能问题与优化方向</h3>
+<table><thead><tr><th>问题</th><th>可能原因</th><th>优化方向</th></tr></thead><tbody>
+<tr><td>首字输出慢</td><td>Prefill、排队、网络</td><td>缩短上下文、缓存提示词</td></tr>
+<tr><td>持续生成慢</td><td>Decode 吞吐量不足</td><td>模型选型、推理服务优化</td></tr>
+<tr><td>显存不足</td><td>KV Cache、并发过高</td><td>限流、GQA、缓存管理</td></tr>
+<tr><td>成本过高</td><td>输入输出 Token 过多</td><td>摘要、缓存、模型分级</td></tr>
+<tr><td>前端卡顿</td><td>频繁更新 React 状态</td><td>批量更新、节流渲染</td></tr>
+</tbody></table>
+<h3>9.2 为什么需要限制上下文长度？</h3>
+<p>假设一个聊天机器人有 100 轮历史消息。</p>
+<p>如果每次请求都把所有历史消息发送给模型，就可能出现：</p>
+<pre><code>第 1 轮：  100 Tokens
+第 2 轮：  300 Tokens
+第 3 轮：  500 Tokens
+...
+第 100 轮：20,000 Tokens</code></pre>
+<p>这会增加输入 Token 成本和 Prefill 计算负担。</p>
+<p>实际应用通常需要结合：</p>
+<ul><li>最近消息窗口。</li><li>历史对话摘要。</li><li>相关记忆检索。</li><li>系统提示词缓存。</li></ul>
+<p>这些属于应用层上下文管理，与模型内部的 KV Cache 并不是一回事。</p>
+<h3>9.3 如何衡量优化是否有效？</h3>
+<p>建议至少监控：</p>
+<table><thead><tr><th>指标</th><th>目标</th></tr></thead><tbody>
+<tr><td>TTFT P50/P95</td><td>观察首字响应延迟</td></tr>
+<tr><td>Decode TPS</td><td>观察持续生成速度</td></tr>
+<tr><td>输入 / 输出 Token</td><td>分析使用量和成本</td></tr>
+<tr><td>错误率</td><td>识别超时与服务失败</td></tr>
+<tr><td>取消率</td><td>识别用户主动中止</td></tr>
+<tr><td>上下文长度</td><td>识别超长请求</td></tr>
+</tbody></table>
+<p>对于生产级服务，建议分别观察 P50、P95 和 P99，而不是只看平均值。</p>
 <h2>十、本篇总结</h2>
-<p><strong>Prefill 处理已有上下文，Decode 逐步生成新 Token，KV Cache 复用历史 Key/Value；Temperature 和 Top-p 控制采样行为，流式输出改善用户等待体验。</strong></p>
+<p>我们把今天学习的知识串联起来：</p>
+<div class="visual"><div class="step"><b>1. Prefill</b><small>处理已有输入上下文</small></div><div class="arrow">↓</div>
+<div class="step"><b>2. Decode</b><small>逐步生成下一个 Token</small></div><div class="arrow">↓</div>
+<div class="step"><b>3. KV Cache</b><small>缓存历史 Key / Value，减少重复计算</small></div><div class="arrow">↓</div>
+<div class="step"><b>4. Temperature / Top-p</b><small>控制 Token 采样策略</small></div><div class="arrow">↓</div>
+<div class="step"><b>5. Streaming</b><small>把生成内容增量传输给客户端</small></div></div>
+<p>最重要的一句话：</p>
+<p><strong>模型通过 Prefill 处理已有上下文，通过 Decode 逐 Token 生成内容，通过 KV Cache 提升推理效率，而聊天应用通过 Streaming 将生成结果实时呈现给用户。</strong></p>
 <h2>十一、交互式课后测验</h2>
 <div class="visual"><div v-for="(q,i) in questions" :key="i" class="question"><strong>{{i+1}}. {{q.q}}</strong><label v-for="(o,j) in q.opts" :key="j" class="option"><input type="radio" :name="'chapter6-'+i" :checked="selected[i]===j" @change="pick(i,j)"/>{{o}}</label><p v-if="submitted" class="feedback">{{selected[i]===q.a?'✓ 回答正确':'正确答案：'+q.opts[q.a]}}。{{q.why}}</p></div><div class="buttons"><button :disabled="questions.some((_,i)=>selected[i]===undefined)" @click="submitted=true">提交评分</button><button @click="reset">重新作答</button></div><div v-if="submitted" class="score">得分：{{score}} / {{questions.length}}</div></div>
 <h2>十二、学习疑问与解答</h2>
@@ -91,5 +314,5 @@ for await (const chunk of stream) {
 </article>
 </template>
 <style scoped>
-.lesson{font-size:15px;line-height:1.85;color:var(--vp-c-text-1);overflow-wrap:anywhere}.meta{font-size:12px;color:var(--vp-c-text-2)}h1{font-size:30px;line-height:1.35;margin:16px 0 24px}h2{font-size:23px;margin:36px 0 18px;border-top:1px solid var(--vp-c-divider);padding-top:12px}h3{font-size:17px;margin:20px 0 10px}p{margin:14px 0}.visual{border:1px solid var(--vp-c-divider);border-radius:14px;padding:18px;margin:20px 0}.visual>strong{display:block;margin-bottom:12px}.visual>small,.step small{display:block;font-size:12px;color:var(--vp-c-text-2);margin-top:8px}.step{background:var(--vp-c-bg-soft);border-radius:8px;padding:12px;text-align:center}.blue{background:rgba(37,99,235,.09)}.green{background:rgba(22,163,74,.09)}.arrow{text-align:center;padding:7px;color:var(--vp-c-text-2)}.formula{text-align:center;background:var(--vp-c-bg-soft);padding:18px;border-radius:9px;font-size:19px;overflow-x:auto}table{display:table;width:100%;font-size:14px}td,th{padding:9px}pre{background:var(--vp-code-block-bg);border-radius:10px;padding:18px;overflow:auto}pre code{font-size:13px;white-space:pre;color:var(--vp-c-text-1)}label{display:block;margin:10px 0}input[type=range]{display:block;width:100%;accent-color:var(--vp-c-brand-1)}.probrow{display:flex;gap:8px;align-items:center;margin:10px 0;font-size:13px}.probrow>span:first-child{width:38px}.probrow>span:last-child{width:55px;text-align:right}.track{flex:1;background:var(--vp-c-bg-soft);border-radius:10px;height:13px;overflow:hidden}.fill{height:100%;background:#2563eb;border-radius:10px}.option{padding:8px;border:1px solid var(--vp-c-divider);border-radius:8px;cursor:pointer}.option input{margin-right:8px}.question{padding:14px 0;border-bottom:1px solid var(--vp-c-divider)}.feedback{background:var(--vp-c-bg-soft);padding:10px;border-radius:8px}.buttons{display:flex;gap:10px;margin-top:15px}.buttons button{background:var(--vp-c-bg-soft);border:1px solid var(--vp-c-divider);border-radius:8px;padding:8px 14px;cursor:pointer}.buttons button:disabled{opacity:.4}.score{text-align:center;font-size:22px;font-weight:bold;margin:15px}footer{display:flex;justify-content:space-between;border-top:1px solid var(--vp-c-divider);padding-top:16px;margin-top:30px}@media(max-width:600px){h1{font-size:24px}h2{font-size:20px}.visual{padding:12px}}
+.lesson{font-size:15px;line-height:1.85;color:var(--vp-c-text-1);overflow-wrap:anywhere}.meta{font-size:12px;color:var(--vp-c-text-2)}h1{font-size:30px;line-height:1.35;margin:16px 0 24px}h2{font-size:23px;margin:36px 0 18px;border-top:1px solid var(--vp-c-divider);padding-top:12px}h3{font-size:17px;margin:20px 0 10px}p{margin:14px 0}.visual{border:1px solid var(--vp-c-divider);border-radius:14px;padding:18px;margin:20px 0}.visual>strong{display:block;margin-bottom:12px}.visual>small,.step small{display:block;font-size:12px;color:var(--vp-c-text-2);margin-top:8px}.step{background:var(--vp-c-bg-soft);border-radius:8px;padding:12px;text-align:center}.blue{background:rgba(37,99,235,.09)}.green{background:rgba(22,163,74,.09)}.arrow{text-align:center;padding:7px;color:var(--vp-c-text-2)}.formula{text-align:center;background:var(--vp-c-bg-soft);padding:18px;border-radius:9px;font-size:19px;overflow-x:auto}table{display:table;width:100%;font-size:14px}td,th{padding:9px}pre{background:var(--vp-code-block-bg);border-radius:10px;padding:18px;overflow:auto}pre code{font-size:13px;white-space:pre;color:var(--vp-c-text-1)}label{display:block;margin:10px 0}input[type=range]{display:block;width:100%;accent-color:var(--vp-c-brand-1)}.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}.metrics b{font-size:22px}.probrow{display:flex;gap:8px;align-items:center;margin:10px 0;font-size:13px}.probrow>span:first-child{width:38px}.probrow>span:last-child{width:55px;text-align:right}.track{flex:1;background:var(--vp-c-bg-soft);border-radius:10px;height:13px;overflow:hidden}.fill{height:100%;background:#2563eb;border-radius:10px}.option{padding:8px;border:1px solid var(--vp-c-divider);border-radius:8px;cursor:pointer}.option input{margin-right:8px}.question{padding:14px 0;border-bottom:1px solid var(--vp-c-divider)}.feedback{background:var(--vp-c-bg-soft);padding:10px;border-radius:8px}.buttons{display:flex;gap:10px;margin-top:15px}.buttons button{background:var(--vp-c-bg-soft);border:1px solid var(--vp-c-divider);border-radius:8px;padding:8px 14px;cursor:pointer}.buttons button:disabled{opacity:.4}.score{text-align:center;font-size:22px;font-weight:bold;margin:15px}footer{display:flex;justify-content:space-between;border-top:1px solid var(--vp-c-divider);padding-top:16px;margin-top:30px}@media(max-width:600px){h1{font-size:24px}h2{font-size:20px}.visual{padding:12px}}
 </style>
