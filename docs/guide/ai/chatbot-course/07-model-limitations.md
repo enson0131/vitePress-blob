@@ -8,7 +8,7 @@ import ContextBudget from "../../../.vitepress/theme/components/ContextBudget.vu
 import Lesson07Quiz from "../../../.vitepress/theme/components/Lesson07Quiz.vue"
 </script>
 
-# 第 07 篇：大模型的能力边界——上下文窗口、幻觉与推理限制
+<h1>第 07 篇：大模型的能力边界——上下文窗口、幻觉与推理限制</h1>
 > 第 07 / 40 篇 · 第一阶段：AI 与大模型基础 · 阅读约 15 分钟
 
 前六篇，我们已经了解了大语言模型如何将文字转换成 Token、利用 Transformer 处理上下文、通过训练获得能力，以及如何通过 Prefill、Decode 和 KV Cache 生成回答。
@@ -27,7 +27,7 @@ import Lesson07Quiz from "../../../.vitepress/theme/components/Lesson07Quiz.vue"
 
 今天我们会从模型原理、交互实验和 TypeScript 工程实践三个角度理解这些问题。
 
-## 一、上下文窗口：模型一次能看到多少内容？
+<h2>一、上下文窗口：模型一次能看到多少内容？</h2>
 
 Context Window（上下文窗口）是模型单次推理能够处理的上下文容量限制，通常以 Token 为单位衡量。
 
@@ -37,25 +37,23 @@ Context Window（上下文窗口）是模型单次推理能够处理的上下文
 
 在常见的共享窗口设计中：
 
-$$
-T_{\text{input}}+T_{\text{output}}\leq T_{\text{context}}
-$$
+<div class="formula" role="math" aria-label="输入 Token 加输出 Token 小于等于上下文窗口">T<sub>input</sub> + T<sub>output</sub> ≤ T<sub>context</sub></div>
 
 还可能受到独立的最大输出长度限制。不同模型 API 的计算规则有所差异。
 
-### 1.1 上下文窗口包含什么？
+<h3>1.1 上下文窗口包含什么？</h3>
 
 <div class="visual"><strong>上下文窗口容量示意</strong><div class="budget"><span style="flex:12;background:#64748b">系统提示</span><span style="flex:30;background:#2563eb">历史消息</span><span style="flex:38;background:#16a34a">当前输入</span><span style="flex:20;background:#d97706">输出预算</span></div><small>比例仅用于演示，不代表真实模型的固定分配。</small></div>
 
 实际请求还可能包含工具结果、检索文档、消息格式开销等内容。
 
-### 1.2 交互实验：上下文预算
+<h3>1.2 交互实验：上下文预算</h3>
 
 <ContextBudget />
 
 **工程结论：** 上下文窗口是有限资源，聊天历史、RAG 文档和输出预算需要统一管理。
 
-## 二、为什么上下文没有超限，模型仍然可能遗漏信息？
+<h2>二、为什么上下文没有超限，模型仍然可能遗漏信息？</h2>
 
 这是比 Token 上限更值得关注的问题。
 
@@ -81,11 +79,11 @@ $$
 
 但这不是所有模型、所有任务都必然遵循的规律。
 
-### 2.1 信息位置与利用效果示意
+<h3>2.1 信息位置与利用效果示意</h3>
 
 <div class="visual"><strong>长上下文中不同位置的信息利用效果</strong><svg viewBox="0 0 340 190" role="img" aria-label="长上下文开头和结尾利用效果较高，中间较低的概念曲线"><path d="M35 12V160H325" fill="none" stroke="currentColor" opacity=".4"/><path d="M38 35 C100 30 110 130 180 135 S270 35 320 32" fill="none" stroke="#2563eb" stroke-width="3"/><text x="38" y="180" fill="currentColor" font-size="12">开头</text><text x="165" y="180" fill="currentColor" font-size="12">中间</text><text x="294" y="180" fill="currentColor" font-size="12">结尾</text></svg><small>概念图，不是某个模型的实测准确率曲线。</small></div>
 
-### 2.2 如何解决？
+<h3>2.2 如何解决？</h3>
 
 工程上可以考虑：
 
@@ -97,7 +95,7 @@ $$
 
 **上下文窗口越大，不等于模型对每一个位置的信息都利用得同样好。**
 
-## 三、幻觉（Hallucination）：为什么 AI 会编造答案？
+<h2>三、幻觉（Hallucination）：为什么 AI 会编造答案？</h2>
 
 假设你向聊天机器人提问：
 
@@ -115,7 +113,7 @@ const [value, setValue] = useMagicState(0);
 
 如果模型把它当成 React 官方 API 介绍，就产生了事实性错误。
 
-### 3.1 为什么会发生？
+<h3>3.1 为什么会发生？</h3>
 
 回顾第一篇的核心原理：
 
@@ -129,7 +127,7 @@ const [value, setValue] = useState(0);
 
 因此，即使遇到不存在的 API 名称，也可能生成语法上合理、但事实不正确的解释。
 
-### 3.2 幻觉不只有一种
+<h3>3.2 幻觉不只有一种</h3>
 
 | 类型 | 示例 |
 |---|---|
@@ -141,15 +139,13 @@ const [value, setValue] = useState(0);
 
 要特别注意：**模型表达得越自信，不代表答案越可靠。**
 
-## 四、Temperature 设置为 0，能消除幻觉吗？
+<h2>四、Temperature 设置为 0，能消除幻觉吗？</h2>
 
 不能。
 
 第 06 篇我们学过：
 
-$$
-P_i=\operatorname{softmax}(z_i/T)
-$$
+<div class="formula" role="math">P<sub>i</sub> = softmax(z<sub>i</sub> / T)</div>
 
 Temperature 主要影响采样分布。
 
@@ -171,7 +167,7 @@ Temperature 主要影响采样分布。
 
 解决幻觉通常需要结合检索、工具调用、结构化约束和结果验证。
 
-## 五、为什么大模型会在数学和逻辑推理中出错？
+<h2>五、为什么大模型会在数学和逻辑推理中出错？</h2>
 
 大模型可以学习大量数学与逻辑模式，但生成流畅的解释，不代表每一步计算都正确。
 
@@ -181,15 +177,13 @@ Temperature 主要影响采样分布。
 
 正确答案是：
 
-$$
-100\times1.2\times0.8=96
-$$
+<div class="formula" role="math">100 × 1.2 × 0.8 = 96</div>
 
 最终价格是 96 元，而不是 100 元。
 
 这种错误可能来自多个方面：错误地套用语言模式、遗漏中间条件、算术运算不准确，或者错误步骤在后续推理中被不断放大。
 
-### 5.1 为什么生成更多推理步骤也不一定正确？
+<h3>5.1 为什么生成更多推理步骤也不一定正确？</h3>
 
 因为增加推理步骤并不自动保证每一步都有效。
 
@@ -209,7 +203,7 @@ $$
 
 ---
 
-## 六、RAG 能完全消除幻觉吗？
+<h2>六、RAG 能完全消除幻觉吗？</h2>
 
 不能，但 RAG 是降低知识性幻觉的重要手段之一。
 
@@ -230,7 +224,7 @@ RAG（Retrieval-Augmented Generation，检索增强生成）的核心思想是�
 
 ---
 
-## 七、TypeScript：如何让聊天机器人在证据不足时拒答？
+<h2>七、TypeScript：如何让聊天机器人在证据不足时拒答？</h2>
 
 假设我们正在开发一个企业内部 AI 助手。
 
@@ -295,7 +289,7 @@ console.log(result);
 
 ---
 
-## 八、生产级聊天机器人的风险控制
+<h2>八、生产级聊天机器人的风险控制</h2>
 
 结合我们前面学习的知识，可以整理出一张工程决策表。
 
@@ -316,7 +310,7 @@ console.log(result);
 
 ---
 
-## 九、本篇总结
+<h2>九、本篇总结</h2>
 
 今天最重要的不是记住某个模型的上下文长度，而是理解模型能力的边界。
 
@@ -333,24 +327,24 @@ console.log(result);
 
 ---
 
-## 十、交互式课后测验
+<h2>十、交互式课后测验</h2>
 <Lesson07Quiz />
 
-## 十一、学习疑问与解答
-### Q1：上下文窗口越大，回答一定越准确吗？
+<h2>十一、学习疑问与解答</h2>
+<h3>Q1：上下文窗口越大，回答一定越准确吗？</h3>
 不一定。更长上下文可能提供更多证据，也可能带来噪声、成本与信息定位困难。
 
-### Q2：Temperature 为 0，回答就完全确定吗？
+<h3>Q2：Temperature 为 0，回答就完全确定吗？</h3>
 不一定。较低随机性不保证事实正确，服务端数值计算和模型版本等因素也可能带来差异。
 
-### Q3：RAG 和微调哪个更适合更新企业知识？
+<h3>Q3：RAG 和微调哪个更适合更新企业知识？</h3>
 通常优先 RAG，因为知识可更新并保留来源；微调更适合改善特定任务行为。
 
-### Q4：如果模型说“我非常确定”，能当作置信度吗？
+<h3>Q4：如果模型说“我非常确定”，能当作置信度吗？</h3>
 不能直接当作经过校准的概率。需要独立评估和外部证据验证。
 
 ---
 [← 第 06 篇](./06-inference) · [返回课程目录](./)
 <style scoped>
-.visual{border:1px solid var(--vp-c-divider);border-radius:14px;padding:18px;margin:20px 0}.visual strong{display:block;margin-bottom:12px}.visual small{display:block;color:var(--vp-c-text-2);font-size:12px}.budget{display:flex;min-height:44px;border-radius:8px;overflow:hidden}.budget span{display:flex;justify-content:center;align-items:center;color:white;font-size:10px;text-align:center;min-width:0}.visual svg{display:block;width:100%;max-width:440px;margin:auto}.step{background:var(--vp-c-bg-soft);border-radius:8px;padding:12px;text-align:center}.arrow{text-align:center;padding:8px;color:var(--vp-c-text-2)}
+.formula{font-family:Georgia,serif;font-size:21px;text-align:center;background:var(--vp-c-bg-soft);border-radius:10px;padding:20px;margin:18px 0;overflow-x:auto}.visual{border:1px solid var(--vp-c-divider);border-radius:14px;padding:18px;margin:20px 0}.visual strong{display:block;margin-bottom:12px}.visual small{display:block;color:var(--vp-c-text-2);font-size:12px}.budget{display:flex;min-height:44px;border-radius:8px;overflow:hidden}.budget span{display:flex;justify-content:center;align-items:center;color:white;font-size:10px;text-align:center;min-width:0}.visual svg{display:block;width:100%;max-width:440px;margin:auto}.step{background:var(--vp-c-bg-soft);border-radius:8px;padding:12px;text-align:center}.arrow{text-align:center;padding:8px;color:var(--vp-c-text-2)}
 </style>
