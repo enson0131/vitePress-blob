@@ -108,6 +108,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '05 · 大语言模型训练', link: 'ai/chatbot-course/05-llm-training' },
           { text: '06 · 模型推理与 KV Cache', link: 'ai/chatbot-course/06-inference' },
           { text: '07 · 大模型的能力边界', link: 'ai/chatbot-course/07-model-limitations' },
+          { text: '08 · Prompt 与 Messages', link: 'ai/chatbot-course/08-prompt-messages' },
         ]
       },
       {
