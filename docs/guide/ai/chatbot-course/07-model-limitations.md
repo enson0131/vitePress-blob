@@ -172,63 +172,166 @@ Temperature 主要影响采样分布。
 解决幻觉通常需要结合检索、工具调用、结构化约束和结果验证。
 
 ## 五、为什么大模型会在数学和逻辑推理中出错？
-模型擅长识别大量模式，但复杂推理需要保持中间状态、执行准确运算并避免步骤传播错误。语言上的连贯不等于逻辑上的有效。
 
-例如：一个商品原价 100 元，先涨价 20%，再降价 20%，最终价格不是 100 元，而是 96 元。
+大模型可以学习大量数学与逻辑模式，但生成流畅的解释，不代表每一步计算都正确。
 
-$
+例如：
+
+> 一个商品原价 100 元，先涨价 20%，再降价 20%，最后是不是又回到了 100 元？
+
+正确答案是：
+
+$$
 100\times1.2\times0.8=96
-$
+$$
 
-对于金额、日期、统计和其他确定性计算，工程上应优先调用计算器、代码执行器或业务系统，而不是仅依赖自然语言生成。
+最终价格是 96 元，而不是 100 元。
+
+这种错误可能来自多个方面：错误地套用语言模式、遗漏中间条件、算术运算不准确，或者错误步骤在后续推理中被不断放大。
+
+### 5.1 为什么生成更多推理步骤也不一定正确？
+
+因为增加推理步骤并不自动保证每一步都有效。
+
+假设模型的某个中间步骤出现错误，后续步骤即使逻辑连贯，也可能建立在错误前提上。
+
+因此，对于确定性任务，我们通常应该使用外部工具。
+
+| 任务 | 更可靠的方案 |
+|---|---|
+| 金额计算 | 计算器或代码执行 |
+| 日期计算 | 日期库 |
+| 数据库统计 | SQL 查询 |
+| 实时股票价格 | 可信行情接口 |
+| API 是否存在 | 官方文档与类型检查 |
+
+**工程结论：让 LLM 负责理解问题、规划任务，让确定性工具负责可验证的计算。**
+
+---
 
 ## 六、RAG 能完全消除幻觉吗？
-不能。RAG 通过检索外部知识为回答提供依据，但检索可能遗漏重要文档、召回错误片段，模型也可能误读来源或引用不相关证据。
 
-<div class="visual"><strong>带证据验证的 RAG 流程</strong><div class="step">用户问题</div><div class="arrow">↓</div><div class="step">检索可信文档 + 重排序</div><div class="arrow">↓</div><div class="step">LLM 基于证据生成回答</div><div class="arrow">↓</div><div class="step">核验引用与结论；证据不足则拒答</div></div>
+不能，但 RAG 是降低知识性幻觉的重要手段之一。
 
-因此，生产级系统需要同时评估检索相关性、引用支持程度、事实正确性和拒答策略。
+RAG（Retrieval-Augmented Generation，检索增强生成）的核心思想是：
 
-## 七、TypeScript：让机器人在证据不足时拒答
-下面使用一个简单的检索结果判断示例。真实系统应结合多条证据、检索分数校准与模型输出验证，而不是把单一相似度阈值当作事实判定。
+**在生成答案前，先检索与问题相关的外部知识。**
+
+<div class="visual"><strong>带证据验证的 RAG 流程</strong><div class="step">用户提出问题</div><div class="arrow">↓</div><div class="step">检索可信文档 + 重排序</div><div class="arrow">↓</div><div class="step">LLM 基于证据生成回答</div><div class="arrow">↓</div><div class="step">核验引用与结论；证据不足则拒答</div></div>
+
+但 RAG 仍然存在几个风险：
+
+- 检索阶段没有找到真正相关的文档。
+- 文档虽然相关，但包含过期或错误的信息。
+- 模型误读了检索内容。
+- 模型给出的引用不能支持它的结论。
+
+因此，生产级 RAG 不能只关注向量相似度，还需要评估检索相关性、引用支持程度和回答的事实正确性。
+
+---
+
+## 七、TypeScript：如何让聊天机器人在证据不足时拒答？
+
+假设我们正在开发一个企业内部 AI 助手。
+
+用户提问：
+
+> 统一登录 SDK 如何验证 Token？
+
+机器人会先检索 SDK 文档。
+
+我们可以设计一个简单的检索结果过滤函数：
 
 ```typescript
-type Evidence = { text: string; source: string; score: number };
+type Evidence = {
+  text: string;
+  source: string;
+  score: number;
+};
 
-function buildContext(items: Evidence[], threshold = 0.75) {
-  const accepted = items.filter(x => x.score >= threshold);
-  if (!accepted.length) {
-    return { canAnswer: false, context: "", sources: [] as string[] };
+function buildContext(
+  items: Evidence[],
+  threshold = 0.75
+) {
+  const accepted = items.filter(
+    item => item.score >= threshold
+  );
+
+  if (accepted.length === 0) {
+    return {
+      canAnswer: false,
+      context: "",
+      sources: [] as string[]
+    };
   }
+
   return {
     canAnswer: true,
-    context: accepted.map(x => x.text).join("\n\n"),
-    sources: accepted.map(x => x.source)
+    context: accepted
+      .map(item => item.text)
+      .join("\n\n"),
+    sources: accepted.map(
+      item => item.source
+    )
   };
 }
 
 const result = buildContext([
-  { text: "统一登录 SDK 提供 token 校验方法", source: "sdk.md", score: 0.91 }
+  {
+    text: "统一登录 SDK 提供 token 校验方法",
+    source: "sdk.md",
+    score: 0.91
+  }
 ]);
+
 console.log(result);
 ```
 
-这里的 0.75 只是教学阈值，不可直接作为所有 Embedding 模型的通用标准。
+这个例子展示了一个基本原则：没有达到检索条件的证据时，不应直接把未经验证的内容当成确定事实输出。
+
+不过，`0.75` 只是教学阈值，并不是所有 Embedding 模型通用的可靠标准。
+
+实际生产环境还需要进行检索分数校准、多文档证据验证和答案质量评估。
+
+---
 
 ## 八、生产级聊天机器人的风险控制
-| 风险 | 工程措施 |
-| --- | --- |
-| 编造 API | 官方文档检索、代码编译与测试 |
-| 长上下文遗漏 | 分段处理、检索与重排序 |
-| 数值计算错误 | 计算器或代码执行工具 |
-| 引用不实 | 引用位置校验、证据支持评估 |
-| 过度自信 | 允许拒答、表达不确定性 |
-| 提示词注入 | 将外部文本视为不可信数据、最小权限 |
 
-对企业内部机器人，尤其应关注权限边界：即使模型能找到某份文档，也不代表当前用户有权读取它。
+结合我们前面学习的知识，可以整理出一张工程决策表。
+
+| 风险 | 工程措施 |
+|---|---|
+| 编造不存在的 API | 官方文档检索、代码编译和测试 |
+| 长上下文遗漏信息 | 分段处理、检索与重排序 |
+| 数值计算错误 | 计算器、代码执行工具 |
+| 编造引用 | 引用溯源、证据支持评估 |
+| 回答过度自信 | 允许拒答、表达不确定性 |
+| 提示词注入 | 外部文本视为不可信数据、最小权限 |
+
+这里还需要强调一个安全问题：
+
+**即使模型能够检索到某份企业文档，也不代表当前用户有权读取它。**
+
+例如，一个普通员工询问管理员后台的敏感信息，RAG 检索系统必须在数据访问层执行权限控制，而不是仅依靠 System Prompt 要求模型保密。
+
+---
 
 ## 九、本篇总结
-**上下文窗口决定模型可处理多少内容，不保证每段内容都被同样有效地利用；幻觉来自生成机制与知识、证据和验证之间的差距；推理错误需要通过工具、评估和工程控制降低风险。**
+
+今天最重要的不是记住某个模型的上下文长度，而是理解模型能力的边界。
+
+| 概念 | 核心结论 |
+|---|---|
+| Context Window | 决定可处理的上下文容量 |
+| Lost in the Middle | 长上下文中的信息利用可能不均衡 |
+| Hallucination | 流畅生成不等于事实正确 |
+| Temperature | 控制采样行为，不保证准确性 |
+| RAG | 提供外部证据，但仍需要验证 |
+| Tool Calling | 让确定性任务交给专门工具 |
+
+**一个可靠的 AI 聊天机器人，不应该假设大模型永远正确，而应该在架构设计中主动考虑模型可能出错。**
+
+---
 
 ## 十、交互式课后测验
 <Lesson07Quiz />
