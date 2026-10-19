@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {computed,ref} from 'vue'
+withDefaults(defineProps<{mode?: 'builder' | 'quiz'}>(), {mode:'builder'})
 const role=ref('你是严谨的前端技术导师。')
 const task=ref('解释 React useEffect 的用途')
 const format=ref('分三点回答，每点不超过50字')
@@ -18,14 +19,14 @@ function pick(i:number,j:number){const a=[...answers.value];a[i]=j;answers.value
 function reset(){answers.value=[];submitted.value=false}
 </script>
 <template>
-<div class="lab"><strong>交互实验：Messages 组装器</strong>
+<div v-if="mode==='builder'" class="lab"><strong>交互实验：Messages 组装器</strong>
 <label>System 指令<textarea v-model="role" rows="2"/></label>
 <label>用户问题<textarea v-model="task" rows="2"/></label>
 <label>输出要求<textarea v-model="format" rows="2"/></label>
 <div class="preview"><div v-for="(m,i) in messagePreview" :key="i" class="msg"><b>{{m.role}}</b><p>{{m.content}}</p></div></div>
 <small>这里只演示如何组装请求，没有实际调用模型。具体 API 角色及优先级规则由模型提供方定义。</small>
 </div>
-<div class="lab"><strong>交互式课后测验</strong>
+<div v-if="mode==='quiz'" class="lab"><strong>交互式课后测验</strong>
 <div v-for="(q,i) in questions" :key="i" class="question"><b>{{i+1}}. {{q.q}}</b>
 <label v-for="(o,j) in q.opts" :key="j" class="option"><input type="radio" :name="'lesson8-'+i" :checked="answers[i]===j" @change="pick(i,j)"/>{{o}}</label>
 <p v-if="submitted" class="feedback">{{answers[i]===q.a?'✓ 回答正确':'正确答案：'+q.opts[q.a]}}。{{q.ex}}</p></div>
