@@ -33,8 +33,8 @@ User：请解释 JavaScript 闭包。</code></pre>
 <p>但要注意：<strong>高优先级指令并不等于不可突破的安全边界</strong>。身份认证、数据库权限、支付授权等关键控制必须由应用后端执行，而不是仅写进 Prompt。</p>
 <h2>四、交互实验：自己组装一组 Messages</h2>
 <p>修改 System、用户问题和输出要求，观察发送给模型的消息结构如何变化。</p>
-<PromptMessagesLesson />
-<p>上方组件同时包含本篇的交互式课后测验，你可以先完成学习，再返回提交答案。</p>
+<PromptMessagesLesson mode="builder" />
+<p>这个实验只负责演示消息组装。请在阅读完本篇后，到第十一节完成交互式测验。</p>
 <h2>五、怎样写出更稳定的 Prompt？</h2>
 <p>比起堆砌「你是世界顶级专家」，更有效的做法通常是明确以下四件事：</p>
 <ol><li><strong>任务</strong>：具体要解决什么问题？</li><li><strong>上下文</strong>：有哪些必须参考的背景？</li><li><strong>约束</strong>：哪些内容不能编造，证据不足怎么办？</li><li><strong>输出格式</strong>：需要 JSON、表格还是分步骤解释？</li></ol>
@@ -145,8 +145,8 @@ console.log(response.choices[0]?.message.content);</code></pre>
 <table><thead><tr><th>概念</th><th>一句话理解</th></tr></thead><tbody><tr><td>Prompt</td><td>提供任务、背景、约束与输出要求</td></tr><tr><td>Messages</td><td>带角色的对话消息结构</td></tr><tr><td>System / Developer</td><td>应用层较高优先级的行为约束</td></tr><tr><td>User</td><td>用户的具体任务</td></tr><tr><td>Few-shot</td><td>用少量示例展示目标行为</td></tr><tr><td>Structured Output</td><td>用 Schema 约束并验证输出结构</td></tr><tr><td>Prompt Injection</td><td>不可信内容试图越权改变模型行为</td></tr></tbody></table>
 <p><strong>最重要的一句话：Prompt 决定如何向模型表达任务，Messages 决定如何组织对话；但可靠性、安全性和权限仍需要应用工程来保证。</strong></p>
 <h2>十一、交互式课后测验</h2>
-<p>本篇包含六道选择题，涵盖 System/User、历史消息、Few-shot、结构化输出、Prompt Injection 与企业级架构。请在第四节的交互组件中作答，提交后可查看分数、正确答案与逐题解析，也可重新作答。</p>
-<p><strong>评分标准：</strong>6 题正确为优秀；4–5 题为良好；2–3 题建议复习 Messages 与 Prompt；0–1 题建议重读本篇。</p>
+<p>完成下面六道选择题，涵盖 System/User、历史消息、Few-shot、结构化输出、Prompt Injection 与企业级架构。提交后可查看分数、正确答案和逐题解析，也可以重新作答。</p>
+<PromptMessagesLesson mode="quiz" />
 <h2>十二、学习疑问与解答</h2>
 <h3>Q1：System Prompt 能保证模型永远遵守吗？</h3>
 <p><strong>不能。</strong>System Prompt 是行为约束，不是绝对可靠的安全机制。即使系统提示写着「普通用户不能查看管理员数据」，也必须在工具执行前由后端验证身份与权限。</p>
