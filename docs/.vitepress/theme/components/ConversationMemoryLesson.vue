@@ -73,5 +73,124 @@ console.log(buildMessages(history, "它和 Vue 有什么区别？"));</code></pr
 <p>将较早对话压缩为「用户开发 React + NestJS 企业系统，偏好 TypeScript 示例，当前讨论统一鉴权」等摘要，结合最近消息发送。摘要可能遗漏信息、过期或错误归纳，需校验和更新。</p>
 <h3>4.4 记忆检索</h3>
 <p>将重要信息持久化，在当前任务需要时召回相关记忆，而不是无限发送全部历史。例如「教程必须 1:1 还原」就是长期项目偏好。</p>
+<h2>五、短期记忆与长期记忆有什么区别？</h2>
+<p>短期记忆主要服务于当前会话，保存最近消息、当前任务状态和临时工具结果；长期记忆跨会话保存用户偏好、项目背景和重要事实。</p>
+<table><thead><tr><th>维度</th><th>短期记忆</th><th>长期记忆</th></tr></thead><tbody>
+<tr><td>作用范围</td><td>当前会话</td><td>跨会话</td></tr>
+<tr><td>保存内容</td><td>聊天历史、任务状态</td><td>偏好、重要事实</td></tr>
+<tr><td>存储方式</td><td>会话数据库、缓存</td><td>持久化数据库、向量库</td></tr>
+<tr><td>生命周期</td><td>通常较短</td><td>通常较长</td></tr>
+<tr><td>检索方式</td><td>按会话读取</td><td>关键词、语义、结构化查询</td></tr>
+<tr><td>主要问题</td><td>上下文过长</td><td>记忆过期、冲突、隐私</td></tr>
+</tbody></table>
+<p><strong>长期记忆不是把全部聊天记录永久放进 Prompt，而是在需要时取出相关信息。</strong></p>
+<h2>六、长期记忆如何存储与检索？</h2>
+<h3>6.1 记忆的数据结构</h3>
+<pre v-pre><code>interface Memory {
+  id: string;
+  userId: string;
+  category: "preference" | "fact" | "project";
+  content: string;
+  createdAt: number;
+  updatedAt: number;
+  sourceConversationId?: string;
+}</code></pre>
+<p>记忆可以存储在 PostgreSQL、MySQL 或 MongoDB 中。结构化偏好可直接 SQL 查询；当需要语义相似检索时，可以考虑 PostgreSQL + pgvector、Qdrant 等方案。还需要考虑来源、有效期、用户删除权和敏感信息保护。</p>
+<h3>6.2 记忆如何进入 Prompt？</h3>
+<div class="visual"><strong>长期记忆检索流程</strong><div class="step">用户发送问题</div><div class="arrow">↓</div><div class="step">Memory Retriever：检索相关记忆</div><div class="arrow">↓</div><div class="step">Memory Filter：权限、冲突与有效期</div><div class="arrow">↓</div><div class="step">Context Builder：组合记忆、历史与当前问题</div><div class="arrow">↓</div><div class="step green">LLM 生成回答</div></div>
+<h3>6.3 交互实验：记忆检索</h3>
+<div class="visual"><strong>关键词记忆检索模拟器</strong>
+<label v-for="q in ['生成下一篇 AI 教程','写一段 React TypeScript 代码','解释 RAG 和 Embedding']" :key="q" class="option"><input type="radio" name="memory-query" :checked="memoryQuery===q" @change="memoryQuery=q"/>{{q}}</label>
+<div v-for="(m,i) in memories" :key="i" class="memory" :class="{kept:matched[i]}">{{matched[i]?'✓':'○'}} {{m}}</div>
+<small>教学用关键词规则，并非真实 Embedding 语义检索。</small></div>
+<h2>七、TypeScript 实现多轮对话管理器</h2>
+<h3>7.1 定义消息类型</h3>
+<pre v-pre><code>type ChatRole = "user" | "assistant";
+interface ChatMessage {
+  id: string;
+  role: ChatRole;
+  content: string;
+  createdAt: number;
+}
+interface Conversation {
+  id: string;
+  userId: string;
+  messages: ChatMessage[];
+}</code></pre>
+<h3>7.2 ConversationManager</h3>
+<pre v-pre><code>class ConversationManager {
+  private conversations = new Map&lt;string, Conversation&gt;();
+
+  create(conversationId: string, userId: string) {
+    const conversation: Conversation = {
+      id: conversationId, userId, messages: []
+    };
+    this.conversations.set(conversationId, conversation);
+    return conversation;
+  }
+
+  addMessage(conversationId: string, userId: string, message: ChatMessage) {
+    const conversation = this.conversations.get(conversationId);
+    if (!conversation || conversation.userId !== userId) {
+      throw new Error("Conversation not found");
+    }
+    conversation.messages.push(message);
+  }
+
+  getHistory(conversationId: string, userId: string) {
+    const conversation = this.conversations.get(conversationId);
+    if (!conversation || conversation.userId !== userId) {
+      throw new Error("Conversation not found");
+    }
+    return [...conversation.messages];
+  }
+}</code></pre>
+<p>进程内 Map 仅用于教学。生产环境应持久化到数据库，并在读写时检查会话归属，避免跨用户访问。</p>
+<h3>7.3 根据 Token 预算裁剪消息</h3>
+<pre v-pre><code>interface Message {
+  role: "user" | "assistant";
+  content: string;
+}
+function trimHistory(
+  history: Message[],
+  maxTokens: number,
+  countTokens: (text: string) => number
+): Message[] {
+  const result: Message[] = [];
+  let usedTokens = 0;
+  for (let i = history.length - 1; i >= 0; i--) {
+    const message = history[i];
+    const tokens = countTokens(message.content);
+    if (usedTokens + tokens > maxTokens) break;
+    result.unshift(message);
+    usedTokens += tokens;
+  }
+  return result;
+}</code></pre>
+<p>这里的 countTokens 需使用与模型兼容的 Tokenizer 或计数接口。实际还应计算消息格式开销，并保持工具调用结构完整。</p>
+<h2>八、React + Node.js 聊天系统架构</h2>
+<div class="visual"><strong>生产级聊天系统架构</strong><div class="step blue">React Chat UI：聊天列表、输入框、流式渲染</div><div class="arrow">↓</div><div class="step">Node.js / NestJS API：鉴权、限流、会话路由</div><div class="arrow">↓</div><div class="step">Conversation Service + Memory Service</div><div class="arrow">↓</div><div class="step green">LLM API + PostgreSQL / Redis / pgvector</div></div>
+<h3>8.1 数据库设计</h3>
+<pre v-pre><code>CREATE TABLE conversations (
+  id UUID PRIMARY KEY,
+  user_id UUID NOT NULL,
+  title TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE messages (
+  id UUID PRIMARY KEY,
+  conversation_id UUID NOT NULL REFERENCES conversations(id),
+  role VARCHAR(20) NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_messages_conversation
+ON messages(conversation_id, created_at);</code></pre>
+<p>生产级还应考虑消息状态、顺序、幂等性、工具调用记录、删除策略和多租户隔离。</p>
+<h3>8.2 为什么要使用 Redis？</h3>
+<p>Redis 适合缓存最近聊天历史、临时任务状态、限流和协调。需要长期保存的重要记录通常应由可靠的持久化数据库承担。初期 MVP 可以先使用 PostgreSQL，等出现性能需求再引入 Redis。</p>
 <!-- CHAPTER09_CONTINUE -->
 </article></template>
