@@ -110,6 +110,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '07 · 大模型的能力边界', link: 'ai/chatbot-course/07-model-limitations' },
           { text: '08 · Prompt 与 Messages', link: 'ai/chatbot-course/08-prompt-messages' },
           { text: '09 · 多轮对话与上下文管理', link: 'ai/chatbot-course/09-conversation-memory' },
+          { text: '10 · 聊天机器人的记忆系统', link: 'ai/chatbot-course/10-memory-system' },
         ]
       },
       {
