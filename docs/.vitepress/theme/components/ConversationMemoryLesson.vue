@@ -69,10 +69,23 @@ console.log(buildMessages(history, "它和 Vue 有什么区别？"));</code></pr
 <label>保留最近完整轮数：{{windowSize}}<input v-model.number="windowSize" type="range" min="1" max="4" step="1"/></label>
 <div v-for="(pair,i) in samples" :key="i" class="memory" :class="{kept:i>=samples.length-windowSize}"><b>第 {{i+1}} 轮 · {{i>=samples.length-windowSize?'保留':'裁剪'}}</b><p>用户：{{pair[0]}}</p><p>AI：{{pair[1]}}</p></div>
 <small>实际裁剪需保持工具调用与消息结构完整。</small></div>
-<h3>4.3 历史摘要</h3>
-<p>将较早对话压缩为「用户开发 React + NestJS 企业系统，偏好 TypeScript 示例，当前讨论统一鉴权」等摘要，结合最近消息发送。摘要可能遗漏信息、过期或错误归纳，需校验和更新。</p>
-<h3>4.4 记忆检索</h3>
-<p>将重要信息持久化，在当前任务需要时召回相关记忆，而不是无限发送全部历史。例如「教程必须 1:1 还原」就是长期项目偏好。</p>
+<h3>4.3 历史摘要（Conversation Summarization）</h3>
+<p>滑动窗口的问题是：重要信息可能被裁剪。例如用户在第一轮说「我正在开发一个 React + NestJS 的企业系统」，后面聊天了 100 轮。如果只保留最近 10 轮，这条背景就可能丢失。</p>
+<p>历史摘要可以把较早的对话转换为简短的状态说明：</p>
+<pre v-pre><code>对话摘要：
+用户正在开发 React + NestJS 企业管理系统。
+用户偏好 TypeScript 示例。
+当前主要讨论统一鉴权和微前端架构。</code></pre>
+<p>后续请求可以组合 System Prompt、历史摘要、最近几轮完整消息和当前用户问题。</p>
+<p>但摘要也存在信息丢失、错误归纳和过期的问题，因此需要定期更新、校验和管理。</p>
+<h3>4.4 记忆检索（Memory Retrieval）</h3>
+<p>另一种方案是将重要信息存储在外部记忆系统中。例如：</p>
+<pre v-pre><code>Memory 1：用户主要使用 TypeScript
+Memory 2：用户正在学习 AI 聊天机器人
+Memory 3：教程需要包含交互式练习
+Memory 4：GitHub 页面需要 1:1 还原</code></pre>
+<p>当用户说「继续生成下一篇教程」，应用可以检索与「教程」相关的记忆，而不是发送所有历史对话。</p>
+<p>不过，记忆的存储、更新和检索都需要独立设计，不能假设模型天然拥有无限长期记忆。</p>
 <h2>五、短期记忆与长期记忆有什么区别？</h2>
 <p>短期记忆主要服务于当前会话，保存最近消息、当前任务状态和临时工具结果；长期记忆跨会话保存用户偏好、项目背景和重要事实。</p>
 <table><thead><tr><th>维度</th><th>短期记忆</th><th>长期记忆</th></tr></thead><tbody>
@@ -191,7 +204,15 @@ CREATE INDEX idx_messages_conversation
 ON messages(conversation_id, created_at);</code></pre>
 <p>生产级还应考虑消息状态、顺序、幂等性、工具调用记录、删除策略和多租户隔离。</p>
 <h3>8.2 为什么要使用 Redis？</h3>
-<p>Redis 适合缓存最近聊天历史、临时任务状态、限流和协调。需要长期保存的重要记录通常应由可靠的持久化数据库承担。初期 MVP 可以先使用 PostgreSQL，等出现性能需求再引入 Redis。</p>
+<p>Redis 可以用于缓存最近聊天历史、保存临时任务状态、请求限流、分布式锁或其他协调机制。</p>
+<p>但 Redis 不一定要承担全部持久化职责。对于需要长期保存的聊天记录，通常应使用可靠的持久化存储。</p>
+<p>初期 MVP 可以先使用 PostgreSQL，等真正出现缓存和高并发需求后再引入 Redis。</p>
+<h3>8.3 恢复聊天界面与让模型利用历史的区别</h3>
+<div class="visual"><strong>两条不同的数据流</strong>
+<div class="step blue">流程 A：PostgreSQL → Node.js GET /messages → React 渲染历史</div>
+<p>这只是恢复聊天界面，不需要调用 LLM。</p>
+<div class="step green">流程 B：用户新问题 → Node.js 读取相关历史 → 组装 Messages → LLM</div>
+<p>这才是让模型利用之前的对话。前端能够显示历史，并不代表模型自动获得了历史。</p></div>
 <h2>九、生产级上下文管理与性能优化</h2>
 <h3>9.1 推荐的上下文组织方式</h3>
 <pre v-pre><code>System Prompt
