@@ -192,5 +192,61 @@ ON messages(conversation_id, created_at);</code></pre>
 <p>生产级还应考虑消息状态、顺序、幂等性、工具调用记录、删除策略和多租户隔离。</p>
 <h3>8.2 为什么要使用 Redis？</h3>
 <p>Redis 适合缓存最近聊天历史、临时任务状态、限流和协调。需要长期保存的重要记录通常应由可靠的持久化数据库承担。初期 MVP 可以先使用 PostgreSQL，等出现性能需求再引入 Redis。</p>
-<!-- CHAPTER09_CONTINUE -->
-</article></template>
+<h2>九、生产级上下文管理与性能优化</h2>
+<h3>9.1 推荐的上下文组织方式</h3>
+<pre v-pre><code>System Prompt
+      +
+相关长期记忆（经过权限与有效期检查）
+      +
+历史对话摘要
+      +
+最近几轮完整消息
+      +
+当前用户问题</code></pre>
+<p>这不是固定公式。代码调试可能更依赖最近错误日志；长期学习助手可能更依赖目标和学习进度。应按任务设计上下文策略。</p>
+<h3>9.2 重点监控指标</h3>
+<table><thead><tr><th>指标</th><th>作用</th></tr></thead><tbody>
+<tr><td>Input Tokens</td><td>衡量上下文成本</td></tr>
+<tr><td>TTFT</td><td>首 Token 响应延迟</td></tr>
+<tr><td>Memory Hit Rate</td><td>记忆召回情况</td></tr>
+<tr><td>Retrieval Relevance</td><td>检索相关性</td></tr>
+<tr><td>Context Truncation Rate</td><td>历史裁剪频率</td></tr>
+<tr><td>Answer Quality</td><td>回答正确性</td></tr>
+</tbody></table>
+<p>记忆命中率越高不一定越好，错误或过期记忆被频繁召回也会降低回答质量。</p>
+<h3>9.3 长期记忆的隐私与安全</h3>
+<p>应考虑用户是否同意保存、能否查看和更正、能否删除、敏感信息如何处理、记忆有效期，以及多用户间的数据隔离。长期记忆不仅是产品能力，也是数据治理责任。</p>
+<h2>十、本篇总结</h2>
+<table><thead><tr><th>概念</th><th>作用</th></tr></thead><tbody>
+<tr><td>Chat History</td><td>保存历史消息</td></tr>
+<tr><td>Context Window</td><td>限制本次推理可处理内容</td></tr>
+<tr><td>Sliding Window</td><td>保留最近对话</td></tr>
+<tr><td>Summarization</td><td>压缩较早历史</td></tr>
+<tr><td>Short-term Memory</td><td>当前会话状态</td></tr>
+<tr><td>Long-term Memory</td><td>跨会话重要信息</td></tr>
+<tr><td>Memory Retrieval</td><td>按需召回记忆</td></tr>
+<tr><td>Conversation Manager</td><td>组织消息与会话状态</td></tr>
+</tbody></table>
+<p><strong>聊天机器人之所以能记住用户，不是因为每次聊天都重新训练模型，而是应用保存、检索并重新提供相关上下文。</strong></p>
+<h2>十一、交互式课后测验</h2>
+<div class="visual"><div v-for="(q,i) in questions" :key="i" class="question"><b>{{i+1}}. {{q.q}}</b>
+<label v-for="(opt,j) in q.opts" :key="j" class="option"><input type="radio" :name="'ch9-'+i" :checked="answers[i]===j" @change="choose(i,j)"/>{{opt}}</label>
+<p v-if="submitted" class="feedback">{{answers[i]===q.a?'✓ 回答正确':'正确答案：'+q.opts[q.a]}}。{{q.ex}}</p></div>
+<div class="buttons"><button :disabled="questions.some((_,i)=>answers[i]===undefined)" @click="submitted=true">提交评分</button><button @click="answers=[];submitted=false">重新作答</button></div>
+<div v-if="submitted" class="metric">得分：{{score}} / {{questions.length}}</div></div>
+<h2>十二、学习疑问与解答</h2>
+<h3>Q1：恢复聊天界面，为什么不等于让模型知道历史？</h3>
+<p>恢复 UI 是从数据库读取消息并渲染 React；让模型利用历史，则需要在推理请求中提供相关消息，或使用支持服务端会话状态的 API。两条流程的服务对象不同。</p>
+<h3>Q2：短期记忆与长期记忆分别适合什么数据库？</h3>
+<p>会话历史可存 PostgreSQL、MySQL、MongoDB 或 SQLite；Redis 可用于热点会话缓存。长期结构化记忆可存 PostgreSQL，语义检索可用 pgvector、Qdrant、Milvus 等。</p>
+<h3>Q3：PostgreSQL 是向量数据库吗？</h3>
+<p>PostgreSQL 本质是关系型数据库。安装 pgvector 扩展后，可以在同一数据库中存储 Embedding 向量并执行相似度检索。初期 AI 聊天机器人推荐 PostgreSQL + pgvector；确有性能需求再加 Redis。</p>
+<h3>Q4：为什么长期记忆不应该直接等于全部聊天记录？</h3>
+<p>聊天历史可能包含无关、过期或敏感内容。长期记忆应按价值、授权、有效期与相关性筛选，并提供查看、更正和删除机制。</p>
+<h3>Q5：KV Cache 是不是长期记忆？</h3>
+<p>不是。KV Cache 是模型推理时复用的 Key/Value 中间状态，不是面向用户偏好和项目事实的持久化记忆库。</p>
+<footer><a href="./08-prompt-messages">← 第 08 篇</a><a href="./">返回课程目录</a></footer>
+
+</article></template><style scoped>
+.lesson{font-size:15px;line-height:1.85;color:var(--vp-c-text-1);overflow-wrap:anywhere}.meta{font-size:12px;color:var(--vp-c-text-2)}h1{font-size:30px;line-height:1.35;margin:16px 0 24px}h2{font-size:23px;margin:36px 0 18px;border-top:1px solid var(--vp-c-divider);padding-top:12px}h3{font-size:18px;margin:22px 0 12px}p{margin:14px 0}.visual{border:1px solid var(--vp-c-divider);border-radius:14px;padding:18px;margin:20px 0}.visual>strong{display:block;margin-bottom:12px}.step{background:var(--vp-c-bg-soft);border-radius:9px;padding:12px;text-align:center}.blue{background:rgba(37,99,235,.09)}.green{background:rgba(22,163,74,.09)}.arrow{text-align:center;padding:6px;color:var(--vp-c-text-2)}pre{background:var(--vp-code-block-bg);padding:18px;border-radius:10px;overflow:auto}pre code{white-space:pre;color:var(--vp-c-text-1);font-size:13px}table{display:table;width:100%;font-size:14px}td,th{padding:9px}label{display:block;margin:10px 0}input[type=range]{display:block;width:100%;accent-color:var(--vp-c-brand-1)}.metric{text-align:center;font-size:23px;font-weight:bold;background:var(--vp-c-bg-soft);border-radius:8px;padding:12px}.visual small{display:block;color:var(--vp-c-text-2);font-size:12px}.memory{padding:10px;border-radius:8px;background:var(--vp-c-bg-soft);margin:8px 0;opacity:.55}.memory.kept{background:rgba(22,163,74,.10);opacity:1}.memory p{margin:4px 0}.option{padding:9px;border:1px solid var(--vp-c-divider);border-radius:8px;cursor:pointer}.option input{margin-right:8px}.question{padding:14px 0;border-bottom:1px solid var(--vp-c-divider)}.feedback{background:var(--vp-c-bg-soft);padding:10px;border-radius:8px}.buttons{display:flex;gap:10px;margin-top:14px}.buttons button{border:1px solid var(--vp-c-divider);background:var(--vp-c-bg-soft);border-radius:8px;padding:9px 14px;cursor:pointer}.buttons button:disabled{opacity:.4}footer{display:flex;justify-content:space-between;border-top:1px solid var(--vp-c-divider);margin-top:30px;padding-top:16px}@media(max-width:600px){h1{font-size:24px}h2{font-size:20px}.visual{padding:12px}}
+</style>
