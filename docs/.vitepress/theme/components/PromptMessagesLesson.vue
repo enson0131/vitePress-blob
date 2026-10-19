@@ -5,6 +5,9 @@ const role=ref('你是严谨的前端技术导师。')
 const task=ref('解释 React useEffect 的用途')
 const format=ref('分三点回答，每点不超过50字')
 const messagePreview=computed(()=>[{role:'system',content:role.value},{role:'user',content:task.value+'。'+format.value}])
+const previewJson=computed(()=>JSON.stringify(messagePreview.value,null,2))
+const copied=ref(false)
+async function copyJson(){try{await navigator.clipboard.writeText(previewJson.value);copied.value=true}catch{copied.value=false}}
 const answers=ref<number[]>([]),submitted=ref(false)
 const questions=[
 {q:'System Prompt 与 User Prompt 的主要区别是什么？',opts:['System 定义上层行为约束，User 表达具体需求','System 一定包含正确事实','System 负责模型训练','System 只能由 Python 编写'],a:0,ex:'角色标识消息来源和指令层次，并不保证其中事实正确。'},
@@ -23,7 +26,7 @@ function reset(){answers.value=[];submitted.value=false}
 <label>System 指令<textarea v-model="role" rows="2"/></label>
 <label>用户问题<textarea v-model="task" rows="2"/></label>
 <label>输出要求<textarea v-model="format" rows="2"/></label>
-<div class="preview"><div v-for="(m,i) in messagePreview" :key="i" class="msg"><b>{{m.role}}</b><p>{{m.content}}</p></div></div>
+<div class="preview"><div class="previewheader"><strong>生成的 Messages</strong><button type="button" @click="copyJson">{{copied?"已复制":"复制 JSON"}}</button></div><pre v-pre="false"><code>{{previewJson}}</code></pre></div>
 <small>这里只演示如何组装请求，没有实际调用模型。具体 API 角色及优先级规则由模型提供方定义。</small>
 </div>
 <div v-if="mode==='quiz'" class="lab"><strong>交互式课后测验</strong>
@@ -34,4 +37,4 @@ function reset(){answers.value=[];submitted.value=false}
 <div v-if="submitted" class="score">得分：{{score}} / {{questions.length}}</div>
 </div>
 </template>
-<style scoped>.lab{border:1px solid var(--vp-c-divider);border-radius:14px;padding:18px;margin:20px 0}.lab>strong{display:block;margin-bottom:12px}label{display:block;margin:12px 0}textarea{display:block;width:100%;padding:9px;border:1px solid var(--vp-c-divider);border-radius:8px;background:var(--vp-c-bg);color:var(--vp-c-text-1)}.preview{background:var(--vp-c-bg-soft);border-radius:10px;padding:12px}.msg{padding:8px;border-bottom:1px solid var(--vp-c-divider);overflow-wrap:anywhere}.msg p{margin:5px 0}.msg b{color:var(--vp-c-brand-1)}small{color:var(--vp-c-text-2)}.question{padding:14px 0;border-bottom:1px solid var(--vp-c-divider)}.option{padding:9px;border:1px solid var(--vp-c-divider);border-radius:8px;cursor:pointer}.option input{margin-right:8px}.feedback{background:var(--vp-c-bg-soft);padding:10px;border-radius:8px}.actions{display:flex;gap:10px;margin-top:14px}.actions button{border:1px solid var(--vp-c-divider);background:var(--vp-c-bg-soft);border-radius:8px;padding:9px 14px;cursor:pointer}.actions button:disabled{opacity:.4}.score{text-align:center;font-size:23px;font-weight:bold;margin:15px}</style>
+<style scoped>.lab{border:1px solid var(--vp-c-divider);border-radius:14px;padding:18px;margin:20px 0}.lab>strong{display:block;margin-bottom:12px}label{display:block;margin:12px 0}textarea{display:block;width:100%;padding:9px;border:1px solid var(--vp-c-divider);border-radius:8px;background:var(--vp-c-bg);color:var(--vp-c-text-1)}.previewheader{display:flex;align-items:center;justify-content:space-between;gap:10px}.previewheader button{padding:6px 10px;border:1px solid var(--vp-c-divider);border-radius:7px;cursor:pointer}.preview pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;margin:8px 0 0}.preview{background:var(--vp-c-bg-soft);border-radius:10px;padding:12px}.msg{padding:8px;border-bottom:1px solid var(--vp-c-divider);overflow-wrap:anywhere}.msg p{margin:5px 0}.msg b{color:var(--vp-c-brand-1)}small{color:var(--vp-c-text-2)}.question{padding:14px 0;border-bottom:1px solid var(--vp-c-divider)}.option{padding:9px;border:1px solid var(--vp-c-divider);border-radius:8px;cursor:pointer}.option input{margin-right:8px}.feedback{background:var(--vp-c-bg-soft);padding:10px;border-radius:8px}.actions{display:flex;gap:10px;margin-top:14px}.actions button{border:1px solid var(--vp-c-divider);background:var(--vp-c-bg-soft);border-radius:8px;padding:9px 14px;cursor:pointer}.actions button:disabled{opacity:.4}.score{text-align:center;font-size:23px;font-weight:bold;margin:15px}</style>
