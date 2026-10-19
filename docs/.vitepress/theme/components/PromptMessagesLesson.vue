@@ -26,7 +26,7 @@ function reset(){answers.value=[];submitted.value=false}
 <label>System 指令<textarea v-model="role" rows="2"/></label>
 <label>用户问题<textarea v-model="task" rows="2"/></label>
 <label>输出要求<textarea v-model="format" rows="2"/></label>
-<div class="preview"><div class="previewheader"><strong>生成的 Messages</strong><button type="button" @click="copyJson">{{copied?"已复制":"复制 JSON"}}</button></div><pre v-pre="false"><code>{{previewJson}}</code></pre></div>
+<div class="preview"><div class="previewheader"><strong>生成的 Messages</strong><button type="button" @click="copyJson">{{copied?"已复制":"复制 JSON"}}</button></div><pre><code>{{previewJson}}</code></pre></div>
 <small>这里只演示如何组装请求，没有实际调用模型。具体 API 角色及优先级规则由模型提供方定义。</small>
 </div>
 <div v-if="mode==='quiz'" class="lab"><strong>交互式课后测验</strong>
