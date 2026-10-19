@@ -16,6 +16,7 @@ title: AI 聊天机器人学习教程
 6. [第 06 篇：模型推理与 KV Cache](./06-inference)
 7. [第 07 篇：大模型的能力边界](./07-model-limitations)
 8. [第 08 篇：Prompt 与 Messages](./08-prompt-messages)
+9. [第 09 篇：多轮对话与上下文管理](./09-conversation-memory)
 
 ## 学习路线
 
