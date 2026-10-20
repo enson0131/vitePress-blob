@@ -1,5 +1,5 @@
 /* Measured from the user's 10.htm + 10_files.zip. Scoped to this lesson only. */
-.lesson10-original.lesson10-original{font:16px/26px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--l10-text,#0d0d0d);width:100%;overflow-wrap:break-word;display:block;font-synthesis:none;}
+.lesson10-original.lesson10-original{font:16px/26px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans CJK SC","WenQuanYi Zen Hei","Microsoft YaHei","PingFang SC",sans-serif;color:var(--l10-text,#0d0d0d);width:100%;overflow-wrap:break-word;display:block;font-synthesis:none;}
 .lesson10-original.lesson10-original :where(*){box-sizing:border-box;margin:0;padding:0;border:0 solid;}
 .lesson10-original.lesson10-original :where(p){font:inherit;line-height:26px;}
 .lesson10-original.lesson10-original :where(h1,h2,h3){color:inherit;letter-spacing:normal;font-weight:600;padding:0;border:0;}
@@ -8,6 +8,7 @@
 .lesson10-original.lesson10-original h3{font-size:18px;line-height:28px;}
 .lesson10-original.lesson10-original strong{font-weight:600;}
 .lesson10-original.lesson10-original blockquote{position:relative;padding:8px 0 8px 24px;color:inherit;font-size:16px;line-height:24px;}
+.lesson10-original.lesson10-original blockquote p{color:inherit;}
 .lesson10-original.lesson10-original blockquote::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:4px;background:var(--l10-quote,#d9d9d9);border-radius:4px;}
 .lesson10-original.lesson10-original hr{height:1px;border:0;border-top:1px solid var(--l10-rule,rgba(0,0,0,.15));}
 .lesson10-original.lesson10-original ol{padding-left:26px;list-style:decimal;}
@@ -15,19 +16,19 @@
 .lesson10-original.lesson10-original a{color:inherit;text-decoration:none;font-weight:500;overflow-wrap:anywhere;}
 .lesson10-original.lesson10-original a:hover{text-decoration:underline;}
 .lesson10-original.lesson10-original .tablewrap{overflow-x:auto;max-width:100%;}
-.lesson10-original.lesson10-original table{border-collapse:separate;border-spacing:0;display:table;min-width:100%;width:100%;font:14px/26px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
-.lesson10-original.lesson10-original tr{background:transparent;}
+.lesson10-original.lesson10-original table{border-collapse:separate;border-spacing:0;display:table;min-width:100%;width:100%;font:14px/26px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans CJK SC","WenQuanYi Zen Hei","Microsoft YaHei","PingFang SC",sans-serif;}
+.lesson10-original.lesson10-original :where(table,thead,tbody,tr,th,td){background:transparent;color:inherit;}
 .lesson10-original.lesson10-original :where(th,td){text-align:start;vertical-align:top;min-width:128px;max-width:192px;border:0;padding:10px 24px 10px 0;white-space:normal;}
 .lesson10-original.lesson10-original th{font-weight:600;line-height:16px;padding-top:8px;padding-bottom:8px;border-bottom:1px solid var(--l10-rule,rgba(0,0,0,.15));}
 .lesson10-original.lesson10-original th:last-child{padding-right:40px;}
 .lesson10-original.lesson10-original td{border-bottom:1px solid var(--l10-soft,rgba(0,0,0,.05));}
 .lesson10-original.lesson10-original tbody tr:last-child td{border:0;padding-bottom:24px;}
 .lesson10-original.lesson10-original .codeblock{container-type:inline-size;border:1px solid var(--l10-soft,rgba(0,0,0,.05));border-radius:20px;background:var(--l10-code,#fcfcfc);overflow:clip;}
-.lesson10-original.lesson10-original .codebar{display:flex;align-items:center;min-height:48px;padding:6px 6px 6px 20px;gap:8px;font:500 14px/20px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+.lesson10-original.lesson10-original .codebar{display:flex;align-items:center;min-height:48px;padding:6px 6px 6px 20px;gap:8px;font:500 14px/20px -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans CJK SC","WenQuanYi Zen Hei",sans-serif;}
 .lesson10-original.lesson10-original .language{flex:1;}
-.lesson10-original.lesson10-original .codeicon{width:20px;height:20px;display:block;}
-.lesson10-original.lesson10-original .codeicon::before{content:"</>";font:12px/20px monospace;}
-.lesson10-original.lesson10-original .codeactions{display:flex;gap:1px;}
+.lesson10-original.lesson10-original .codeicon{width:20px;height:20px;display:block;flex:none;white-space:nowrap;}
+.lesson10-original.lesson10-original .codeicon::before{content:"</>";font:11px/20px monospace;white-space:nowrap;}
+.lesson10-original.lesson10-original .codeactions{display:flex;gap:1px;flex:none;}
 .lesson10-original.lesson10-original button{height:36px;width:36px;background:transparent;border-radius:50%;color:inherit;cursor:pointer;position:relative;}
 .lesson10-original.lesson10-original button:hover{background:var(--l10-soft,rgba(0,0,0,.05));}
 .lesson10-original.lesson10-original button:focus-visible{outline:2px solid #2563eb;outline-offset:-2px;}
