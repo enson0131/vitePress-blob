@@ -36,7 +36,6 @@ try {
   const response = await page.goto(target, { waitUntil: 'networkidle', timeout: 60000 })
   assert(response?.ok(), 'Lesson HTTP response must succeed')
   await page.locator('.lesson10-original [data-source-block="123"]').waitFor()
-  // A static HTML extraction validates serialized text, not a rewritten summary.
   const rendered = await page.locator('.lesson10-original').evaluate(element => ({
     blocks: Array.from(element.children).map(node => ({ id: node.getAttribute('data-source-block'), text: (node.textContent || '').replace(/\s+/g, ' ').trim() })),
     code: Array.from(element.querySelectorAll('pre code')).map(node => node.textContent),
@@ -54,16 +53,13 @@ try {
   report.checks.push('124 ordered source blocks: exact normalized-text hash', '9 code/flow blocks: exact byte hashes', '4 tables: every cell matches', '16 original headings retained')
   await page.screenshot({ path: `${output}/desktop.png`, fullPage: true })
   report.screenshots.push('desktop.png')
-
-  const copy = page.locator('.lesson10-original [data-action="copy"]').first()
-  await copy.click()
+  await page.locator('.lesson10-original [data-action="copy"]').first().click()
   await page.locator('.copy-status').filter({ hasText: '代码已完整复制' }).waitFor()
   assert.equal(await page.evaluate(() => navigator.clipboard.readText()), rendered.code[0])
   const wrap = page.locator('.lesson10-original [data-action="wrap"]').first()
   await wrap.click(); assert.equal(await wrap.getAttribute('aria-pressed'), 'true')
   await wrap.click(); assert.equal(await wrap.getAttribute('aria-pressed'), 'false')
   report.checks.push('Code copying and wrapping work')
-
   await page.locator('.lesson10-extras > summary').click()
   assert(await page.getByRole('button', { name: '提交评分', exact: true }).isDisabled())
   for (let i = 0; i < 4; i++) await page.locator(`[name="q10-${i}"]`).nth(1).check()
@@ -72,13 +68,15 @@ try {
   assert.equal(await page.locator('.quiz-feedback').count(), 4)
   await page.getByRole('button', { name: '重新作答', exact: true }).click()
   assert.equal(await page.locator('.quiz-question input:checked').count(), 0)
-  await page.locator('[name="l10-budget"]').fill('4000')
+  await page.locator('[name="l10-budget"]').evaluate(element => {
+    element.value = '4000'
+    element.dispatchEvent(new Event('input', { bubbles: true }))
+  })
   assert.match(await page.locator('.budget-feedback').innerText(), /超出预算/)
   report.checks.push('Four quiz questions: scoring, explanations and reset', 'Five budget controls: reactive total and overflow feedback')
   await page.locator('.lesson10-extras').screenshot({ path: `${output}/interactions.png` })
   report.screenshots.push('interactions.png')
   await page.locator('.lesson10-extras > summary').click()
-
   await page.setViewportSize({ width: 390, height: 844 })
   assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Mobile layout must not overflow horizontally')
   const hidden = await page.locator('.lesson10-original [data-source-block]').evaluateAll(nodes => nodes.filter(n => getComputedStyle(n).display === 'none').length)
