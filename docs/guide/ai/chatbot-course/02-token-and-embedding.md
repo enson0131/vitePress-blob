@@ -11,6 +11,8 @@ import CourseWebArticle from '../../../.vitepress/theme/components/CourseWebArti
 import source from '../../../.vitepress/theme/components/course-sources/02-token-and-embedding.web.html?raw'
 import config from '../../../.vitepress/theme/components/course-sources/02-token-and-embedding.web.json'
 import '../../../.vitepress/theme/components/course-sources/02-token-and-embedding.web.css'
+import { useSourceFidelity } from '../../../.vitepress/theme/components/course-sources/useSourceFidelity'
+useSourceFidelity(2)
 </script>
 
 <CourseWebArticle :source="source" :chapter="config.chapter" :questions="config.questions" />

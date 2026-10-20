@@ -1,0 +1,76 @@
+name: Audit lessons 02 05 06 09
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - '.github/workflows/lessons-audit.yml'
+      - 'scripts/*source*'
+      - 'scripts/audit-lessons.mjs'
+      - 'docs/.vitepress/theme/components/course-sources/**'
+      - 'docs/guide/ai/chatbot-course/02-token-and-embedding.md'
+      - 'docs/guide/ai/chatbot-course/05-llm-training.md'
+      - 'docs/guide/ai/chatbot-course/06-inference.md'
+      - 'docs/guide/ai/chatbot-course/09-conversation-memory.md'
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/lessons-audit.yml'
+      - 'scripts/*source*'
+      - 'docs/.vitepress/theme/components/course-sources/**'
+      - 'docs/guide/ai/chatbot-course/02-token-and-embedding.md'
+      - 'docs/guide/ai/chatbot-course/05-llm-training.md'
+      - 'docs/guide/ai/chatbot-course/06-inference.md'
+      - 'docs/guide/ai/chatbot-course/09-conversation-memory.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install and build complete site
+        run: |
+          npm install --global yarn
+          yarn install --ignore-engines
+          yarn build
+      - name: Install isolated browser tools
+        run: |
+          npm install --prefix "$RUNNER_TEMP/audit-tools" playwright
+          "$RUNNER_TEMP/audit-tools/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Verify source hashes and interactive built pages
+        env:
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/audit-tools/node_modules/playwright/index.mjs
+          REPORT_DIR: lesson-audit/local
+        run: |
+          ./node_modules/.bin/vitepress preview docs --port 4173 > /tmp/preview.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:4173/vitePress-blob/ >/dev/null && break || sleep 1; done
+          node scripts/verify-source-lessons.mjs
+      - name: Verify actual published Pages after merge
+        if: github.event_name == 'push'
+        env:
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/audit-tools/node_modules/playwright/index.mjs
+          AUDIT_BASE: https://enson0131.github.io/vitePress-blob/guide/ai/chatbot-course/
+          REPORT_DIR: lesson-audit/live
+        run: |
+          for i in $(seq 1 18); do
+            if node scripts/verify-source-lessons.mjs; then exit 0; fi
+            sleep 10
+          done
+          exit 1
+      - name: Save source versions for review
+        if: always()
+        run: |
+          mkdir -p lesson-audit/source
+          cp -r docs/.vitepress/theme/components lesson-audit/source/components
+          cp -r docs/guide/ai/chatbot-course lesson-audit/source/pages
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lessons-02-05-06-09-audit
+          path: lesson-audit/
+          retention-days: 14

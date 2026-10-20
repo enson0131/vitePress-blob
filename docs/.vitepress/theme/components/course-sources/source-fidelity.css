@@ -1,0 +1,70 @@
+/* Local variables used by the uploaded HTML. Scoped to the four audited lessons. */
+.web-course-source:is([data-chapter="2"],[data-chapter="5"],[data-chapter="6"],[data-chapter="9"]) {
+  --spacing: .25rem;
+  --radius-md: .625rem;
+  --radius-lg: .78125rem;
+  --radius-xl: .9375rem;
+  --color-text: #0d0d0d;
+  --color-text-prose: #0d0d0d;
+  --color-text-secondary: #5d5d5d;
+  --color-text-tertiary: #8f8f8f;
+  --color-text-success: #00a240;
+  --color-text-info: #48a04c;
+  --color-border: #0000001a;
+  --color-border-subtle: #0000000d;
+  --color-surface-secondary: #fcfcfc;
+  --color-surface-tertiary: #f3f3f3;
+  --vp-c-text-1: #0d0d0d;
+  --vp-c-text-2: #5d5d5d;
+  --vp-c-text-3: #8f8f8f;
+  min-width: 0;
+  max-width: 100%;
+}
+.dark .web-course-source:is([data-chapter="2"],[data-chapter="5"],[data-chapter="6"],[data-chapter="9"]) {
+  --color-text: #ededed;
+  --color-text-prose: #ededed;
+  --color-text-secondary: #cdcdcd;
+  --color-text-tertiary: #afafaf;
+  --color-text-success: #40c977;
+  --color-text-info: #53b559;
+  --color-border: #ffffff26;
+  --color-border-subtle: #ffffff0d;
+  --color-surface-secondary: #212121;
+  --color-surface-tertiary: #303030;
+  --vp-c-text-1: #ededed;
+  --vp-c-text-2: #cdcdcd;
+  --vp-c-text-3: #afafaf;
+}
+.web-course-source:is([data-chapter="2"],[data-chapter="5"],[data-chapter="6"],[data-chapter="9"]) [data-d-component="blockquote"] {
+  border-left: 3px solid var(--color-border) !important;
+  color: var(--color-text-prose);
+}
+.web-course-source:is([data-chapter="2"],[data-chapter="5"],[data-chapter="6"],[data-chapter="9"]) [data-web-code] {
+  min-width: 0 !important;
+  max-width: 100%;
+}
+.web-course-source:is([data-chapter="2"],[data-chapter="5"],[data-chapter="6"],[data-chapter="9"]) [data-web-code] :is(pre,[data-code-block-source]) {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+}
+.web-course-source:is([data-chapter="2"],[data-chapter="5"],[data-chapter="6"],[data-chapter="9"]) :is(.katex-display,[data-d-component="math"][data-d-block]) {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+@media (max-width: 600px) {
+  .web-course-source:is([data-chapter="2"],[data-chapter="5"],[data-chapter="6"],[data-chapter="9"]) :is([data-web-part],[data-d-direction="col"],[data-d-component="box"],[data-d-component="row"],[data-web-code]) {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  .web-course-source:is([data-chapter="2"],[data-chapter="5"],[data-chapter="6"],[data-chapter="9"]) [data-d-component="table"] {
+    min-width: 0 !important;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto !important;
+  }
+  .web-course-source:is([data-chapter="2"],[data-chapter="5"],[data-chapter="6"],[data-chapter="9"]) [data-d-component="row"] {
+    flex-wrap: wrap;
+  }
+}

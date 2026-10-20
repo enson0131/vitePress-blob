@@ -10,6 +10,8 @@ import CourseWebArticle from '../../../.vitepress/theme/components/CourseWebArti
 import LessonQuiz from '../../../.vitepress/theme/components/LessonQuiz.vue'
 import source from '../../../.vitepress/theme/components/course-sources/09-conversation-memory.web.html?raw'
 import '../../../.vitepress/theme/components/course-sources/09-conversation-memory.web.css'
+import { useSourceFidelity } from '../../../.vitepress/theme/components/course-sources/useSourceFidelity'
+useSourceFidelity(9)
 </script>
 
 <CourseWebArticle :source="source" :chapter="9" />
