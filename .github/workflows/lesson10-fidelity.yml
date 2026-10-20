@@ -1,0 +1,70 @@
+name: Chapter 10 source fidelity
+
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'docs/.vitepress/theme/components/MemoryLesson.vue'
+      - 'docs/.vitepress/theme/components/memory10/**'
+      - 'docs/guide/ai/chatbot-course/10-memory-system.md'
+      - 'scripts/verify-lesson10.mjs'
+      - '.github/workflows/lesson10-fidelity.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'docs/.vitepress/theme/components/MemoryLesson.vue'
+      - 'docs/.vitepress/theme/components/memory10/**'
+      - 'scripts/verify-lesson10.mjs'
+      - '.github/workflows/lesson10-fidelity.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install project dependencies
+        run: |
+          npm install --global yarn
+          yarn install --ignore-engines
+      - name: Build the complete VitePress site
+        run: yarn build
+      - name: Install isolated browser test tools
+        run: |
+          npm install --prefix "$RUNNER_TEMP/lesson10-tools" playwright
+          "$RUNNER_TEMP/lesson10-tools/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Verify built page and all interactions
+        env:
+          REPORT_DIR: lesson10-verification/local
+        run: |
+          export PLAYWRIGHT_MODULE="$RUNNER_TEMP/lesson10-tools/node_modules/playwright/index.mjs"
+          ./node_modules/.bin/vitepress preview docs --port 4173 > /tmp/lesson10-preview.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/vitePress-blob/ >/dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/verify-lesson10.mjs
+      - name: Verify the actual published GitHub Pages page
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        env:
+          WAIT_FOR_PAGES: 'true'
+          LESSON10_URL: https://enson0131.github.io/vitePress-blob/guide/ai/chatbot-course/10-memory-system
+          REPORT_DIR: lesson10-verification/live
+        run: |
+          export PLAYWRIGHT_MODULE="$RUNNER_TEMP/lesson10-tools/node_modules/playwright/index.mjs"
+          node scripts/verify-lesson10.mjs
+      - name: Save screenshots and fidelity reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lesson10-fidelity-${{ github.run_id }}
+          path: lesson10-verification/
+          retention-days: 14
+          if-no-files-found: warn

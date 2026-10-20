@@ -1,0 +1,23 @@
+{
+  "source": "10.htm + 10_files.zip, lesson-10 assistant reply only",
+  "uploadedHtmlSha256": "c2771f7fddf47c88d734786ffc587ee8066b46230c49e48d45e386612826f74b",
+  "blocks": 124,
+  "headingCount": 16,
+  "sectionCount": 12,
+  "codeBlocks": 9,
+  "tables": 4,
+  "textSha256": "d8666c8e8dded94b04d49a2b6657c6a62b9e3d286738f02264832196d24d9253",
+  "codeSha256": [
+    "979fe465958a7fa8ac426b7e4f67c546b0cb2f163f14a76f95e32d23f551fa9b",
+    "85922dad96adb4efbe27b0b3ac56e7dcf5c8f50d9d145e8b772393bbdf59d8fb",
+    "0f9dda56ca0226870fa18624e345451b57447f63bb998f246bf5bc8cd2c31718",
+    "8e28903c2c605872ef8a4555a43dc89293aff869b6853bf4db90da49b1532188",
+    "255c3f454872fe4cf212b774ab6f2611deacc4f1404444340b2ac20107da4b1a",
+    "b19128ca58905e962b009b4714600ac3602468a1245b01dc8e3a40a8951faf5e",
+    "23ca090959ace56fcb2f39e3e74c20b7cb8484601d52f5dc6bedd3d41ec54f82",
+    "b4ac6b4f6684bb2d92d60c9e0712d0e2cda30815a95c80981251676a9f65552d",
+    "387c987c054e535020783d87c6998ceccfb2e45754ade0abb10841d22c70201c"
+  ],
+  "tableSha256": "a79aedc9a6fa53d80dfd9ff581b0617c05722cf7f84437331a2785e5bc6aad36",
+  "note": "Full source reply retained, including its historical publishing note. Legacy GitHub exercises are separate supplementary content. Text hash normalizes HTML whitespace only; code hashes preserve exact whitespace."
+}

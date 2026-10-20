@@ -1,0 +1,80 @@
+<h1 data-source-block="0" style="margin-top:0px;margin-bottom:8px">📘 第 10 篇：聊天机器人的记忆系统——短期记忆、长期记忆与语义检索</h1>
+<p data-source-block="1" style="margin-top:0px;margin-bottom:4px"><strong>《AI 聊天机器人学习教程》｜第 10 / 40 篇</strong></p>
+<p data-source-block="2" style="margin-top:16px;margin-bottom:16px">所属阶段：第二阶段 · 聊天机器人核心原理<br/>阅读时间：约 15 分钟<br/>技术栈：TypeScript + Node.js + Vue 3</p>
+<h2 data-source-block="3" style="margin-top:16px;margin-bottom:4px">一、为什么聊天机器人需要记忆？</h2>
+<p data-source-block="4" style="margin-top:0px;margin-bottom:4px">假设你今天告诉 AI：</p>
+<blockquote data-source-block="5" style="margin-top:0px;margin-bottom:8px"><p>我是一名前端开发工程师，以后给我代码示例时，优先使用 TypeScript。</p></blockquote>
+<p data-source-block="6" style="margin-top:8px;margin-bottom:4px">第二天，你打开一个新对话：</p>
+<blockquote data-source-block="7" style="margin-top:0px;margin-bottom:8px"><p>帮我实现一个防抖函数。</p></blockquote>
+<p data-source-block="8" style="margin-top:8px;margin-bottom:4px">如果聊天机器人具有长期记忆，它就可能主动选择 TypeScript，而不需要你重复说明。</p>
+<p data-source-block="9" style="margin-top:16px;margin-bottom:4px">但这里有一个重要问题：</p>
+<p data-source-block="10" style="margin-top:16px;margin-bottom:4px"><strong>大语言模型本身并不等于记忆数据库。</strong></p>
+<p data-source-block="11" style="margin-top:16px;margin-bottom:4px">聊天机器人能够记住信息，通常依赖应用层的记忆管理系统。</p>
+<p data-source-block="12" style="margin-top:16px;margin-bottom:16px">我们可以把记忆分成三类。</p>
+<div class="tablewrap" data-source-block="13" style="margin-top:16px;margin-bottom:0px"><table><thead><tr><th>记忆类型</th><th>作用</th><th>存储位置</th></tr></thead><tbody><tr><td>短期记忆</td><td>理解当前对话</td><td>Messages / 上下文</td></tr><tr><td>长期记忆</td><td>跨会话保存偏好和事实</td><td>数据库、向量索引</td></tr><tr><td>KV Cache</td><td>加速模型推理</td><td>推理服务内存或显存</td></tr></tbody></table></div>
+<p data-source-block="14" style="margin-top:8px;margin-bottom:4px">需要特别注意：</p>
+<p data-source-block="15" style="margin-top:16px;margin-bottom:4px"><strong>KV Cache 不是长期记忆。</strong></p>
+<p data-source-block="16" style="margin-top:16px;margin-bottom:16px">它主要用于避免重复计算历史 Token 的 Key 和 Value。</p>
+<hr data-source-block="17" style="margin-top:28px;margin-bottom:28px"/>
+<h2 data-source-block="18" style="margin-top:0px;margin-bottom:4px">二、记忆系统的核心架构</h2>
+<p data-source-block="19" style="margin-top:0px;margin-bottom:4px">一个完整的记忆系统通常包含两条独立流程。</p>
+<h3 data-source-block="20" style="margin-top:16px;margin-bottom:4px">2.1 写入记忆</h3>
+<div class="codeblock" data-code="0" data-source-block="21" style="margin-top:20px;margin-bottom:20px"><div class="codebar"><span aria-hidden="true" class="codeicon"></span><span class="language">纯文本</span><span class="codeactions"><button aria-label="启用自动换行" aria-pressed="false" data-action="wrap" type="button"></button><button aria-label="复制代码" data-action="copy" type="button"></button></span></div><pre aria-label="纯文本代码或流程" tabindex="0"><code>用户发送消息
+     ↓
+判断是否值得保存
+     ↓
+提取候选记忆
+     ↓
+验证、去重、处理冲突
+     ↓
+保存数据库
+     ↓
+更新检索索引</code></pre></div>
+<p data-source-block="22" style="margin-top:8px;margin-bottom:4px">例如：</p>
+<div class="codeblock" data-code="1" data-source-block="23" style="margin-top:20px;margin-bottom:20px"><div class="codebar"><span aria-hidden="true" class="codeicon"></span><span class="language">纯文本</span><span class="codeactions"><button aria-label="启用自动换行" aria-pressed="false" data-action="wrap" type="button"></button><button aria-label="复制代码" data-action="copy" type="button"></button></span></div><pre aria-label="纯文本代码或流程" tabindex="0"><code>用户：
+以后代码示例优先使用 TypeScript。</code></pre></div>
+<p data-source-block="24" style="margin-top:8px;margin-bottom:4px">可以提取为：</p>
+<div class="codeblock" data-code="2" data-source-block="25" style="margin-top:20px;margin-bottom:20px"><div class="codebar"><span aria-hidden="true" class="codeicon"></span><span class="language">JSON</span><span class="codeactions"><button aria-label="启用自动换行" aria-pressed="false" data-action="wrap" type="button"></button><button aria-label="复制代码" data-action="copy" type="button"></button></span></div><pre aria-label="JSON代码或流程" tabindex="0"><code>{
+  "category": <span class="text-codex-syntax-string">"preference"</span>,
+  "content": <span class="text-codex-syntax-string">"代码示例优先使用 TypeScript"</span>,
+  "scope": <span class="text-codex-syntax-string">"user"</span>
+}</code></pre></div>
+<p data-source-block="26" style="margin-top:8px;margin-bottom:4px">但不是所有聊天内容都应该保存。</p>
+<p data-source-block="27" style="margin-top:16px;margin-bottom:16px">例如临时问题、过期信息、未经验证的推断，以及不必要的敏感信息，都不应该默认永久保存。</p>
+<h3 data-source-block="28" style="margin-top:16px;margin-bottom:4px">2.2 读取记忆</h3>
+<div class="codeblock" data-code="3" data-source-block="29" style="margin-top:20px;margin-bottom:20px"><div class="codebar"><span aria-hidden="true" class="codeicon"></span><span class="language">纯文本</span><span class="codeactions"><button aria-label="启用自动换行" aria-pressed="false" data-action="wrap" type="button"></button><button aria-label="复制代码" data-action="copy" type="button"></button></span></div><pre aria-label="纯文本代码或流程" tabindex="0"><code>用户提出新问题
+     ↓
+识别当前任务
+     ↓
+检索相关记忆
+     ↓
+检查权限和有效期
+     ↓
+根据相关性排序
+     ↓
+注入 Messages
+     ↓
+LLM 生成回答</code></pre></div>
+<p data-source-block="30" style="margin-top:8px;margin-bottom:4px"><strong>长期记忆的关键不是保存所有内容，而是在正确的时候取出正确的信息。</strong></p>
+<hr data-source-block="31" style="margin-top:28px;margin-bottom:28px"/>
+<h2 data-source-block="32" style="margin-top:0px;margin-bottom:4px">三、短期记忆：Sliding Window 与 Summary</h2>
+<p data-source-block="33" style="margin-top:0px;margin-bottom:4px">假设用户与机器人已经进行了 100 轮对话。</p>
+<p data-source-block="34" style="margin-top:16px;margin-bottom:16px">如果每次请求都发送全部历史消息，会出现两个问题：</p>
+<ol data-source-block="35" style="margin-top:0px;margin-bottom:0px"><li>输入 Token 成本越来越高。</li><li>Prefill 需要处理越来越长的上下文。</li></ol>
+<p data-source-block="36" style="margin-top:8px;margin-bottom:4px">因此可以使用滑动窗口。</p>
+<div class="codeblock" data-code="4" data-source-block="37" style="margin-top:20px;margin-bottom:20px"><div class="codebar"><span aria-hidden="true" class="codeicon"></span><span class="language">TypeScript</span><span class="codeactions"><button aria-label="启用自动换行" aria-pressed="false" data-action="wrap" type="button"></button><button aria-label="复制代码" data-action="copy" type="button"></button></span></div><pre aria-label="TypeScript代码或流程" tabindex="0"><code><span class="text-codex-syntax-keyword">const</span> <span class="text-codex-syntax-variable">recentMessages</span> <span class="text-codex-syntax-keyword">=</span> <span class="text-codex-syntax-variable">messages</span><span class="text-codex-syntax-keyword">.</span>slice(<span class="text-codex-syntax-keyword">-</span><span class="text-codex-syntax-literal">20</span>);</code></pre></div>
+<p data-source-block="38" style="margin-top:8px;margin-bottom:4px">这样只保留最近 20 条消息。</p>
+<p data-source-block="39" style="margin-top:16px;margin-bottom:4px">但是，如果用户的重要要求出现在更早的消息中，就可能被丢弃。</p>
+<p data-source-block="40" style="margin-top:16px;margin-bottom:16px">另一种方式是历史摘要：</p>
+<div class="codeblock" data-code="5" data-source-block="41" style="margin-top:20px;margin-bottom:20px"><div class="codebar"><span aria-hidden="true" class="codeicon"></span><span class="language">纯文本</span><span class="codeactions"><button aria-label="启用自动换行" aria-pressed="false" data-action="wrap" type="button"></button><button aria-label="复制代码" data-action="copy" type="button"></button></span></div><pre aria-label="纯文本代码或流程" tabindex="0"><code>原始历史：
+用户介绍了自己的技术背景、
+项目情况和代码风格偏好。
+
+压缩摘要：
+用户是前端开发工程师，
+优先使用 TypeScript，
+目前正在学习 AI 聊天机器人开发。</code></pre></div>
+<p data-source-block="42" style="margin-top:8px;margin-bottom:4px">摘要能够减少 Token，但属于有损压缩。</p>
+<p data-source-block="43" style="margin-top:16px;margin-bottom:4px">例如，把“每月 1 号投入 800 美元”摘要为“每月投资”，就丢失了重要的日期和金额。</p>
+<p data-source-block="44" style="margin-top:16px;margin-bottom:16px">因此，关键事实最好保留结构化记录和原始来源。</p>
+<hr data-source-block="45" style="margin-top:28px;margin-bottom:28px"/>

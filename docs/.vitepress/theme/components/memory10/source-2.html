@@ -1,0 +1,118 @@
+<h2 data-source-block="46" style="margin-top:0px;margin-bottom:4px">四、长期记忆的数据结构</h2>
+<p data-source-block="47" style="margin-top:0px;margin-bottom:4px">实际开发中，不建议只保存一段字符串。</p>
+<p data-source-block="48" style="margin-top:16px;margin-bottom:16px">可以使用以下 TypeScript 类型：</p>
+<div class="codeblock" data-code="6" data-source-block="49" style="margin-top:20px;margin-bottom:20px"><div class="codebar"><span aria-hidden="true" class="codeicon"></span><span class="language">TypeScript</span><span class="codeactions"><button aria-label="启用自动换行" aria-pressed="false" data-action="wrap" type="button"></button><button aria-label="复制代码" data-action="copy" type="button"></button></span></div><pre aria-label="TypeScript代码或流程" tabindex="0"><code><span class="text-codex-syntax-keyword">type</span> <span class="text-codex-syntax-variable">MemoryRecord</span> <span class="text-codex-syntax-keyword">=</span> {
+  id: <span class="text-codex-syntax-variable">string</span>;
+  userId: <span class="text-codex-syntax-variable">string</span>;
+
+  scope: <span class="text-codex-syntax-string">"user"</span> <span class="text-codex-syntax-keyword">|</span> <span class="text-codex-syntax-string">"project"</span>;
+
+  content: <span class="text-codex-syntax-variable">string</span>;
+
+  category:
+    <span class="text-codex-syntax-keyword">|</span> <span class="text-codex-syntax-string">"preference"</span>
+    <span class="text-codex-syntax-keyword">|</span> <span class="text-codex-syntax-string">"fact"</span>
+    <span class="text-codex-syntax-keyword">|</span> <span class="text-codex-syntax-string">"task"</span>;
+
+  sourceMessageId?: <span class="text-codex-syntax-variable">string</span>;
+
+  createdAt: <span class="text-codex-syntax-variable">string</span>;
+  updatedAt: <span class="text-codex-syntax-variable">string</span>;
+  expiresAt?: <span class="text-codex-syntax-variable">string</span>;
+
+  status:
+    <span class="text-codex-syntax-keyword">|</span> <span class="text-codex-syntax-string">"active"</span>
+    <span class="text-codex-syntax-keyword">|</span> <span class="text-codex-syntax-string">"superseded"</span>
+    <span class="text-codex-syntax-keyword">|</span> <span class="text-codex-syntax-string">"deleted"</span>;
+};</code></pre></div>
+<p data-source-block="50" style="margin-top:8px;margin-bottom:4px">为什么需要 <span class="InlineCode-Cddi3Y">status</span>？</p>
+<p data-source-block="51" style="margin-top:16px;margin-bottom:16px">假设用户之前说：</p>
+<blockquote data-source-block="52" style="margin-top:0px;margin-bottom:8px"><p>代码示例优先 Python。</p></blockquote>
+<p data-source-block="53" style="margin-top:8px;margin-bottom:4px">后来又说：</p>
+<blockquote data-source-block="54" style="margin-top:0px;margin-bottom:8px"><p>以后改成 TypeScript。</p></blockquote>
+<p data-source-block="55" style="margin-top:8px;margin-bottom:4px">记忆系统不能让两条互相冲突的偏好同时生效。</p>
+<p data-source-block="56" style="margin-top:16px;margin-bottom:16px">更合理的方式是让新偏好生效，并将旧记录标记为已被替代。</p>
+<hr data-source-block="57" style="margin-top:28px;margin-bottom:28px"/>
+<h2 data-source-block="58" style="margin-top:0px;margin-bottom:4px">五、Embedding 如何帮助检索记忆？</h2>
+<p data-source-block="59" style="margin-top:0px;margin-bottom:4px">假设数据库保存了一条记忆：</p>
+<blockquote data-source-block="60" style="margin-top:0px;margin-bottom:8px"><p>用户喜欢使用 TypeScript 开发前端应用。</p></blockquote>
+<p data-source-block="61" style="margin-top:8px;margin-bottom:4px">后来用户问：</p>
+<blockquote data-source-block="62" style="margin-top:0px;margin-bottom:8px"><p>我之前说过代码示例用什么语言吗？</p></blockquote>
+<p data-source-block="63" style="margin-top:8px;margin-bottom:4px">这两句话并没有完全相同的关键词，但语义相关。</p>
+<p data-source-block="64" style="margin-top:16px;margin-bottom:4px">我们可以通过 Embedding 将文本转换成向量，再执行相似度检索。</p>
+<p data-source-block="65" style="margin-top:16px;margin-bottom:16px">典型流程：</p>
+<div class="codeblock" data-code="7" data-source-block="66" style="margin-top:20px;margin-bottom:20px"><div class="codebar"><span aria-hidden="true" class="codeicon"></span><span class="language">纯文本</span><span class="codeactions"><button aria-label="启用自动换行" aria-pressed="false" data-action="wrap" type="button"></button><button aria-label="复制代码" data-action="copy" type="button"></button></span></div><pre aria-label="纯文本代码或流程" tabindex="0"><code>用户当前问题
+     ↓
+Embedding
+     ↓
+生成查询向量
+     ↓
+向量数据库检索
+     ↓
+获取相关记忆
+     ↓
+权限过滤与重排序
+     ↓
+注入当前上下文</code></pre></div>
+<p data-source-block="67" style="margin-top:8px;margin-bottom:4px">不过，向量相似度高不代表信息一定正确。</p>
+<p data-source-block="68" style="margin-top:16px;margin-bottom:16px">实际系统还需要考虑记忆来源、时间有效性和用户权限。</p>
+<hr data-source-block="69" style="margin-top:28px;margin-bottom:28px"/>
+<h2 data-source-block="70" style="margin-top:0px;margin-bottom:4px">六、TypeScript：实现一个简单记忆检索器</h2>
+<p data-source-block="71" style="margin-top:0px;margin-bottom:4px">下面先用关键词匹配演示检索流程。</p>
+<div class="codeblock" data-code="8" data-source-block="72" style="margin-top:20px;margin-bottom:20px"><div class="codebar"><span aria-hidden="true" class="codeicon"></span><span class="language">TypeScript</span><span class="codeactions"><button aria-label="启用自动换行" aria-pressed="false" data-action="wrap" type="button"></button><button aria-label="复制代码" data-action="copy" type="button"></button></span></div><pre aria-label="TypeScript代码或流程" tabindex="0"><code><span class="text-codex-syntax-keyword">type</span> <span class="text-codex-syntax-variable">Memory</span> <span class="text-codex-syntax-keyword">=</span> {
+  id: <span class="text-codex-syntax-variable">string</span>;
+  userId: <span class="text-codex-syntax-variable">string</span>;
+  projectId?: <span class="text-codex-syntax-variable">string</span>;
+  content: <span class="text-codex-syntax-variable">string</span>;
+  updatedAt: <span class="text-codex-syntax-variable">number</span>;
+  deleted?: <span class="text-codex-syntax-variable">boolean</span>;
+};
+
+<span class="text-codex-syntax-keyword">function</span> <span class="text-codex-syntax-variable">retrieve</span>(
+  <span class="text-codex-syntax-variable">records</span>: <span class="text-codex-syntax-variable">Memory</span>[],
+  <span class="text-codex-syntax-variable">userId</span>: <span class="text-codex-syntax-variable">string</span>,
+  <span class="text-codex-syntax-variable">query</span>: <span class="text-codex-syntax-variable">string</span>,
+  <span class="text-codex-syntax-variable">projectId</span>?: <span class="text-codex-syntax-variable">string</span>
+) {
+  <span class="text-codex-syntax-keyword">const</span> <span class="text-codex-syntax-variable">terms</span> <span class="text-codex-syntax-keyword">=</span> <span class="text-codex-syntax-variable">query</span>
+    <span class="text-codex-syntax-keyword">.</span>toLowerCase()
+    <span class="text-codex-syntax-keyword">.</span>split(<span class="text-codex-syntax-string">/\s+/</span>)
+    <span class="text-codex-syntax-keyword">.</span>filter(<span class="text-codex-syntax-variable">Boolean</span>);
+
+  <span class="text-codex-syntax-keyword">return</span> <span class="text-codex-syntax-variable">records</span>
+    <span class="text-codex-syntax-keyword">.</span>filter(<span class="text-codex-syntax-variable">m</span> =&gt;
+      <span class="text-codex-syntax-variable">m</span><span class="text-codex-syntax-keyword">.</span>userId <span class="text-codex-syntax-keyword">===</span> <span class="text-codex-syntax-variable">userId</span> <span class="text-codex-syntax-keyword">&amp;&amp;</span>
+      <span class="text-codex-syntax-keyword">!</span><span class="text-codex-syntax-variable">m</span><span class="text-codex-syntax-keyword">.</span>deleted
+    )
+    <span class="text-codex-syntax-keyword">.</span>filter(<span class="text-codex-syntax-variable">m</span> =&gt;
+      <span class="text-codex-syntax-keyword">!</span><span class="text-codex-syntax-variable">m</span><span class="text-codex-syntax-keyword">.</span>projectId <span class="text-codex-syntax-keyword">||</span>
+      <span class="text-codex-syntax-variable">m</span><span class="text-codex-syntax-keyword">.</span>projectId <span class="text-codex-syntax-keyword">===</span> <span class="text-codex-syntax-variable">projectId</span>
+    )
+    <span class="text-codex-syntax-keyword">.</span>map(<span class="text-codex-syntax-variable">m</span> =&gt; ({
+      record: <span class="text-codex-syntax-variable">m</span>,
+      score: <span class="text-codex-syntax-variable">terms</span><span class="text-codex-syntax-keyword">.</span>filter(<span class="text-codex-syntax-variable">t</span> =&gt;
+        <span class="text-codex-syntax-variable">m</span><span class="text-codex-syntax-keyword">.</span>content<span class="text-codex-syntax-keyword">.</span>toLowerCase()<span class="text-codex-syntax-keyword">.</span>includes(<span class="text-codex-syntax-variable">t</span>)
+      )<span class="text-codex-syntax-keyword">.</span>length
+    }))
+    <span class="text-codex-syntax-keyword">.</span>filter(<span class="text-codex-syntax-variable">x</span> =&gt; <span class="text-codex-syntax-variable">x</span><span class="text-codex-syntax-keyword">.</span>score <span class="text-codex-syntax-keyword">&gt;</span> <span class="text-codex-syntax-literal">0</span>)
+    <span class="text-codex-syntax-keyword">.</span>sort((<span class="text-codex-syntax-variable">a</span>, <span class="text-codex-syntax-variable">b</span>) =&gt;
+      <span class="text-codex-syntax-variable">b</span><span class="text-codex-syntax-keyword">.</span>score <span class="text-codex-syntax-keyword">-</span> <span class="text-codex-syntax-variable">a</span><span class="text-codex-syntax-keyword">.</span>score <span class="text-codex-syntax-keyword">||</span>
+      <span class="text-codex-syntax-variable">b</span><span class="text-codex-syntax-keyword">.</span>record<span class="text-codex-syntax-keyword">.</span>updatedAt <span class="text-codex-syntax-keyword">-</span> <span class="text-codex-syntax-variable">a</span><span class="text-codex-syntax-keyword">.</span>record<span class="text-codex-syntax-keyword">.</span>updatedAt
+    )
+    <span class="text-codex-syntax-keyword">.</span>slice(<span class="text-codex-syntax-literal">0</span>, <span class="text-codex-syntax-literal">5</span>)
+    <span class="text-codex-syntax-keyword">.</span>map(<span class="text-codex-syntax-variable">x</span> =&gt; <span class="text-codex-syntax-variable">x</span><span class="text-codex-syntax-keyword">.</span>record);
+}</code></pre></div>
+<p data-source-block="73" style="margin-top:8px;margin-bottom:4px">这是教学实现，并不具备真正的语义检索能力。</p>
+<p data-source-block="74" style="margin-top:16px;margin-bottom:4px">生产环境可以使用 PostgreSQL + pgvector 等方案。</p>
+<p data-source-block="75" style="margin-top:16px;margin-bottom:16px"><strong>注意：用户权限过滤应在可信数据库查询层完成，而不是先读取全部用户数据再交给模型判断。</strong></p>
+<hr data-source-block="76" style="margin-top:28px;margin-bottom:28px"/>
+<h2 data-source-block="77" style="margin-top:0px;margin-bottom:4px">七、长期记忆是否应该覆盖用户当前要求？</h2>
+<p data-source-block="78" style="margin-top:0px;margin-bottom:4px">不应该。</p>
+<p data-source-block="79" style="margin-top:16px;margin-bottom:16px">例如，长期记忆中保存：</p>
+<blockquote data-source-block="80" style="margin-top:0px;margin-bottom:8px"><p>用户代码示例优先 TypeScript。</p></blockquote>
+<p data-source-block="81" style="margin-top:8px;margin-bottom:4px">但用户这次明确要求：</p>
+<blockquote data-source-block="82" style="margin-top:0px;margin-bottom:8px"><p>请使用 Python 实现。</p></blockquote>
+<p data-source-block="83" style="margin-top:8px;margin-bottom:4px">机器人就应该优先满足当前明确要求，而不是机械地坚持 TypeScript。</p>
+<p data-source-block="84" style="margin-top:16px;margin-bottom:4px">长期记忆应该作为辅助上下文，而不是不可修改的命令。</p>
+<p data-source-block="85" style="margin-top:16px;margin-bottom:16px">当然，用户当前要求也不能覆盖更高优先级的安全和权限约束。</p>
+<hr data-source-block="86" style="margin-top:28px;margin-bottom:28px"/>

@@ -1,0 +1,37 @@
+<h2 data-source-block="87" style="margin-top:0px;margin-bottom:4px">八、如何实现记忆更新与遗忘？</h2>
+<p data-source-block="88" style="margin-top:0px;margin-bottom:4px">一个可靠的记忆系统需要支持更新、过期和删除。</p>
+<div class="tablewrap" data-source-block="89" style="margin-top:16px;margin-bottom:0px"><table><thead><tr><th>场景</th><th>处理方式</th></tr></thead><tbody><tr><td>用户修改偏好</td><td>新记录生效，旧记录失效</td></tr><tr><td>临时任务完成</td><td>归档或过期</td></tr><tr><td>用户要求删除记忆</td><td>删除或失效相关记录及索引</td></tr><tr><td>记忆来源不可靠</td><td>降低可信度或不保存</td></tr></tbody></table></div>
+<p data-source-block="90" style="margin-top:8px;margin-bottom:4px">不能只在 Prompt 中写一句“忘记这件事”，就认为已经删除了数据库中的信息。</p>
+<hr data-source-block="91" style="margin-top:28px;margin-bottom:28px"/>
+<h2 data-source-block="92" style="margin-top:0px;margin-bottom:4px">九、如何评估记忆系统？</h2>
+<p data-source-block="93" style="margin-top:0px;margin-bottom:4px">生产环境建议关注以下指标：</p>
+<div class="tablewrap" data-source-block="94" style="margin-top:16px;margin-bottom:0px"><table><thead><tr><th>指标</th><th>作用</th></tr></thead><tbody><tr><td>记忆召回率</td><td>是否找到真正相关的记忆</td></tr><tr><td>错误注入率</td><td>是否把不相关信息加入上下文</td></tr><tr><td>过期记忆命中率</td><td>是否使用失效信息</td></tr><tr><td>跨用户数据泄漏率</td><td>检查权限隔离</td></tr><tr><td>用户纠错成功率</td><td>修改偏好后能否正确生效</td></tr><tr><td>Token 成本</td><td>记忆注入是否过度消耗上下文</td></tr></tbody></table></div>
+<p data-source-block="95" style="margin-top:8px;margin-bottom:4px">其中，跨用户数据泄漏属于高优先级安全问题。</p>
+<hr data-source-block="96" style="margin-top:28px;margin-bottom:28px"/>
+<h2 data-source-block="97" style="margin-top:0px;margin-bottom:4px">十、本篇总结</h2>
+<p data-source-block="98" style="margin-top:0px;margin-bottom:4px">今天需要记住五个概念。</p>
+<div class="tablewrap" data-source-block="99" style="margin-top:16px;margin-bottom:0px"><table><thead><tr><th>概念</th><th>核心作用</th></tr></thead><tbody><tr><td>短期记忆</td><td>保留最近对话</td></tr><tr><td>长期记忆</td><td>跨会话持久化信息</td></tr><tr><td>Embedding</td><td>支持语义检索</td></tr><tr><td>记忆注入</td><td>将相关信息加入上下文</td></tr><tr><td>遗忘机制</td><td>允许更新、过期和删除</td></tr></tbody></table></div>
+<p data-source-block="100" style="margin-top:8px;margin-bottom:4px"><strong>最重要的一句话：聊天机器人的记忆不是模型自动记住一切，而是应用系统决定保存什么、检索什么，以及何时遗忘。</strong></p>
+<hr data-source-block="101" style="margin-top:28px;margin-bottom:28px"/>
+<h2 data-source-block="102" style="margin-top:0px;margin-bottom:4px">十一、课后测验</h2>
+<p data-source-block="103" style="margin-top:0px;margin-bottom:4px">完整的 GitHub 交互页面包含 <strong>4 道选择题</strong>，支持提交评分、查看正确答案及解析、重新作答。</p>
+<p data-source-block="104" style="margin-top:16px;margin-bottom:16px">你可以重点思考：聊天记录已经保存到数据库，为什么模型仍然可能不知道用户之前说过什么？</p>
+<hr data-source-block="105" style="margin-top:28px;margin-bottom:28px"/>
+<h2 data-source-block="106" style="margin-top:0px;margin-bottom:4px">十二、学习疑问与解答</h2>
+<p data-source-block="107" style="margin-top:0px;margin-bottom:4px"><strong>Q1：模型会因为聊天次数增加而自动训练自己吗？</strong></p>
+<p data-source-block="108" style="margin-top:16px;margin-bottom:4px">普通聊天推理不会直接修改模型权重。应用可以保存和检索记忆，但这不等于重新训练模型。</p>
+<p data-source-block="109" style="margin-top:16px;margin-bottom:4px"><strong>Q2：是否需要保存每一句对话？</strong></p>
+<p data-source-block="110" style="margin-top:16px;margin-bottom:4px">不需要。应该根据实际价值、隐私、用户意愿和保留期限决定。</p>
+<p data-source-block="111" style="margin-top:16px;margin-bottom:4px"><strong>Q3：记忆是否应该永远覆盖当前指令？</strong></p>
+<p data-source-block="112" style="margin-top:16px;margin-bottom:4px">不应该。相关历史偏好通常应该让位于用户当前明确要求。</p>
+<p data-source-block="113" style="margin-top:16px;margin-bottom:4px"><strong>Q4：为什么长期记忆需要权限过滤？</strong></p>
+<p data-source-block="114" style="margin-top:16px;margin-bottom:16px">因为记忆可能包含用户或项目数据。必须防止跨用户、跨租户和跨项目的数据泄漏。</p>
+<hr data-source-block="115" style="margin-top:28px;margin-bottom:28px"/>
+<h2 data-source-block="116" style="margin-top:0px;margin-bottom:4px">🚀 GitHub 发布状态</h2>
+<p data-source-block="117" style="margin-top:0px;margin-bottom:4px"><strong>第 10 篇已提交到你的 GitHub 仓库。</strong></p>
+<p data-source-block="118" style="margin-top:16px;margin-bottom:4px">本次采用约定的 <strong>HTML + Vue 3 组件嵌入</strong>方式，包含完整文章、上下文预算交互实验、TypeScript 示例及 4 道交互式选择题。</p>
+<p data-source-block="119" style="margin-top:16px;margin-bottom:4px"><a href="https://enson0131.github.io/vitePress-blob/guide/ai/chatbot-course/10-memory-system" rel="noopener noreferrer" target="_blank">阅读第 10 篇完整交互教程</a></p>
+<p data-source-block="120" style="margin-top:16px;margin-bottom:4px"><a href="https://github.com/enson0131/vitePress-blob/commit/83e118891d8156ea22c64eeef26aa9d9a96b18dd" rel="noopener noreferrer" target="_blank">查看 GitHub 最新提交</a></p>
+<p data-source-block="121" style="margin-top:16px;margin-bottom:4px"><strong>当前进度：10 / 40 篇（25%）</strong></p>
+<p data-source-block="122" style="margin-top:16px;margin-bottom:4px">源码和课程导航已经提交，但 GitHub Pages 的构建、部署及视觉 1:1 还原尚未验证。</p>
+<p data-source-block="123" style="margin-top:16px;margin-bottom:0px"><strong>下一篇：第 11 篇《上下文压缩与 Token 优化：如何让聊天机器人记得更多、花费更少？》</strong></p>
