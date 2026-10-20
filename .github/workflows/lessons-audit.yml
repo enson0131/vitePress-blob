@@ -1,0 +1,40 @@
+name: Audit lessons 02 05 06 09
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - '.github/workflows/lessons-audit.yml'
+      - 'scripts/audit-lessons.mjs'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install isolated browser tools
+        run: |
+          npm install --prefix "$RUNNER_TEMP/audit-tools" playwright
+          "$RUNNER_TEMP/audit-tools/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Inspect published pages without modifying content
+        env:
+          PLAYWRIGHT_MODULE: ${{ runner.temp }}/audit-tools/node_modules/playwright/index.mjs
+        run: node scripts/audit-lessons.mjs
+      - name: Collect current source for local comparison
+        if: always()
+        run: |
+          mkdir -p lesson-audit/source
+          cp -r docs/.vitepress/theme/components lesson-audit/source/components
+          cp -r docs/guide/ai/chatbot-course lesson-audit/source/pages
+          cp package.json docs/.vitepress/config.ts lesson-audit/source/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lessons-02-05-06-09-audit
+          path: lesson-audit/
+          retention-days: 14
