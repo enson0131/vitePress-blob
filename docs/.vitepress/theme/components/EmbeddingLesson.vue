@@ -5,7 +5,6 @@ const toc=['Token：AI 眼中的文字','Embedding：把文字转换成向量','
 <template>
 <article class="ai-html-lesson">
 <header>
-  <div class="metadata"><span class="tag">第 02 / 40 篇</span><span>第一阶段：AI 与大模型基础</span><span>阅读约 10 分钟</span></div>
   <h1>Token 与 Embedding：为什么 AI 能把文字变成数学？</h1>
   <p>上一篇我们学习了 ChatGPT 的基本工作流程：用户输入 → Tokenization → Transformer → 预测下一个 Token → 生成回答。</p>
   <p><strong>计算机只认识数字，为什么 ChatGPT 能知道「苹果」和「香蕉」在语义上比较接近？</strong></p>

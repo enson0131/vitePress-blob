@@ -1,0 +1,21 @@
+{
+  "chapter": 5,
+  "questions": [
+    {
+      "answer": 0,
+      "explanation": "自回归预训练以预测下一个 Token 为核心目标。"
+    },
+    {
+      "answer": 1,
+      "explanation": "负对数损失为 −ln(p)，正确 Token 的概率越高，损失越低。"
+    },
+    {
+      "answer": 1,
+      "explanation": "SFT 使用指令与示范回答，帮助模型学习遵循指令。"
+    },
+    {
+      "answer": 2,
+      "explanation": "RAG 可以检索最新文档，适合持续更新的企业知识库。"
+    }
+  ]
+}

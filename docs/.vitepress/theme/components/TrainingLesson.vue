@@ -16,7 +16,6 @@ function reset(){scores.value=[];submitted.value=false}
 </script>
 <template>
 <article class="lesson">
-<div class="meta">第 05 / 40 篇 · 第一阶段：AI 与大模型基础 · 阅读约 12 分钟</div>
 <h1>大语言模型是如何训练出来的？</h1>
 <p>前四篇，我们学习了 Token、Embedding、Transformer、Attention 和位置编码。但一个刚初始化的 Transformer 并不会写代码。它是如何逐步成为能回答问题的聊天助手的？</p>
 <h2>一、模型一开始并不知道正确答案</h2>

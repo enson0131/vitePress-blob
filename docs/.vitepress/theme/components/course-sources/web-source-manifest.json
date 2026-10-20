@@ -1,0 +1,143 @@
+{
+  "source": "User-authorized ChatGPT conversation, rendered article DOM only",
+  "conversationId": "6ad023a3-615c-83e8-b7c0-f6fe854992e1",
+  "articles": [
+    {
+      "chapter": 2,
+      "part": 0,
+      "messageId": "f957ddef-8e79-4b8d-9e90-813c08b18b5f",
+      "sourceTextSha256": "a7eccbaed38aaede95af849cc24cf3f300c52a4d10f8afda3aa4c5c0050624ff",
+      "sourceTextCharacters": 3128,
+      "sourceSvgCount": 0
+    },
+    {
+      "chapter": 2,
+      "part": 1,
+      "messageId": "9abcd3c4-e25f-44a7-84a6-42661a1ad405",
+      "sourceTextSha256": "338eedb6cdf43fe055af213c7a5f153c8092f379790b8f482aa773d9bac934a7",
+      "sourceTextCharacters": 2161,
+      "sourceSvgCount": 0
+    },
+    {
+      "chapter": 3,
+      "part": 0,
+      "messageId": "c493141b-856f-49d9-9550-657dad5658ad",
+      "sourceTextSha256": "eb824ef36e85726cfb171d5c875e7eaf22c87c299cf3880864dc6e8e8f99d819",
+      "sourceTextCharacters": 1585,
+      "sourceSvgCount": 0
+    },
+    {
+      "chapter": 5,
+      "part": 0,
+      "messageId": "c9822f68-1d23-4612-b983-f07fead9f804",
+      "sourceTextSha256": "3a6f70b224d8f33e62005f538995f422d98cf9fe1d6aa69e23a3c5221a28bce6",
+      "sourceTextCharacters": 2064,
+      "sourceSvgCount": 0
+    },
+    {
+      "chapter": 6,
+      "part": 0,
+      "messageId": "ba11332c-b107-410c-98e6-cee6376108a2",
+      "sourceTextSha256": "00e4cf5fe898a801d1d7596d70535d54b0ddb3b904f928b2c18f15cf94b0bd44",
+      "sourceTextCharacters": 3828,
+      "sourceSvgCount": 0
+    },
+    {
+      "chapter": 6,
+      "part": 1,
+      "messageId": "a44fd9d5-c229-4f7e-a7e1-e5cc76c800f7",
+      "sourceTextSha256": "00bf65a0cd019f6a36f2d0cebe71ba1638cf273bd803cd3c1a329e7d1c1a7127",
+      "sourceTextCharacters": 5977,
+      "sourceSvgCount": 0
+    },
+    {
+      "chapter": 7,
+      "part": 0,
+      "messageId": "651b7f0b-2165-4e1c-bcc9-a8c954000ac5",
+      "sourceTextSha256": "3e02f9c94037f76e5202782184f54b5fe454bb970e1c6885d229fa476bdf9f4d",
+      "sourceTextCharacters": 5239,
+      "sourceSvgCount": 0
+    },
+    {
+      "chapter": 8,
+      "part": 0,
+      "messageId": "3e7d900a-d468-4dce-b8df-59529fa86008",
+      "sourceTextSha256": "369a28ab074b877e40e98e363cc0e4009a37128f38a6b4da231558d99007f7bf",
+      "sourceTextCharacters": 5151,
+      "sourceSvgCount": 0
+    },
+    {
+      "chapter": 9,
+      "part": 0,
+      "messageId": "88153fba-d694-48e5-8b62-602c38b40804",
+      "sourceTextSha256": "f969e83db89b97ef76ad03ebc466d9954067a6277439fa318351866bf1c24f69",
+      "sourceTextCharacters": 4701,
+      "sourceSvgCount": 0
+    },
+    {
+      "chapter": 9,
+      "part": 1,
+      "messageId": "4bc25b25-1b87-4f29-8459-01e3a2a4feb8",
+      "sourceTextSha256": "fc5ebe0b98751f4355f64321c8f1d8b675de6fb9fcd8620d1f4b0a5c44aecda1",
+      "sourceTextCharacters": 5763,
+      "sourceSvgCount": 0
+    }
+  ],
+  "unavailableOriginals": [
+    3,
+    4
+  ],
+  "verification": {
+    "chapter01": {
+      "source": "User-provided 01.html",
+      "orderedContentBlocks": 89,
+      "codeBlocks": 11,
+      "tables": 2,
+      "content": "matched"
+    },
+    "capturedWebArticles": "Original heading text, static paragraphs, code whitespace, table cells and formula DOM verified against captured rendered messages.",
+    "interaction": "Vue event handlers and native form controls reimplement calculations, copying and grading; original ChatGPT React scripts are not copied.",
+    "visual": "Desktop and 390px layout inspected; no claim of pixel-for-pixel equivalence to the ChatGPT application shell.",
+    "partialOriginals": {
+      "3": "Q/K/V follow-up restored; main lesson original unavailable."
+    },
+    "unverifiedMainLessons": [
+      3,
+      4
+    ],
+    "quizExplanationSources": {
+      "2": "Captured rendered answers",
+      "7": "Captured rendered answers",
+      "5": "Local explanations; hidden original answer text not inspected",
+      "6": "Local explanations; hidden original answer text not inspected"
+    },
+    "chapter09": {
+      "source": "User-provided /Users/enson/Downloads/09.htm and 09_files",
+      "sourceFileSha256": "8f8dfefb9fdc8ed5805d8c74f12a7613f674bfdef91a2d8dca920431cea2b08e",
+      "parts": 2,
+      "sourceEnding": "Part two ends after the section 11 quiz introduction; actual quiz questions and section 12 are absent.",
+      "quiz": "Five existing local questions and five Q&A entries retained as an explicitly labelled supplement.",
+      "contentAudit": {
+        "part1-headings": 19,
+        "part1-paragraphs": 200,
+        "part1-code": 5,
+        "part1-tablecells": 33,
+        "part1-math": 2,
+        "part2-headings": 23,
+        "part2-paragraphs": 184,
+        "part2-code": 6,
+        "part2-tablecells": 65,
+        "part2-math": 0
+      },
+      "interactionChecks": [
+        "History growth: 500 * (1000 + 2000) = 1,500,000; 1171.9% of 128K",
+        "Sliding window: retaining four and one complete turns updates all four rows",
+        "Memory retrieval: TypeScript/React and RAG/Embedding modes select the corresponding memories",
+        "Local quiz: 5/5 grading and reset verified",
+        "Code copy and line wrap verified"
+      ],
+      "visualChecks": "Desktop and 390px mobile page header inspected.",
+      "build": "npm run build completed; existing demo.md document-is-not-defined diagnostic and CSS @media warning remain. Built article text matches both restored source parts."
+    }
+  }
+}

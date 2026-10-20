@@ -13,7 +13,6 @@ const score=computed(()=>quiz.filter((q,i)=>answers.value[i]===q.a).length)
 function pick(i:number,j:number){answers.value=[...answers.value];answers.value[i]=j;submitted.value=false}
 </script>
 <template><article class="lesson">
-<div class="meta"><b>第 04 / 40 篇</b> · 第一阶段：AI 与大模型基础 · 阅读约 12 分钟</div>
 <h1>位置编码：Transformer 如何知道 Token 的顺序？</h1>
 <p>上一篇我们学习了 Transformer 与 Self-Attention。但如果模型主要计算 Token 之间的关系，它怎么知道哪个词在前、哪个词在后？</p>
 <p>例如「小明喜欢小红」和「小红喜欢小明」包含几乎相同的词，但语义不同。关键在于 <strong>Positional Encoding（位置编码）</strong>。</p>

@@ -17,7 +17,6 @@ const score=computed(()=>questions.filter((q,i)=>answers.value[i]===q.a).length)
 function choose(i:number,j:number){const a=[...answers.value];a[i]=j;answers.value=a;submitted.value=false}
 </script>
 <template><article class="lesson">
-<div class="meta">第 09 / 40 篇 · 第二阶段：聊天机器人核心原理 · 阅读约 20 分钟</div>
 <h1>多轮对话与上下文管理：ChatGPT 为什么能记住我们之前聊过的内容？</h1>
 <p>如果大语言模型本身不会因为普通聊天而持续更新参数，为什么 ChatGPT 能记住前面聊过的内容？答案涉及模型层的上下文计算、应用层的历史管理和记忆层的按需检索。</p>
 <h2>一、大语言模型本身真的有记忆吗？</h2>

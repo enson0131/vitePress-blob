@@ -1,6 +1,7 @@
 import DefaultTheme from 'vitepress/theme'
-import { onMounted, watch, nextTick } from 'vue'
+import { h, onMounted, watch, nextTick } from 'vue'
 import { useRoute } from 'vitepress'
+import CourseLessonMeta from './components/CourseLessonMeta.vue'
 import './zoom.css'
 
 let hasImageViewerListener = false
@@ -157,6 +158,9 @@ const observeMermaidRender = (initImageViewer: () => void) => {
 
 export default {
   ...DefaultTheme,
+  Layout: () => h(DefaultTheme.Layout, null, {
+    'doc-before': () => h(CourseLessonMeta)
+  }),
   setup() {
     const route = useRoute()
 

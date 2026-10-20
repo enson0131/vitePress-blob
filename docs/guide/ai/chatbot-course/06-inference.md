@@ -1,10 +1,15 @@
 ---
 title: "06 · 模型推理：Prefill、Decode 与 KV Cache"
 outline: deep
+readingTime: "12–15"
+courseMeta: false
 ---
 
 <script setup>
-import InferenceLesson from '../../../.vitepress/theme/components/InferenceLesson.vue'
+import CourseWebArticle from '../../../.vitepress/theme/components/CourseWebArticle.vue'
+import source from '../../../.vitepress/theme/components/course-sources/06-inference.web.html?raw'
+import config from '../../../.vitepress/theme/components/course-sources/06-inference.web.json'
+import '../../../.vitepress/theme/components/course-sources/06-inference.web.css'
 </script>
 
-<InferenceLesson />
+<CourseWebArticle :source="source" :chapter="config.chapter" :questions="config.questions" />

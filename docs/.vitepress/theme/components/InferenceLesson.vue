@@ -25,7 +25,6 @@ function reset(){selected.value=[];submitted.value=false}
 </script>
 <template>
 <article class="lesson">
-<div class="meta">第 06 / 40 篇 · 第一阶段：AI 与大模型基础 · 阅读约 12–15 分钟</div>
 <h1>模型推理：ChatGPT 为什么一个 Token 一个 Token 地回答？</h1>
 <p>上一篇我们学习了预训练、SFT 和偏好对齐。模型训练好之后，用户输入问题，它是如何在几秒钟内给出回答的？这就是 <strong>Inference（推理）</strong>。本篇重点认识 Prefill、Decode、KV Cache、Temperature、Top-p，以及聊天产品中的流式输出。</p>
 <h2>一、推理不是训练</h2>

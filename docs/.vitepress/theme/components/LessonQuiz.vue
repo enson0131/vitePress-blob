@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-const props = defineProps<{ chapter: 1 | 3 }>()
+const props = defineProps<{ chapter: 1 | 3 | 9 }>()
 const banks = {
 1:[
 {q:'基础 LLM 的核心生成机制是什么？',options:['从数据库查找固定答案','根据上下文预测下一个 Token','按字典逐字替换'],answer:1,why:'自回归模型依据已有上下文预测并生成后续 Token。'},
@@ -14,6 +14,13 @@ const banks = {
 {q:'GPT 的 Causal Mask 限制什么？',options:['当前位置不能访问未来 Token','当前位置不能访问过去 Token','模型不能看到用户输入'],answer:0,why:'因果掩码屏蔽未来位置，但允许模型使用已提供的用户上下文。'},
 {q:'FFN 与残差连接的主要作用是什么？',options:['FFN 进行非线性变换，残差帮助信息与梯度传播','两者只用于 Tokenizer','两者都负责持久化历史'],answer:0,why:'Transformer Block 不只有 Attention，还包含 FFN、残差、归一化等结构。'},
 {q:'用户问「它和 Vue 有什么区别」，怎样让模型知道「它」是 React？',options:['Self-Attention 自动读取数据库','把相关历史消息加入当前请求','只提高 Temperature'],answer:1,why:'应用层必须提供相关上下文，模型不能访问未传入的历史。'}
+],
+9:[
+{q:'无状态聊天 API 如何利用历史？',options:['应用提供相关历史','模型自动修改权重','Tokenizer 自动读取数据库'],answer:0,why:'需要把相关上下文提供给模型。'},
+{q:'滑动窗口的主要风险？',options:['不能减少 Token','较早重要信息可能被裁剪','必须使用向量数据库'],answer:1,why:'窗口会丢失更早的消息。'},
+{q:'长期记忆必须使用向量数据库吗？',options:['必须','不必，结构化记忆可以用关系数据库','只能存储在模型权重中'],answer:1,why:'PostgreSQL 可以保存结构化记忆；语义检索时再考虑 pgvector。'},
+{q:'KV Cache 和长期记忆一样吗？',options:['一样','KV Cache 是推理缓存，长期记忆由应用管理','KV Cache 是数据库'],answer:1,why:'两者用途和生命周期不同。'},
+{q:'恢复聊天 UI 就代表模型获得历史吗？',options:['是','不是，仍需将历史提供给模型或使用服务端会话状态','只取决于 React'],answer:1,why:'界面显示与模型推理是两条不同的数据流。'}
 ]};
 const questions = computed(()=>banks[props.chapter])
 const selected=ref<number[]>([])

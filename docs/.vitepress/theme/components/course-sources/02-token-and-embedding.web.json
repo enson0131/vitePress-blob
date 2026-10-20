@@ -1,0 +1,17 @@
+{
+  "chapter": 2,
+  "questions": [
+    {
+      "answer": 1,
+      "explanation": "Token ID 本身只是编号。模型通过 Embedding 和后续网络计算学习语义表示。"
+    },
+    {
+      "answer": 1,
+      "explanation": "普通聊天直接调用 LLM API 即可，模型内部会完成 Token Embedding 等处理。"
+    },
+    {
+      "answer": 1,
+      "explanation": "余弦相似度衡量方向接近程度，不保证事实正确或检索结果一定相关。"
+    }
+  ]
+}

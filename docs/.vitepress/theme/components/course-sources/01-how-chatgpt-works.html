@@ -1,0 +1,196 @@
+<h1>第 01 篇：ChatGPT 到底是如何回答问题的？</h1>
+<p><strong>所属阶段：</strong> AI 与大模型基础<br>
+<strong>阅读时间：</strong> 约 8 分钟<br>
+<strong>前置知识：</strong> 无</p>
+<h2>1. 先理解一个关键事实</h2>
+<p>当你向 ChatGPT 提问：</p>
+<blockquote><p>为什么 JavaScript 是单线程的？</p>
+</blockquote>
+<p>你可能认为 ChatGPT 的工作流程是：</p>
+<pre><code>接收问题
+   ↓
+理解问题
+   ↓
+查找正确答案
+   ↓
+输出答案</code></pre>
+<p>但对于基础的大语言模型而言，更接近真实情况的过程是：</p>
+<pre><code>用户输入
+   ↓
+Tokenization（分词）
+   ↓
+转换成 Token ID
+   ↓
+Transformer 模型计算
+   ↓
+预测下一个 Token 的概率
+   ↓
+选择下一个 Token
+   ↓
+重复生成
+   ↓
+最终回答</code></pre>
+<p>这里最重要的概念是：</p>
+<p><strong>大语言模型的核心生成机制，是根据已有上下文预测接下来应该出现什么 Token。</strong></p>
+<p>它不是传统意义上的数据库查询系统。</p>
+<p>当然，现代 ChatGPT 产品还可能结合搜索、工具调用、记忆等能力，因此完整产品比单纯的大语言模型复杂得多。</p>
+<h2>2. Token 是什么？</h2>
+<p>Token 是模型处理文本时使用的基本单位。</p>
+<p>例如：</p>
+<pre><code>用户输入：
+
+我是一名前端开发工程师</code></pre>
+<p>经过 Tokenizer 处理后，可能变成：</p>
+<pre><code>["我", "是一名", "前端", "开发", "工程师"]</code></pre>
+<p>这里只是示意。不同模型使用不同的 Tokenizer，实际切分结果可能不同。</p>
+<p>随后，每个 Token 会被转换为数字 ID：</p>
+<pre><code>"我"      → 123
+"是一名"  → 456
+"前端"    → 789
+"开发"    → 234
+"工程师"  → 567</code></pre>
+<p>这些 ID 同样只是示例。</p>
+<p>为什么需要 Token？</p>
+<p>因为神经网络不能直接对字符串进行数学运算，它需要数值表示。</p>
+<p>因此，文本必须经过编码，才能进入模型。</p>
+<h2>3. 模型如何生成回答？</h2>
+<p>假设用户输入：</p>
+<pre><code>JavaScript 是一种</code></pre>
+<p>模型会计算不同 Token 作为下一个输出的概率。</p>
+<p>例如：</p>
+<table><thead><tr><th>候选 Token</th>
+<th align="right">假设概率</th>
+</tr>
+</thead>
+<tbody><tr><td>编程</td>
+<td align="right">65%</td>
+</tr>
+<tr><td>脚本</td>
+<td align="right">20%</td>
+</tr>
+<tr><td>动态</td>
+<td align="right">10%</td>
+</tr>
+<tr><td>其他</td>
+<td align="right">5%</td>
+</tr>
+</tbody>
+</table>
+<p>模型根据生成策略选出一个 Token。</p>
+<p>假设选中了「编程」。</p>
+<p>那么上下文就变成：</p>
+<pre><code>JavaScript 是一种编程</code></pre>
+<p>接下来模型再次计算：</p>
+<pre><code>语言 → 85%
+工具 → 8%
+框架 → 4%
+其他 → 3%</code></pre>
+<p>最终可能生成：</p>
+<pre><code>JavaScript 是一种编程语言。</code></pre>
+<p>这就是自回归生成（Autoregressive Generation）的基本思想。</p>
+<p>需要注意，模型并不是每次都简单选择概率最高的 Token。实际生成还可能受到 Temperature、Top-p 等采样参数影响。</p>
+<h2>4. Transformer 在其中负责什么？</h2>
+<p>Transformer 是现代大语言模型广泛使用的神经网络架构。</p>
+<p>它的一个核心机制叫作：</p>
+<p><strong>Attention（注意力机制）。</strong></p>
+<p>举个例子：</p>
+<blockquote><p>小明把电脑放在桌子上，因为它太重了。</p>
+</blockquote>
+<p>这里的「它」指什么？</p>
+<p>模型需要结合上下文，判断「它」更可能指电脑，而不是桌子。</p>
+<p>Attention 可以帮助模型在处理某个位置时，利用其他位置的信息。</p>
+<p>不过，Attention 不等同于人类的理解能力，也不是简单的关键词匹配。</p>
+<p>它通过训练得到的参数，计算不同 Token 表示之间的关联，并利用这些关联构建上下文表示。</p>
+<p>在现代生成式语言模型中，通常使用带因果掩码的 Self-Attention，确保生成当前位置时不能直接看到未来尚未生成的 Token。</p>
+<h2>5. 为什么 ChatGPT 能回答编程问题？</h2>
+<p>原因主要来自预训练。</p>
+<p>模型在训练阶段接触大量文本及代码相关数据，通过预测 Token 学习语言、代码和知识中的统计规律。</p>
+<p>例如，模型可能在训练过程中学习到：</p>
+<pre><code class="language-javascript"><span class="token-keyword">const</span> sum = (a, b) =&gt; a + b;</code></pre>
+<p>以及大量类似的代码结构。</p>
+<p>因此，当你提问：</p>
+<blockquote><p>如何使用 JavaScript 实现防抖？</p>
+</blockquote>
+<p>模型可以根据训练中学到的规律，生成符合要求的代码。</p>
+<p>但需要区分：</p>
+<p><strong>能够生成看起来正确的代码，不代表代码一定正确。</strong></p>
+<p>这也是为什么 AI 编程需要测试、静态检查和人工审查。</p>
+<h2>6. 从前端开发的角度理解整个流程</h2>
+<p>假设我们开发一个 AI 聊天机器人。</p>
+<p>前端使用 React，后端使用 Node.js。</p>
+<p>整体架构可以简化为：</p>
+<pre><code>┌──────────────────────┐
+│      React UI        │
+│                      │
+│ 用户输入聊天内容       │
+└──────────┬───────────┘
+           │
+           │ HTTP Request
+           ▼
+┌──────────────────────┐
+│     Node.js API      │
+│                      │
+│ 1. 验证用户身份       │
+│ 2. 构建 Messages     │
+│ 3. 调用模型 API      │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│      LLM API         │
+│                      │
+│ Tokenization         │
+│ Transformer          │
+│ Token Generation     │
+└──────────┬───────────┘
+           │
+           │ Streaming
+           ▼
+┌──────────────────────┐
+│      React UI        │
+│                      │
+│ 实时显示模型回答       │
+└──────────────────────┘</code></pre>
+<p>这里有一个非常重要的工程概念：</p>
+<p><strong>聊天机器人应用与大语言模型不是同一个东西。</strong></p>
+<p>大语言模型负责生成内容，而聊天机器人应用还需要解决身份认证、会话管理、数据存储、流式传输、权限控制等问题。</p>
+<p>这也是整个系列后续要重点讲解的内容。</p>
+<hr>
+<h2>7. 今天需要记住的 5 个概念</h2>
+<table><thead><tr><th>概念</th>
+<th>一句话理解</th>
+</tr>
+</thead>
+<tbody><tr><td>LLM</td>
+<td>通过大规模训练获得语言生成能力的模型</td>
+</tr>
+<tr><td>Token</td>
+<td>模型处理文本的基本单位</td>
+</tr>
+<tr><td>Tokenizer</td>
+<td>将文本编码为 Token ID 的组件</td>
+</tr>
+<tr><td>Transformer</td>
+<td>现代大语言模型常用的神经网络架构</td>
+</tr>
+<tr><td>Attention</td>
+<td>让模型在处理 Token 时利用上下文信息的机制</td>
+</tr>
+</tbody>
+</table>
+<h3>思考题</h3>
+<p>为什么 ChatGPT 有时候会一本正经地给出错误答案？</p>
+<p>提示：思考一下「预测下一个 Token」和「验证事实是否正确」之间有什么区别。</p>
+<p>这道题会在第 13 篇《为什么大语言模型会产生幻觉？》中深入解释。</p>
+<hr>
+<h2>后续学习安排</h2>
+<p>下一篇是：</p>
+<p><strong>第 02 篇：《Token 与 Embedding：为什么 AI 能把文字变成数学？》</strong></p>
+<p>我们会进一步研究：</p>
+<ul><li>Token ID 与 Embedding 有什么区别？</li>
+<li>为什么语义相近的词可以具有相近的向量表示？</li>
+<li>Embedding 为什么能够支持语义搜索？</li>
+<li>ChatGPT 的上下文窗口为什么有限？</li>
+<li>Token 数量如何影响 API 成本？</li>
+</ul>
+<p>我会继续采用这种<strong>技术文章 + 架构图 + 代码示例 + 思考题</strong>的形式，让你既能在工作间隙阅读，也能逐步建立完整的 AI 聊天机器人知识体系。</p>

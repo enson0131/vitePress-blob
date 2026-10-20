@@ -1,0 +1,21 @@
+{
+  "chapter": 6,
+  "questions": [
+    {
+      "answer": 0,
+      "explanation": "Prefill 处理已有上下文并建立后续解码可复用的 KV Cache。"
+    },
+    {
+      "answer": 1,
+      "explanation": "KV Cache 缓存历史位置的 Key 和 Value，减少重复计算。"
+    },
+    {
+      "answer": 2,
+      "explanation": "提高 Temperature 通常让候选概率分布更均匀，但不保证准确性。"
+    },
+    {
+      "answer": 2,
+      "explanation": "Fetch 的 ReadableStream 支持逐块读取；网络 Chunk 不一定对应一个 Token。"
+    }
+  ]
+}

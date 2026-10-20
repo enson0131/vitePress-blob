@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import PromptMessagesLesson from './PromptMessagesLesson.vue'
+import PromptMessagesSupplement from './PromptMessagesSupplement.vue'
 </script>
 <template>
 <article class="lesson08">
 <h1>第 08 篇：Prompt 与 Messages——聊天机器人如何理解用户指令？</h1>
-<blockquote>第 08 / 40 篇 · 第二阶段：聊天机器人核心原理 · 阅读约 15 分钟</blockquote>
 <p>前七篇，我们学习了大语言模型的底层机制与能力边界。</p>
 <p>从这一篇开始，我们正式进入<strong>聊天机器人应用设计</strong>。</p>
 <p>你可能已经发现，同样是向 ChatGPT 提问：</p>
@@ -46,7 +46,7 @@ User：请解释 JavaScript 闭包。</code></pre>
 <h2>四、交互实验：自己组装 Messages</h2>
 <p>修改 System、用户问题和输出要求，观察发送给模型的消息结构如何变化。</p>
 <PromptMessagesLesson mode="builder" />
-<p>这个实验只负责演示消息组装。请在阅读完本篇后，到第十一节完成交互式测验。</p>
+<p>这个实验只负责演示消息组装。请在阅读完本篇后，到下方补充部分的第十一节完成交互式测验。</p>
 <h2>五、怎样写出更稳定的 Prompt？</h2>
 <p>比起堆砌「你是世界顶级专家」，更有效的做法通常是明确以下四件事：</p>
 <ol><li><strong>任务</strong>：具体要解决什么问题？</li><li><strong>上下文</strong>：有哪些必须参考的背景？</li><li><strong>约束</strong>：哪些内容不能编造，证据不足怎么办？</li><li><strong>输出格式</strong>：需要 JSON、表格还是分步骤解释？</li></ol>
@@ -156,45 +156,7 @@ console.log(response.choices[0]?.message.content);</code></pre>
 <h2>十、本篇总结</h2>
 <table><thead><tr><th>概念</th><th>一句话理解</th></tr></thead><tbody><tr><td>Prompt</td><td>提供任务、背景、约束与输出要求</td></tr><tr><td>Messages</td><td>带角色的对话消息结构</td></tr><tr><td>System / Developer</td><td>应用层较高优先级的行为约束</td></tr><tr><td>User</td><td>用户的具体任务</td></tr><tr><td>Few-shot</td><td>用少量示例展示目标行为</td></tr><tr><td>Structured Output</td><td>用 Schema 约束并验证输出结构</td></tr><tr><td>Prompt Injection</td><td>不可信内容试图越权改变模型行为</td></tr></tbody></table>
 <p><strong>最重要的一句话：Prompt 决定如何向模型表达任务，Messages 决定如何组织对话；但可靠性、安全性和权限仍需要应用工程来保证。</strong></p>
-<h2>十一、交互式课后测验</h2>
-<p>完成下面六道选择题，涵盖 System/User、历史消息、Few-shot、结构化输出、Prompt Injection 与企业级架构。提交后可查看分数、正确答案和逐题解析，也可以重新作答。</p>
-<PromptMessagesLesson mode="quiz" />
-<h2>十二、学习疑问与解答</h2>
-<h3>Q1：System Prompt 能保证模型永远遵守吗？</h3>
-<p><strong>不能。</strong>System Prompt 是行为约束，不是绝对可靠的安全机制。即使系统提示写着「普通用户不能查看管理员数据」，也必须在工具执行前由后端验证身份与权限。</p>
-<pre v-pre class="code"><code class="language-typescript">async function getAdminData(user: User) {
-  if (!user.permissions.includes("admin:read")) {
-    throw new Error("Permission denied");
-  }
-  return database.getAdminData();
-}</code></pre>
-<p><strong>总结：</strong>Prompt 表达行为要求，后端执行安全边界。</p>
-<h3>Q2：为什么多轮聊天需要重复发送历史消息？</h3>
-<p>模型需要利用历史上下文理解当前问题。例如「我正在学习 React」之后询问「它和 Vue 有什么区别」，如果没有历史，模型可能无法判断「它」指 React。</p>
-<p>但不必无限发送全部历史。实际可以采用最近 N 轮窗口、历史摘要、相关记忆检索和服务端会话状态管理。应用层历史消息管理与模型内部 KV Cache 是不同概念。</p>
-<h3>Q3：Prompt 越长，回答效果越好吗？</h3>
-<p><strong>不一定。</strong>冗长提示可能增加 Token 成本、引入无关信息、产生冲突并稀释关键要求。清楚说明角色、任务、约束和输出格式通常比堆砌空泛角色设定更可测试。</p>
-<pre v-pre class="code"><code class="language-text">你是一名前端技术导师。
-请使用 TypeScript 示例。
-先解释原理，再给工程实践。
-如果不确定，请明确说明。</code></pre>
-<p>Prompt 质量应由实际任务的评估结果衡量，而不是单纯由长度决定。</p>
-<h3>Q4：Few-shot 与 SFT（监督微调）有什么区别？</h3>
-<table><thead><tr><th>对比</th><th>Few-shot</th><th>SFT</th></tr></thead><tbody>
-<tr><td>是否修改模型权重</td><td>否</td><td>是</td></tr>
-<tr><td>示例在哪里</td><td>当前上下文</td><td>训练数据</td></tr>
-<tr><td>是否需要训练</td><td>否</td><td>是</td></tr>
-<tr><td>典型用途</td><td>快速指定任务格式</td><td>优化特定任务行为</td></tr>
-</tbody></table>
-<p>通常先尝试清晰 Prompt、Few-shot 和结构化输出，经过评估仍不稳定且有足够优质样本时，再考虑微调。</p>
-<h3>Q5：System Prompt、Messages 和 RAG 是什么关系？</h3>
-<div class="lessonflow"><div>System Prompt：定义统一登录 SDK 助手的行为</div><span>↓</span><div>Messages：组织用户问题和历史对话</div><span>↓</span><div>RAG：检索经过权限过滤的 SDK 文档</div><span>↓</span><div>LLM：根据问题和检索结果生成回答</div></div>
-<p>三者不是互相替代的关系，而是可以组合使用。</p>
-<h3>Q6：聊天机器人能否只使用 Prompt，不使用 Messages？</h3>
-<p><strong>可以，但取决于应用。</strong>一次性文本生成可以使用单个 Prompt。对于多轮聊天、工具调用、历史记录和不同指令来源，结构化 Messages 更容易管理。部分 API 使用统一 Input 结构而非 Messages 数组，核心思想仍是明确区分任务、历史和外部数据。</p>
-<h2>第 08 篇最终总结</h2>
-<p><strong>Prompt 负责告诉模型应该做什么，Messages 负责提供对话上下文，而应用层负责保证数据、权限和执行过程的可靠性。</strong></p>
-<p>下一篇：第 09 篇《多轮对话与上下文管理》。</p>
+<PromptMessagesSupplement />
 <hr/>
 <p><a href="./07-model-limitations">← 第 07 篇</a> · <a href="./">返回课程目录</a></p>
 </article>

@@ -1,0 +1,18 @@
+{
+  "share_url": "https://chatgpt.com/share/6ad5c617-d024-83ea-a94d-5e4b5dea4572",
+  "scope": "01 完整正文及 08 第十一、十二节补充原文；其余正文未验证",
+  "sources": [
+    {
+      "lesson": "01",
+      "message_id": "e2fca19e-5ec0-4f2e-9a30-b00576b2764b",
+      "file": "01-how-chatgpt-works.html",
+      "note": "从第 01 篇标题开始，包含后续学习安排；去除聊天界面控件，代码换行保持原样。"
+    },
+    {
+      "lesson": "08-supplement",
+      "message_id": "82054aa4-5503-4add-a196-381c024088d7",
+      "file": "08-prompt-messages-supplement.html",
+      "note": "完整补充回复，包含 6 道测验、17 个代码块、6 组问答、总结和学习进度。"
+    }
+  ]
+}
