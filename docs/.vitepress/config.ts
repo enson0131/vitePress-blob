@@ -106,7 +106,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         collapsed: false,
         items: [
           { text: '教程总览', link: 'fullstack-course/' },
-          { text: '01 · 从 BFF 思维走向业务后端', link: 'fullstack-course/01-from-bff-to-business-backend' },
+          { text: '01 · 从把接口接通到对业务结果负责', link: 'fullstack-course/01-from-bff-to-business-backend' },
         ]
       },
       {
