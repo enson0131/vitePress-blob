@@ -79,6 +79,11 @@ function nav(): DefaultTheme.NavItem[] {
       activeMatch: '/guide/ai/chatbot-course/'
     },
     {
+      text: '全栈进阶教程',
+      link: '/guide/fullstack-course/',
+      activeMatch: '/guide/fullstack-course/'
+    },
+    {
       text: '摄影笔记',
       link: '/shoot/基础概念/光圈',
       activeMatch: '/shoot/'
@@ -96,6 +101,14 @@ function nav(): DefaultTheme.NavItem[] {
 /* prettier-ignore */
 function sidebarGuide(): DefaultTheme.SidebarItem[] {
     return [
+      {
+        text: '前端到全栈进阶教程',
+        collapsed: false,
+        items: [
+          { text: '教程总览', link: 'fullstack-course/' },
+          { text: '01 · 从 BFF 思维走向业务后端', link: 'fullstack-course/01-from-bff-to-business-backend' },
+        ]
+      },
       {
         text: 'AI 聊天机器人学习教程',
         collapsed: false,
