@@ -66,15 +66,23 @@ for(const lesson of manifest.lessons){
   }else{
    const cfg=JSON.parse(readFileSync(`docs/.vitepress/theme/components/course-sources/${lesson.slug}.web.json`,'utf8'))
    for(const [i,q]of cfg.questions.entries())await root.locator(`[data-web-question="${i}"] input[type=radio]`).nth(q.answer).check()
-   await root.locator('[data-web-action="submit-quiz"]').click();assert.match(await root.locator('[data-web-score]').innerText(),new RegExp(`${cfg.questions.length} / ${cfg.questions.length}`))
+   const inlineSubmit=root.locator('[data-web-action="submit-quiz"]')
+   if(await inlineSubmit.count())await inlineSubmit.click()
+   else await page.locator('.web-extra-quiz-actions').getByRole('button',{name:'提交评分',exact:true}).click()
+   assert.match(await root.locator('[data-web-score]').innerText(),new RegExp(`${cfg.questions.length} / ${cfg.questions.length}`))
    const reset=page.getByRole('button',{name:'重新作答',exact:true});await reset.first().click();assert.equal(await root.locator('[data-web-question] input:checked').count(),0)
   }
   report.checks.push('All quiz answers, full score, explanations and reset verified (chapter 09 supplement treated separately)')
   await page.setViewportSize({width:390,height:844});await page.waitForTimeout(150)
   report.mobile=await page.evaluate(()=>({viewport:innerWidth,width:document.documentElement.scrollWidth,overflows:Array.from(document.querySelectorAll('.vp-doc *')).filter(n=>n.getBoundingClientRect().right>innerWidth+1).slice(0,30).map(n=>({tag:n.tagName,cls:n.className,style:n.getAttribute('data-web-style'),right:n.getBoundingClientRect().right,text:n.textContent?.slice(0,50)}))}))
   await page.screenshot({path:`${dir}/mobile.png`,fullPage:true});assert(report.mobile.width<=391,'390px page must not overflow')
-  await page.evaluate(()=>document.documentElement.classList.add('dark'));await page.waitForTimeout(100);await page.screenshot({path:`${dir}/mobile-dark.png`,fullPage:true})
-  report.checks.push('390px viewport has no horizontal page overflow; light/dark screenshots saved')
+  await page.setViewportSize({width:1280,height:960})
+  await page.locator('.VPSwitchAppearance').first().click()
+  await page.waitForFunction(()=>document.documentElement.classList.contains('dark'))
+  await page.waitForTimeout(100)
+  if(lesson.chapter===2)for(const image of await root.locator('img[data-d-component="svg"]').all())assert(decodeURIComponent((await image.getAttribute('src')).split(',').slice(1).join(',')).includes('color:rgb(237, 237, 237)'),'SVG labels adapt to dark mode without changing content')
+  await page.setViewportSize({width:390,height:844});await page.screenshot({path:`${dir}/mobile-dark.png`,fullPage:true})
+  report.checks.push('390px viewport has no horizontal page overflow; real theme toggle and light/dark screenshots verified')
   assert.equal(report.errors.length,0,'No browser runtime errors');report.status='passed'
  }catch(e){report.status='failed';report.failure=String(e);await page.screenshot({path:`${dir}/failure.png`,fullPage:true}).catch(()=>{})}
  writeFileSync(`${dir}/report.json`,JSON.stringify(report,null,2));reports.push(report);await ctx.close()
