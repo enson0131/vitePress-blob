@@ -35,7 +35,7 @@ jobs:
           yarn build
       - name: Install isolated verification tools
         run: |
-          npm install --prefix "$RUNNER_TEMP/lesson11-tools" playwright typescript openai @types/node
+          npm install --prefix "$RUNNER_TEMP/lesson11-tools" playwright typescript@5.8.3 openai @types/node
           "$RUNNER_TEMP/lesson11-tools/node_modules/.bin/playwright" install --with-deps chromium
       - name: Verify built page and TypeScript examples
         env:
