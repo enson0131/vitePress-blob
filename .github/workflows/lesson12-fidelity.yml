@@ -1,0 +1,65 @@
+name: Chapter 12 source fidelity
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'docs/.vitepress/theme/components/StructuredResponsesLesson.vue'
+      - 'docs/.vitepress/theme/components/lesson12/**'
+      - 'docs/guide/ai/chatbot-course/12-structured-responses.md'
+      - 'scripts/verify-lesson12.mjs'
+      - '.github/workflows/lesson12-fidelity.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'docs/.vitepress/theme/components/StructuredResponsesLesson.vue'
+      - 'docs/.vitepress/theme/components/lesson12/**'
+      - 'docs/guide/ai/chatbot-course/12-structured-responses.md'
+      - 'scripts/verify-lesson12.mjs'
+      - '.github/workflows/lesson12-fidelity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Build complete VitePress site
+        run: |
+          npm install --global yarn
+          yarn install --ignore-engines
+          yarn build
+      - name: Install isolated verification tools
+        run: |
+          npm install --prefix "$RUNNER_TEMP/lesson12-tools" playwright typescript@5.8.3 openai zod@4 @types/node
+          "$RUNNER_TEMP/lesson12-tools/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Verify built page and complete TypeScript examples
+        env:
+          REPORT_DIR: lesson12-verification/local
+        run: |
+          export LESSON12_TOOLS="$RUNNER_TEMP/lesson12-tools"
+          ./node_modules/.bin/vitepress preview docs --port 4173 > /tmp/lesson12-preview.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/vitePress-blob/ >/dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/verify-lesson12.mjs
+      - name: Verify actual published GitHub Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        env:
+          WAIT_FOR_PAGES: 'true'
+          LESSON12_URL: https://enson0131.github.io/vitePress-blob/guide/ai/chatbot-course/12-structured-responses
+          REPORT_DIR: lesson12-verification/live
+        run: |
+          export LESSON12_TOOLS="$RUNNER_TEMP/lesson12-tools"
+          node scripts/verify-lesson12.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lesson12-fidelity-${{ github.run_id }}
+          path: lesson12-verification/
+          retention-days: 14
