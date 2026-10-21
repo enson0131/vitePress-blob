@@ -55,7 +55,7 @@ export default withMermaid(defineConfig({
         },
     
         socialLinks: [
-          { icon: 'github', link: 'https://github.com/enson0131' }
+          { icon: 'github', link: 'https://github.com/enson0131/vitePress-blob' }
         ],
       }
 }))
@@ -156,11 +156,12 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '知识图谱', link: 'javaScript相关/index' },
           { text: '定义', link: 'javaScript相关/定义' },
           { text: '数据类型', link: 'javaScript相关/数据类型' },
-          { text: '基础概念', link: 'javaScript相关/概要' },
+          { text: '基础概念', link: 'javaScript相关/基础概念' },
           { text: '继承相关', link: 'javaScript相关/继承相关' },
           { text: 'ES6 相关', link: 'javaScript相关/ES6相关' },
           { text: 'Promise 相关', link: 'javaScript相关/Promise' },
           { text: '事件循环机制', link: 'javaScript相关/事件循环机制' },
+          { text: 'DOM 相关', link: 'javaScript相关/DOM相关' },
           { text: 'JavaScript编译机制', link: 'javaScript相关/JavaScript编译机制' },
           { text: 'JavaScript执行机制', link: 'javaScript相关/JavaScript执行机制' },
           { text: '垃圾回收机制', link: 'javaScript相关/垃圾回收机制' },
@@ -175,9 +176,8 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'position', link: 'css相关/position' },
           { text: 'BFC', link: 'css相关/BFC' },
           { text: '隐藏元素的方法', link: 'css相关/隐藏元素的方法' },
-          { text: '对 line-height 的理解及其赋值方式', link: 'css相关对 line-height 的理解及其赋值方式' },
-          { text: 'visibility属性相关', link: 'css相关/visibility属性相关' },
           { text: 'display、visibility、opacity区别', link: 'css相关/display、visibility、opacity区别' },
+          { text: 'display、float、position的关系', link: 'css相关/display、float、position的关系'},
           { text: '对 line-height 的理解及其赋值方式', link: 'css相关/对 line-height 的理解及其赋值方式'},
           { text: 'link和import的区别', link: 'css相关/link和import的区别'}
         ]
@@ -187,13 +187,11 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         collapsed: false,
         items: [
           { text: '概要', link: '浏览器相关/概要' },
-          { text: '浏览器进程架构', link: '浏览器相关/进程' },
+          { text: '浏览器进程架构', link: '浏览器相关/浏览器进程架构' },
           { text: '浏览器渲染流程', link: '浏览器相关/浏览器渲染流程' },
           { text: '浏览器安全', link: '浏览器相关/浏览器安全' },
-          { text: '浏览器内核', link: '浏览器相关/浏览器内核' },
           { text: '浏览器缓存', link: '浏览器相关/浏览器缓存' },
-          { text: '浏览器渲染机制', link: '浏览器相关/浏览器渲染机制' },
-          { text: '浏览器内核有哪些', link: '浏览器相关/浏览器内核有哪些' },
+          { text: '浏览器内核', link: '浏览器相关/浏览器内核' },
         ]
       },
       {
@@ -207,9 +205,6 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: 'HTTP', link: '网络相关/HTTP' },
           { text: 'HTTPS', link: '网络相关/HTTPS' },
           { text: 'DNS', link: '网络相关/DNS' },
-          { text: 'TCP', link: '网络相关/TCP' },
-          { text: 'UDP', link: '网络相关/UDP' },
-          { text: 'HTTP1、HTTP2、HTTP3', link: '网络相关/HTTP1、HTTP2、HTTP3' },
           { text: 'CDN', link: '网络相关/CDN' },
           { text: '跨域请求', link: '网络相关/跨域请求'},
           // { text: '常见的问题', link: '网络相关/常见的问题'}
@@ -219,12 +214,11 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         text: 'React 笔记',
         collapsed: false,
         items: [
-          { text: '概要', link: 'React/概要' },
-          { text: '基础概念', link: 'React/基础概念' },
           { text: 'React是什么', link: 'React/React是什么' },
           { text: '什么是Fiber', link: 'React/什么是Fiber' },
           { text: 'React 中的 Diff 算法', link: 'React/diff算法' },
           { text: 'React 为什么要使用 JSX', link: 'React/React为什么要使用JSX' },
+          { text: '如何设计 React 组件', link: 'React/如何设计React组件' },
           { text: 'setState 是同步还是异步', link: 'React/setState是同步还是异步的' },
           { text: 'React 是如何渲染的', link: 'React/React是如何渲染的' },
           { text: 'React 中的事件机制', link: 'React/React中的事件机制' },
@@ -271,7 +265,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
         text: 'Canvas 笔记',
         collapsed: false,
         items: [
-          { text: 'Canvas 尺寸与分辨率矫正', link: 'canvas/Canvas尺寸及分辨率矫正' },
+          { text: 'Canvas 尺寸与分辨率矫正', link: 'canvas/Canvas尺寸及辨率矫正' },
           { text: '实现一个自由绘制的 Canvas 画板', link: 'canvas/如何在Canvas画板上自由书写' },
           { text: '通过贝塞尔曲线优化 Canvas 书写性能', link: 'canvas/通过贝塞尔曲线优化Canvas书写性能' },
           { text: '通过上下分层优化 Canvas 书写性能', link: 'canvas/通过上下分层优化Canvas书写性能' },
