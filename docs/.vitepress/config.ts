@@ -124,6 +124,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '08 · Prompt 与 Messages', link: 'ai/chatbot-course/08-prompt-messages' },
           { text: '09 · 多轮对话与上下文管理', link: 'ai/chatbot-course/09-conversation-memory' },
           { text: '10 · 聊天机器人的记忆系统', link: 'ai/chatbot-course/10-memory-system' },
+          { text: '11 · 上下文压缩与 Token 优化', link: 'ai/chatbot-course/11-context-optimization' },
         ]
       },
       {
