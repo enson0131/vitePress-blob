@@ -126,6 +126,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '10 · 聊天机器人的记忆系统', link: 'ai/chatbot-course/10-memory-system' },
           { text: '11 · 上下文压缩与 Token 优化', link: 'ai/chatbot-course/11-context-optimization' },
           { text: '12 · 结构化输出与响应契约', link: 'ai/chatbot-course/12-structured-responses' },
+          { text: '13 · 幻觉、证据与答案核验', link: 'ai/chatbot-course/13-hallucinations-and-evidence' },
         ]
       },
       {
