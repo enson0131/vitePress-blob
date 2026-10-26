@@ -19,7 +19,7 @@ function reset(){epoch++;step.value=0;bad.value='';good.value='';rows.value=[];d
 async function pipeline(){
  const token=epoch;running.value=true
  try{
-  const input=new ReadableStream<Uint8Array>({start(c){chunks.forEach(v=>c.enqueue(v));c.close()}})
+  const input=new ReadableStream<BufferSource>({start(c){chunks.forEach(v=>c.enqueue(v));c.close()}})
   const reader=input.pipeThrough(new TextDecoderStream()).getReader()
   let text=''
   try{while(true){const part=await reader.read();if(part.done)break;text+=part.value}}
