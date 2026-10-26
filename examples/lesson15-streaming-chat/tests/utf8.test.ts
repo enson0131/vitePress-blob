@@ -23,7 +23,12 @@ test("supplement: TextDecoderStream rejoins every byte boundary including emoji"
  const text="你好🙂，流式解码";
  const bytes=new TextEncoder().encode(text);
  for(let cut=1;cut<bytes.length;cut++){
-  const reader=stream([bytes.slice(0,cut),bytes.slice(cut)]).pipeThrough(new TextDecoderStream()).getReader();
+  const input=new ReadableStream<BufferSource>({start(c){
+   c.enqueue(bytes.slice(0,cut));
+   c.enqueue(bytes.slice(cut));
+   c.close();
+  }});
+  const reader=input.pipeThrough(new TextDecoderStream()).getReader();
   let actual="";
   try{while(true){const part=await reader.read();if(part.done)break;actual+=part.value;}}
   finally{reader.releaseLock();}
