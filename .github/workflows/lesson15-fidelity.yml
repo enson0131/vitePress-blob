@@ -1,0 +1,62 @@
+name: Chapter 15 source fidelity
+on:
+  pull_request:
+    branches: [master]
+    paths: ['docs/.vitepress/theme/components/lesson15/**', 'docs/guide/ai/chatbot-course/15-streaming-sse-chat.md', 'examples/lesson15-streaming-chat/**', 'scripts/verify-lesson15.mjs', '.github/workflows/lesson15-fidelity.yml']
+  push:
+    branches: [master]
+    paths: ['docs/.vitepress/theme/components/lesson15/**', 'docs/guide/ai/chatbot-course/15-streaming-sse-chat.md', 'examples/lesson15-streaming-chat/**', 'scripts/verify-lesson15.mjs', '.github/workflows/lesson15-fidelity.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test and build complete React Node example
+        run: |
+          mkdir -p lesson15-verification
+          cd examples/lesson15-streaming-chat
+          npm install
+          npm test | tee ../../lesson15-verification/node-tests.log
+          npm run build | tee ../../lesson15-verification/react-build.log
+      - name: Build VitePress
+        run: |
+          npm install --global yarn
+          yarn install --ignore-engines
+          yarn build
+      - name: Install browser test tools
+        run: |
+          npm install --prefix "$RUNNER_TEMP/lesson-tools" playwright
+          "$RUNNER_TEMP/lesson-tools/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Verify built page
+        env:
+          REPORT_DIR: lesson15-verification/local
+        run: |
+          export LESSON_TOOLS="$RUNNER_TEMP/lesson-tools"
+          ./node_modules/.bin/vitepress preview docs --port 4173 >/tmp/lesson15-preview.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -fsS http://127.0.0.1:4173/vitePress-blob/ >/dev/null && break
+            sleep 1
+          done
+          node scripts/verify-lesson15.mjs
+      - name: Verify actual GitHub Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        env:
+          WAIT_FOR_PAGES: 'true'
+          LESSON_URL: https://enson0131.github.io/vitePress-blob/guide/ai/chatbot-course/15-streaming-sse-chat
+          REPORT_DIR: lesson15-verification/live
+        run: |
+          export LESSON_TOOLS="$RUNNER_TEMP/lesson-tools"
+          node scripts/verify-lesson15.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lesson15-verification-${{ github.run_id }}
+          path: lesson15-verification/
+          retention-days: 14
