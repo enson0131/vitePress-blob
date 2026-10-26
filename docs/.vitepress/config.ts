@@ -128,6 +128,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '12 · 结构化输出与响应契约', link: 'ai/chatbot-course/12-structured-responses' },
           { text: '13 · 幻觉、证据与答案核验', link: 'ai/chatbot-course/13-hallucinations-and-evidence' },
           { text: '14 · React + Node.js 第一条聊天链路', link: 'ai/chatbot-course/14-first-react-node-chat' },
+          { text: '15 · 流式输出与 SSE', link: 'ai/chatbot-course/15-streaming-sse-chat' },
         ]
       },
       {
