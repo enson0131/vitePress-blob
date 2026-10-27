@@ -131,6 +131,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '15 · 流式输出与 SSE', link: 'ai/chatbot-course/15-streaming-sse-chat' },
           { text: '16 · 消息状态与多轮会话', link: 'ai/chatbot-course/16-multiturn-message-state' },
           { text: '17 · 会话与消息持久化', link: 'ai/chatbot-course/17-conversation-persistence' },
+          { text: '18 · 错误处理与断线恢复', link: 'ai/chatbot-course/18-error-retry-recovery' },
         ]
       },
       {

@@ -1,0 +1,7 @@
+{
+ "name":"lesson18-resilient-chat", "version":"1.0.0", "type":"module", "private":true,
+ "engines":{"node":">=22.16.0"},
+ "scripts":{"server":"node --experimental-strip-types server/index.ts","test":"node --experimental-strip-types --test tests/*.test.ts","dev":"vite --host 127.0.0.1","check":"tsc --noEmit","build":"tsc --noEmit && vite build"},
+ "dependencies":{"react":"^19.0.0","react-dom":"^19.0.0"},
+ "devDependencies":{"vite":"^7.0.0","typescript":"^5.8.3","@types/react":"^19.0.0","@types/react-dom":"^19.0.0","@types/node":"^22.0.0","@vitejs/plugin-react":"^4.5.0"}
+}
