@@ -1,0 +1,237 @@
+import{d as I,h as y,g as m,o as s,c as a,k as n,l as g,F as _,D as b,t,e as v,a as L,p as D,m as B,_ as F,H as T}from"./chunks/framework.ac6a668e.js";const K=`<h1>📘 第 13 篇：AI 说得像真的，怎么知道它没在编？</h1>
+<p><strong>幻觉、证据与答案核验｜第 13 / 40 篇｜阅读约 10–12 分钟</strong></p>
+<p>上一篇，我们让 AI 从“写小作文”改成“按表格回答”。</p>
+<p>现在，表格整整齐齐，引用一应俱全，代码看起来也像那么回事。</p>
+<p>你复制运行，控制台却回你一句：</p>
+<blockquote>
+<p><code>TypeError: sdk.autoFixLogin is not a function</code></p>
+</blockquote>
+<p><strong>格式验收过了，事实还没验收。</strong></p>
+<p>这一篇，我们给聊天机器人加一道检查：你说的每个关键结论，证据在哪里？</p>
+<h2>一、先看一个“看起来很专业”的错误</h2>
+<p>假设你正在做一个 SDK 问答助手，手里只有两段资料。<strong>以下 SDK、资料和回答都是教学设定，不是你公司真实接口的说明。</strong></p>
+<blockquote>
+<p><strong>S1：</strong> 本项目 v2 的 Token 校验必须由服务端完成，前端不得保存服务端密钥。<br />
+<strong>S2：</strong> 登录失败后，最多重试 2 次。</p>
+</blockquote>
+<p>用户问：“登录失败怎么办？”</p>
+<p>AI 回答：</p>
+<blockquote>
+<p>SDK 默认自动重试两次，还可以调用 <code>sdk.autoFixLogin()</code> 一键修复。为了方便，前端也能保存服务端密钥。来源：S1、S2。</p>
+</blockquote>
+<p>读起来挺顺，仔细一看却有三个问题：</p>
+<p>“最多重试两次”被说成了“默认自动重试两次”；资料没提到的方法，被当成现成接口；“不得保存”被说成了“可以保存”。</p>
+<p>本篇关注的幻觉，就是这种<strong>把错误或缺乏依据的内容，当作事实说出来</strong>的情况，包括与给定资料不一致的回答。不是看到 AI 写了虚构故事就叫幻觉——用户本来就在要求创作时，虚构是任务的一部分。<a href="#source-1" aria-label="参考资料1">[1]</a></p>
+<h2>二、它为什么能把错话说得这么圆？</h2>
+<h3>2.1 学会“怎么说”，不等于每次都“查过了”</h3>
+<p>语言模型在预训练中学习预测后续 Token，而不是为输出的每句话自动附上一张“事实核验通过”的证明。模型可以学到知识和推理能力，但这种生成过程本身不保证每个细节都真实。<a href="#source-2" aria-label="参考资料2">[2]</a></p>
+<p>比如，<code>sdk.autoFixLogin()</code> 很像一个合理的 API 名称。</p>
+<p>合理的名字、熟悉的代码结构、流畅的解释，拼在一起，就可能让一段没有依据的回答看起来特别像官方文档。</p>
+<p><strong>像一个答案，和是正确答案，是两件事。</strong></p>
+<h3>2.2 有些评分方式，还会鼓励“不知道也猜一个”</h3>
+<p>想象一次考试：答错零分，空着也零分。不会做时，蒙一个还有机会得分。</p>
+<p>OpenAI 的研究指出，偏重答对率、不给恰当的不确定性留位置的训练与评估激励，会鼓励猜测。这是幻觉持续存在的一个重要解释，不是所有错误的唯一原因。<a href="#source-2" aria-label="参考资料2">[2]</a></p>
+<p>所以，开发机器人时，别只考核“它回答了多少问题”，也要考核“它有没有把不知道的事情说成知道”。</p>
+<h2>三、先学会分三种情况，别急着判“真或假”</h2>
+<p>继续使用 S1、S2。我们只判断：<strong>这些资料是否支持下面的话？</strong></p>
+<table>
+<thead>
+<tr>
+<th>待核对的结论</th>
+<th>判定</th>
+<th>为什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>本项目登录失败后，最多重试 2 次</td>
+<td>有依据</td>
+<td>S2 明确写了上限</td>
+</tr>
+<tr>
+<td>SDK 默认自动重试 2 次</td>
+<td>证据不足</td>
+<td>上限不是默认行为，也没有说明自动执行</td>
+</tr>
+<tr>
+<td>本项目允许前端保存服务端密钥</td>
+<td>与资料冲突</td>
+<td>S1 明确说“不得”</td>
+</tr>
+<tr>
+<td>SDK 提供 <code>autoFixLogin()</code></td>
+<td>证据不足</td>
+<td>两段资料都没有介绍这个接口</td>
+</tr>
+</tbody>
+</table>
+<p>最容易踩坑的是最后一行：</p>
+<p><strong>“资料没写”不等于“这个功能肯定不存在”。</strong></p>
+<p>你能得出的结论是“目前无法确认”，不是把一个未知答案硬改成“没有”。同样，回答与资料一致，也不自动证明资料本身正确；还要确认资料的版本、时效和适用对象。</p>
+<p>记住三个标签就够了：<strong>有依据、冲突、证据不足。</strong></p>
+<h2>四、别给整篇作文打分，要逐条核对结论</h2>
+<p>一句话可能一半对、一半没依据：</p>
+<blockquote>
+<p>登录失败最多重试两次，并且会自动刷新 Token。</p>
+</blockquote>
+<p>前半句由 S2 支持，后半句没有对应资料。不能因为前半句正确，就给整句话盖章。</p>
+<p>这种“把长回答拆成小事实，再逐条检查”的思路，也用于 FActScore 等事实性评估研究。一段回答可能混合了有依据和无依据的信息，简单判整段对或错，会丢失细节。<a href="#source-3" aria-label="参考资料3">[3]</a></p>
+<p>实际核对时，我建议连问三句：</p>
+<p><strong>引用是真的吗？原文真这么写吗？原文支持的是这句结论吗？</strong></p>
+<p>其中第三句最关键。哪怕把 S2 一字不漏地引用出来，它也不能证明“自动重试”。引用不是装饰性的脚注，而是结论和依据之间的连接。</p>
+<p>对于你的技术助手，还要多留意一个词：<strong>版本</strong>。v1 的接口说明，不能不加说明地拿来回答 v2 的接入问题。</p>
+<h2>五、RAG 是开卷考试，不是标准答案</h2>
+<p>RAG 把相关资料找来，让模型参考它们作答。你可以把它想成开卷考试：书拿到了，但仍可能翻错页、看漏“不得”，或给原文加上自己的猜测。</p>
+<p>因此，我建议把“检索后直接回答”改成下面这个小流程：</p>
+<pre><code class="language-text">找到相关资料
+    ↓
+检查版本与适用范围
+    ↓
+列出准备回答的关键结论
+    ↓
+给每条结论寻找支持原句
+    ↓
+能确认的回答；冲突的改正；缺依据的说明缺口
+</code></pre>
+<p>允许模型承认信息不足、先摘取原句、再按结论核对引用，是官方文档建议的减幻觉方法；这些方法降低风险，但不保证错误归零。<a href="#source-1" aria-label="参考资料1">[1]</a></p>
+<p>下面是一段可放进你的问答系统的教学提示词：</p>
+<pre><code class="language-text">请只根据本次提供的资料回答具体接口问题。
+
+每个关键结论都应对应资料中的支持原句。
+区分“明确支持”“明确冲突”“资料未说明”。
+不要把“最多”改成“默认”，不要把“可以”改成“必须”。
+资料未说明的方法名，不要自行补成真实接口。
+能回答一部分，就先回答那部分，再说明还缺什么。
+</code></pre>
+<p>这段提示词不是事实保险，更不是权限系统。它只是让任务更明确；检查结果仍然需要验证。<a href="#source-1" aria-label="参考资料1">[1]</a></p>
+<h2>六、TypeScript：先写一个小小的“回答闸门”</h2>
+<p>我们先不造一个万能事实验证器，只做一件简单的事：<strong>根据已经得到的核对结果，决定下一步怎么处理。</strong></p>
+<pre><code class="language-typescript">// 核对结果应来自上游评审，不是让模型自行声明“我正确”。
+type Check = {
+  claim: string;
+  verdict: &quot;supported&quot; | &quot;contradicted&quot; | &quot;insufficient&quot;;
+};
+
+export function chooseAction(checks: readonly Check[]): string {
+  if (checks.length === 0) return &quot;补充材料或完成核对&quot;;
+
+  if (checks.some(c =&gt; c.verdict === &quot;contradicted&quot;)) {
+    return &quot;撤回冲突结论，重写后再核对&quot;;
+  }
+
+  if (checks.every(c =&gt; c.verdict === &quot;supported&quot;)) {
+    return &quot;按已核对的结论回答&quot;;
+  }
+
+  if (checks.some(c =&gt; c.verdict === &quot;supported&quot;)) {
+    return &quot;只回答有依据的部分，并说明缺口&quot;;
+  }
+
+  return &quot;说明证据不足，不猜测&quot;;
+}
+
+console.log(chooseAction([
+  { claim: &quot;最多重试两次&quot;, verdict: &quot;supported&quot; },
+  { claim: &quot;默认自动重试&quot;, verdict: &quot;insufficient&quot; }
+])); // 只回答有依据的部分，并说明缺口
+</code></pre>
+<p><strong>这段代码没有判断一句话是不是真的。</strong> 它只处理评审结果。上游需要覆盖答案中的全部关键事实，并用原文、确定性检查或人工复核来核对；模型辅助评审也可能判断错。</p>
+<p>例如检查某个 API：可以核对指定版本的官方文档、类型定义和测试。某一项检查通过，也不要扩大成“整段答案都正确”。</p>
+<p>重写后新增了结论，就要检查新增的内容，不能拿旧回答的验收结果给新回答背书。这是本篇的处理规则。</p>
+<h2>七、“不知道”也可以说得有用</h2>
+<p>差的回答：</p>
+<blockquote>
+<p>不知道。</p>
+</blockquote>
+<p>仍然差的回答：</p>
+<blockquote>
+<p>不太确定，但应该可以调用 <code>sdk.autoFixLogin()</code>。</p>
+</blockquote>
+<p>加上“不太确定”，并没有给这个接口补出证据。</p>
+<p>基于本篇资料，更好的回答是：</p>
+<blockquote>
+<p>本项目规定，登录失败后最多重试两次；Token 校验由服务端完成，前端不得保存服务端密钥。</p>
+<p>当前资料没有说明重试是否自动执行，也没有介绍修复接口。需要补充对应版本的重试配置和 API 文档，才能确认实现方式。</p>
+</blockquote>
+<p>它没有全部拒答，也没有硬凑一个“完整方案”。</p>
+<p><strong>把确定的交付，把不确定的标清。</strong> 这就是本篇希望机器人采取的回答方式。</p>
+<h2>八、怎样知道机器人真的变可靠了？</h2>
+<p>假设你准备了 20 个测试问题，下面是两套方案的结果。<strong>数据是教学示例，不是任何模型的实测成绩。</strong></p>
+<table>
+<thead>
+<tr>
+<th>结果</th>
+<th style="text-align:right">方案 A：每题都答</th>
+<th style="text-align:right">方案 B：没把握时暂不答</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>回答了多少题</td>
+<td style="text-align:right">20</td>
+<td style="text-align:right">15</td>
+</tr>
+<tr>
+<td>答对多少题</td>
+<td style="text-align:right">15</td>
+<td style="text-align:right">14</td>
+</tr>
+<tr>
+<td>答错多少题</td>
+<td style="text-align:right">5</td>
+<td style="text-align:right">1</td>
+</tr>
+<tr>
+<td>暂未回答</td>
+<td style="text-align:right">0</td>
+<td style="text-align:right">5</td>
+</tr>
+<tr>
+<td>已回答问题的正确率</td>
+<td style="text-align:right">75%</td>
+<td style="text-align:right">约 93.3%</td>
+</tr>
+</tbody>
+</table>
+<p>B 的错误更少，但它也少答对了一题；不能只拿“93.3%”就宣布全面胜出。</p>
+<p>我的建议是同时看：<strong>答对多少、答错多少、遗漏多少。</strong> 对原本有依据的问题无故不答，也要计入质量问题。这样才不会把一个永远说“不知道”的机器人评成优等生。</p>
+<p>工程练习可以从四个样本开始：正常资料、缺少关键资料、混入旧版本、原文包含否定条件。每次改 Prompt 或检索策略，都重新跑一遍，别只凭“这次看起来聪明了”。</p>
+<h2>九、课后测验：这次你来当事实检查员</h2>
+<h3>第 1 题：资料写“最多重试两次”，能确认什么？</h3>
+<p>A. SDK 默认自动重试两次。<br />
+B. 重试次数上限是两次。<br />
+C. 每次失败必须重试两次。</p>
+<h3>第 2 题：没有找到某个方法的介绍，应该怎么说？</h3>
+<p>A. 这个方法一定不存在。<br />
+B. 根据命名规律补一个用法。<br />
+C. 当前资料不足以确认，需要对应版本文档。</p>
+<h3>第 3 题：引用原文确实存在，就说明答案有依据吗？</h3>
+<p>A. 不一定，还要核对原文是否支持具体结论。<br />
+B. 是，找到同一句话就行。<br />
+C. 是，只要引用数量足够多。</p>
+<h3>第 4 题：为什么不能只看“已回答问题的正确率”？</h3>
+<p>A. 这个指标完全没有用。<br />
+B. 还要看覆盖了多少问题，避免通过大量不回答抬高分数。<br />
+C. 应该只看回答速度。</p>
+<p><strong>答案：1B、2C、3A、4B。</strong></p>
+<p>第一题不能把上限变成默认行为；第二题不能把未知变成否定；第三题区分“引用存在”和“支持结论”；第四题提醒我们，可靠与有用都要评估。</p>
+<p><strong>动手练习：</strong> 把“最多重试 2 次”改为“仅在网络超时时最多重试 2 次”。再检查原来的答案。发现了吗？次数没变，但适用条件变了；遗漏这个条件，同样会误导用户。</p>
+<h2>十、两个容易误会的地方</h2>
+<p><strong>让 AI 再检查一遍，就能放心了吗？</strong></p>
+<p>不能把它当成保证。研究中，自我检查的效果会因任务和方法而不同，有些设置改善结果，有些反而变差。比起只问“你确定吗”，本篇更建议让检查围绕具体原文、版本和测试结果展开。<a href="#source-4" aria-label="参考资料4">[4]</a></p>
+<p><strong>模型说“我有 99% 把握”，可以直接放行吗？</strong></p>
+<p>本篇不会用这句话放行。这个数字没有经过你自己的校准与验证；而且把同一句话重复说三遍，也没有增加新的证据。我们的检查对象是结论和依据，不是语气。</p>
+<hr />
+<h2>本篇只带走这一句话</h2>
+<blockquote>
+<p><strong>不要只问 AI“你确定吗”，要问“哪条证据，支持你哪句话？”</strong></p>
+</blockquote>
+<p>第 13 篇结束。进度：<strong>13 / 40 篇，32.5%</strong>。</p>
+<p>第二阶段到这里收官。下一篇进入工程开发：把 React 聊天界面与 Node.js 服务真正连起来。</p>
+<h2>资料依据</h2>
+<p>本文的 SDK、资料、测试数字、提示词与代码为教学设计。以下来源支持原理说明，不是对教学例子的真实业务背书。</p>
+<p id="source-1">[1] Anthropic，Reduce hallucinations：<a href="https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations">https://platform.claude.com/docs/en/test-and-evaluate/strengthen-guardrails/reduce-hallucinations</a></p>
+<p id="source-2">[2] OpenAI，Why language models hallucinate：<a href="https://openai.com/index/why-language-models-hallucinate/">https://openai.com/index/why-language-models-hallucinate/</a></p>
+<p id="source-3">[3] Min 等，FActScore（EMNLP 2023）：<a href="https://aclanthology.org/2023.emnlp-main.741/">https://aclanthology.org/2023.emnlp-main.741/</a></p>
+<p id="source-4">[4] Li 等，When Hindsight is Not 20/20（NAACL 2024 Findings）：<a href="https://aclanthology.org/2024.findings-naacl.237/">https://aclanthology.org/2024.findings-naacl.237/</a></p>
+`,N=[{q:"资料写“最多重试两次”，能确认什么？",options:["SDK 默认自动重试两次。","重试次数上限是两次。","每次失败必须重试两次。"],a:1,why:"上限不等于默认行为，也不意味着必须执行。"},{q:"没有找到某个方法的介绍，应该怎么说？",options:["这个方法一定不存在。","根据命名规律补一个用法。","当前资料不足以确认，需要对应版本文档。"],a:2,why:"资料未说明，不等于已经证明它不存在。"},{q:"引用原文确实存在，就说明答案有依据吗？",options:["不一定，还要核对原文是否支持具体结论。","是，找到同一句话就行。","是，只要引用数量足够多。"],a:0,why:"原句真实存在，不代表它支持回答中的全部结论。"},{q:"为什么不能只看“已回答问题的正确率”？",options:["这个指标完全没有用。","还要看覆盖了多少问题，避免通过大量不回答抬高分数。","应该只看回答速度。"],a:1,why:"要同时评估答对、答错和遗漏多少，而非只看一个百分比。"}],H=[{claim:"本项目登录失败后，最多重试两次。",answer:"supported",why:"与 S2 的重试次数上限一致。"},{claim:"SDK 默认自动重试两次。",answer:"insufficient",why:"“最多”只规定上限，没有说明是否自动执行或默认开启。"},{claim:"本项目允许前端保存服务端密钥。",answer:"contradicted",why:"S1 明确写了“前端不得保存服务端密钥”。"},{claim:"SDK 提供 autoFixLogin() 方法。",answer:"insufficient",why:"S1、S2 都没有介绍这个方法。不能据此断言存在，也不能断言不存在。"},{claim:"只有网络超时才可以重试。",answer:"insufficient",why:"当前 S2 没有说明哪些失败类型允许重试，不能自行补出条件。"}],u={questions:N,cases:H},f=i=>(D("data-v-7c810886"),i=i(),B(),i),P={class:"lesson13"},E=["innerHTML"],$={class:"extras"},M=f(()=>n("h2",null,"配套练习：你来核对证据",-1)),O=f(()=>n("p",null,"固定样本，本地交互，不调用模型，不自动验证任意文字。",-1)),R=f(()=>n("blockquote",null,[n("p",null,"S1：本项目 v2 的 Token 校验必须由服务端完成，前端不得保存服务端密钥。"),n("p",null,"S2：登录失败后，最多重试 2 次。")],-1)),V={class:"actions"},G=["onClick"],W={key:0,role:"status",class:"feedback"},J=f(()=>n("h2",null,"四道课后选择题",-1)),U=["name","checked","onChange"],j={key:0,class:"feedback"},z={class:"actions"},Q=["disabled"],X={key:0,role:"status"},Y=I({__name:"HallucinationEvidenceLesson",setup(i){const p=y({}),l=y(!1),h=y({}),S=m(()=>u.questions.every((d,r)=>p.value[r]!==void 0)),x=m(()=>u.questions.filter((d,r)=>p.value[r]===d.a).length),k={supported:"有依据",contradicted:"冲突",insufficient:"证据不足"};function A(d,r){p.value[d]=r,l.value=!1}function w(){p.value={},l.value=!1}return(d,r)=>(s(),a("article",P,[n("div",{class:"original",innerHTML:g(K)},null,8,E),n("section",$,[M,O,R,(s(!0),a(_,null,b(g(u).cases,(e,o)=>(s(),a("div",{key:o,class:"trial"},[n("strong",null,t(o+1)+". "+t(e.claim),1),n("div",V,[(s(),a(_,null,b(k,(q,c)=>n("button",{key:c,type:"button",onClick:C=>h.value[o]=c},t(q),9,G)),64))]),h.value[o]?(s(),a("p",W,t(h.value[o]===e.answer?"✓ 判断正确。":"还差一步。")+"正确判定："+t(k[e.answer])+"。"+t(e.why),1)):v("",!0)]))),128)),n("button",{type:"button",onClick:r[0]||(r[0]=e=>h.value={})},"重做证据练习"),J,(s(!0),a(_,null,b(g(u).questions,(e,o)=>(s(),a("fieldset",{key:o},[n("legend",null,t(o+1)+". "+t(e.q),1),(s(!0),a(_,null,b(e.options,(q,c)=>(s(),a("label",{key:c},[n("input",{type:"radio",name:"l13q"+o,checked:p.value[o]===c,onChange:C=>A(o,c)},null,40,U),L(t(String.fromCharCode(65+c))+". "+t(q),1)]))),128)),l.value?(s(),a("p",j,t(p.value[o]===e.a?"✓ 回答正确。":"回答错误。")+"正确答案："+t(String.fromCharCode(65+e.a))+"。"+t(e.why),1)):v("",!0)]))),128)),n("div",z,[n("button",{type:"button",disabled:!S.value,onClick:r[1]||(r[1]=e=>l.value=!0)},"提交评分",8,Q),n("button",{type:"button",onClick:w},"重新作答")]),l.value?(s(),a("p",X,"得分："+t(x.value)+" / "+t(g(u).questions.length),1)):v("",!0)])]))}});const Z=F(Y,[["__scopeId","data-v-7c810886"]]),en=JSON.parse('{"title":"13 · 幻觉、证据与答案核验","description":"","frontmatter":{"title":"13 · 幻觉、证据与答案核验","readingTime":"10–12","outline":false,"prev":{"text":"12 · 结构化输出与响应契约","link":"./12-structured-responses"}},"headers":[],"relativePath":"guide/ai/chatbot-course/13-hallucinations-and-evidence.md","filePath":"guide/ai/chatbot-course/13-hallucinations-and-evidence.md","lastUpdated":1793118415000}'),nn={name:"guide/ai/chatbot-course/13-hallucinations-and-evidence.md"},on=Object.assign(nn,{setup(i){return(p,l)=>(s(),a("div",null,[T(Z)]))}});export{en as __pageData,on as default};
