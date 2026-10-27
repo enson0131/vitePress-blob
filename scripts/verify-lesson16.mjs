@@ -75,6 +75,9 @@ try{
  report.checks.push('Four quiz questions: full/wrong scores, explanations and reset')
  for(const [name,width,dark] of [['desktop',1280,false],['mobile',390,false],['mobile-dark',390,true]]){
   await page.setViewportSize({width,height:900});await page.evaluate(d=>document.documentElement.classList.toggle('dark',d),dark)
+  await page.waitForTimeout(750) // Let VitePress responsive sidebar/theme transitions finish.
+  const colors=await page.locator('.lesson16').evaluate(root=>({base:getComputedStyle(root).color,quotes:[...root.querySelectorAll('.original blockquote p')].map(n=>getComputedStyle(n).color)}))
+  assert(colors.quotes.every(color=>color===colors.base),'Quote text must keep readable theme foreground')
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Page horizontal overflow')
   assert.equal(await page.locator('.original > *').evaluateAll(nodes=>nodes.filter(n=>getComputedStyle(n).display==='none').length),0)
   await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:out+'/'+name+'-top.png'});await page.screenshot({path:out+'/'+name+'-full.png',fullPage:true})
