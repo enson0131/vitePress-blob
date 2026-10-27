@@ -1,0 +1,80 @@
+name: Chapter 16 source fidelity
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'docs/.vitepress/theme/components/lesson16/**'
+      - 'docs/guide/ai/chatbot-course/16-multiturn-message-state.md'
+      - 'examples/chatbot-course/lesson16/**'
+      - 'scripts/verify-lesson16.mjs'
+      - 'scripts/lesson16-source-hashes.json'
+      - '.github/workflows/lesson16-fidelity.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'docs/.vitepress/theme/components/lesson16/**'
+      - 'docs/guide/ai/chatbot-course/16-multiturn-message-state.md'
+      - 'examples/chatbot-course/lesson16/**'
+      - 'scripts/verify-lesson16.mjs'
+      - 'scripts/lesson16-source-hashes.json'
+      - '.github/workflows/lesson16-fidelity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify example tests, full TypeScript and React build
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p lesson16-verification
+          cd examples/chatbot-course/lesson16
+          npm install
+          npm test 2>&1 | tee "$GITHUB_WORKSPACE/lesson16-verification/node-tests.log"
+          npm run build 2>&1 | tee "$GITHUB_WORKSPACE/lesson16-verification/react-build.log"
+      - name: Build complete VitePress site
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global yarn
+          yarn install --ignore-engines
+          yarn build 2>&1 | tee lesson16-verification/vitepress-build.log
+      - name: Install browser verification tools
+        run: |
+          npm install --prefix "$RUNNER_TEMP/lesson16-tools" playwright
+          "$RUNNER_TEMP/lesson16-tools/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Verify built lesson and interactions
+        shell: bash
+        env:
+          REPORT_DIR: lesson16-verification/local
+        run: |
+          set -euo pipefail
+          export LESSON_TOOLS="$RUNNER_TEMP/lesson16-tools"
+          ./node_modules/.bin/vitepress preview docs --port 4173 >/tmp/lesson16-preview.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/vitePress-blob/ >/dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/verify-lesson16.mjs
+      - name: Verify actual published GitHub Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        env:
+          WAIT_FOR_PAGES: 'true'
+          LESSON_URL: https://enson0131.github.io/vitePress-blob/guide/ai/chatbot-course/16-multiturn-message-state
+          REPORT_DIR: lesson16-verification/live
+        run: |
+          export LESSON_TOOLS="$RUNNER_TEMP/lesson16-tools"
+          node scripts/verify-lesson16.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lesson16-verification-${{ github.run_id }}
+          path: lesson16-verification/
+          retention-days: 14
