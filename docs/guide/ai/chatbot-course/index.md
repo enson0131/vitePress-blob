@@ -6,9 +6,9 @@ title: AI 聊天机器人学习教程
 
 从底层原理到工程实践的 40 篇中文文字教程，以 React、TypeScript、Node.js 为工程技术栈。
 
-## 已编写：01–16 篇
+## 已编写：01–17 篇
 
-当前已编写 **16 / 40 篇（40%）**。下列目录反映已有文章；内容编写、原稿校对和线上发布分别验收。
+当前已编写 **17 / 40 篇（42.5%）**。下列目录反映已有文章；内容编写、原稿校对和线上发布分别验收。
 
 1. [第 01 篇：ChatGPT 如何回答问题](./01-how-chatgpt-works)
 2. [第 02 篇：Token 与 Embedding](./02-token-and-embedding)
@@ -26,6 +26,7 @@ title: AI 聊天机器人学习教程
 14. [第 14 篇：React + Node.js 第一条聊天链路](./14-first-react-node-chat)
 15. [第 15 篇：流式输出与 SSE（含中文分块解码）](./15-streaming-sse-chat)
 16. [第 16 篇：消息状态与多轮会话](./16-multiturn-message-state)
+17. [第 17 篇：会话与消息持久化](./17-conversation-persistence)
 
 ## 原课程大纲：六个阶段
 
@@ -62,6 +63,7 @@ title: AI 聊天机器人学习教程
 | [14](./14-first-react-node-chat) | 怎样接通第一条聊天链路？ | React + Node.js 单轮非流式请求、后端密钥、输入检查、模拟模式、响应状态与开发代理 |
 | [15](./15-streaming-sse-chat) | 怎样边生成边显示，且不把断线当成功？ | SSE 协议、UTF-8 跨块解码、TextDecoderStream、事件分帧、背压、结束状态、取消链路与完整工程 |
 | [16](./16-multiturn-message-state) | 如何管理多轮消息与旧请求？ | 固定 Turn.id、status 驱动、控制器归属检查、最近6轮所有状态的已有回答、重试与新会话 |
+| [17](./17-conversation-persistence) | 刷新、断线和重试后如何保留聊天？ | React 拼接 SSE 并批量 PUT 快照、Node.js 服务端校验与 SQLite 存储、固定 Turn.id、最近 6 轮上下文、断线恢复与最终保存确认 |
 
 这些文章形成了三条相互衔接的知识线：
 
@@ -90,6 +92,7 @@ title: AI 聊天机器人学习教程
 - 14 保留原工程包的完整 HTML 正文，使用 Vue 嵌入；配套源码在 `examples/lesson14-first-chat`，新增原文、交互与工程构建检查。
 - 15 保留原稿的全部110个内容块，在第三节后插入用户提供的完整 UTF-8 补充。原稿、补充、代码与表格均设有一致性校验；配套工程在 `examples/lesson15-streaming-chat`，页面包含中文分块实验、原流式演示和四题评分。
 - 16 使用用户确认的最新修订稿，完整 HTML + Vue 嵌入；配套工程在 `examples/chatbot-course/lesson16`，38份原文件设有哈希校验，正文和线上交互由专用工作流检查。
+- 17 沿用固定 Turn.id 与最近 6 轮所有状态的历史策略；通过前端批量 PUT 保存 SSE 草稿，后端进行鉴权、乐观锁及断线状态兜底。
 
 每篇文章包含原理、工程案例、复习题，以及持续维护的「学习疑问与解答」。问题按所属知识点回填到对应文章。
 

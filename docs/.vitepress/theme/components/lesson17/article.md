@@ -1,0 +1,669 @@
+# 📘 第 17 篇：刷新一下，聊天怎么没了？——会话与消息持久化
+
+**《AI 聊天机器人学习教程》｜第 17 / 40 篇**  
+**第三阶段：聊天机器人工程开发｜阅读约 15–20 分钟｜React + TypeScript + Node.js + SQLite**
+
+第 16 篇，我们终于解决了一个让人头疼的问题：每轮问答都有固定的 `Turn.id`，流式内容更新自己的气泡，停止和重新回答也不会被旧请求串话。
+
+于是你满意地按了浏览器刷新键。
+
+**聊天记录，全没了。**
+
+不是模型健忘，而是上节的消息只住在 React 内存里。今天要给聊天记录一个真正的住处：**数据库**。
+
+学完本篇，你可以完成：创建会话、写入用户问题、前端批量保存回答、刷新后恢复历史、停止与重试保留状态，以及删除会话。配套工程使用**模拟 SSE**，不调用收费模型；数据库和恢复逻辑才是本篇的主角。
+
+---
+
+## 一、先纠正一个误会：显示在屏幕上，不等于已经保存
+
+假设用户刚刚发出：
+
+> 用户：帮我解释一下闭包。  
+> AI：闭包可以理解为……
+
+React 里有 `turns`，不代表服务器知道这句话；服务器收到了，不代表数据已写入磁盘；数据写到了磁盘，也不代表这轮回答已经完整结束。
+
+要把这三层分开：
+
+| 层次 | 主要职责 | 刷新之后 |
+| --- | --- | --- |
+| React 状态 | 当前气泡、草稿、按钮状态 | 内存会重建 |
+| Node.js 接口 | 校验、转发、决定业务状态 | 进程重启会丢失内存变量 |
+| 数据库 | 保存会话、消息、状态和顺序 | 文件/数据库仍在时可重新读取 |
+
+**一句话：页面是显示器，数据库才是记录本。**
+
+第 10 篇的“长期记忆”又是另一回事：数据库保存了每条聊天，模型也不会自动读到它。模型这次能看见哪些历史，仍需要应用在发送前组织上下文。
+
+## 二、保存什么？先把 Conversation 和 Turn 区分开
+
+继续沿用第 16 篇的结构，但这次把会话也放进数据库。
+
+```typescript
+// 一场会话
+interface Conversation {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+type Status =
+  | "waiting" | "streaming" | "answered"
+  | "refused" | "incomplete" | "stopped" | "failed";
+
+// 一轮问答，问题和回答一起保存
+interface Turn {
+  id: string;              // 重试时不改变
+  conversationId: string;  // 属于哪场会话
+  question: string;
+  answer: string;          // 流式中的草稿也可以存在这里
+  status: Status;
+  notice: string;          // 错误提示，不冒充回答正文
+  revision: number;        // 防止旧版本覆盖新版本
+  createdAt: string;
+  updatedAt: string;
+}
+```
+
+**这里不额外保存 `position`。**按 `createdAt` 升序显示历史；如果创建时间完全相同，再按 `id` 做稳定排序。这样不受重试后 `updatedAt` 变化的影响。注意 `id` 排序并不一定等于同一毫秒内真实插入先后；如果未来需要严格事件顺序，再设计单调序号。
+
+为什么需要 `revision`？因为后台的旧写入可能在新写入之后到达。它是数据库层面的版本检查；旧网络回调仍要沿用第 16 篇的 `AbortController` 归属检查。**状态表示进度，ID 表示身份，revision 表示保存版本。**
+
+## 三、谁负责保存聊天？本篇改为“前端主动写入”
+
+先给出本篇采用的、与你想法一致的架构：
+
+> **前端负责用户操作、接收 SSE 和保存回答快照；后端负责生成、校验写入请求、操作 SQLite，以及断线状态兜底。**
+
+这是一种合理的教学与产品实现选择，并不存在“只有后端保存 AI 答案才是正确”的规定。它的优势是保存时机清晰、前端可以控制草稿同步；代价是浏览器需要承担更多的并发管理和失败补偿工作。
+
+| 场景 | 前端操作 | Node.js / SQLite 行为 |
+| --- | --- | --- |
+| 新建会话 | `POST /api/conversations` | 验证身份、创建 Conversation |
+| 打开历史 | `GET /api/conversations/:id` | 返回按 `createdAt,id` 排序的 Turns |
+| 发送问题 | `POST /api/conversations/:id/turns` | 先插入 `waiting`，然后返回 SSE |
+| AI 流式生成 | 接收 `delta`，立刻更新气泡 | 后端只生成并向 SSE 推送，不逐段保存 AI 正文 |
+| 保存草稿 | 前端按 **800ms 或累计 2KiB** 调用 `PUT /api/conversations/:id/turns/:turnId` | 后端验证身份、状态与版本，保存**完整草稿快照** |
+| 正常完成 | 收到 `end` 后再发最后一个 `PUT`，等待成功才显示 `answered` | 接受最终正文和状态，成功写入后返回新 revision |
+| 主动停止 | **先保存已收到的草稿**，再 `POST /stop` | 中止生成，保留已有数据库正文并标 `stopped` |
+| 意外断线 | 浏览器停止发送增量与 PUT | 服务端中止当前生成、将最近已保存的正文标为 `incomplete` |
+| 重新回答 | `POST /retry` | 复用固定 `Turn.id`、清空旧正文、开始新流 |
+| 修改标题或删除会话 | `PATCH` / `DELETE` | 由后端鉴权后执行 |
+
+### 3.1 完整的前后端时序
+
+```text
+React（发起和保存）        Node.js（生成/鉴权）        SQLite
+      │ POST /turns             │                    │
+      ├────────────────────────→│ INSERT waiting ────→│
+      │←──────── SSE meta ──────┤                    │
+      │←──────── SSE delta ① ───┤                    │
+      │    立即显示草稿          │                    │
+      │←──────── SSE delta ② ───┤                    │
+      │   到 800ms / 2KiB       │                    │
+      │ PUT {answer,revision,   │                    │
+      │     status:streaming}   │                    │
+      ├────────────────────────→│ 验证并 UPDATE ─────→│
+      │←─ 200 {revision + 1} ──┤                    │
+      │←──────── SSE end ───────┤                    │
+      │ PUT {answer:完整正文,   │                    │
+      │     status:answered}    │                    │
+      ├────────────────────────→│ 验证并 UPDATE ─────→│
+      │←───── 200 OK ──────────┤                    │
+      │ UI 展示回答已保存完成    │                    │
+```
+
+这里要纠正一个常见误会：**SSE `end` 只表示模型生成完成，不表示数据库已保存完成**。在这个设计里，前端还必须等待最终 `PUT` 成功。如果保存失败，UI 应显示保存失败或待确认，不能假装已经持久化。
+
+### 3.2 这种设计的问题，怎么面对？
+
+假如用户在 800ms 检查点之前刷新，后端数据库可能只有 `waiting` 或上一段草稿。**最新几个已经出现在屏幕上的字可能丢失**。这不是设计失效，而是需要事先明确的取舍：
+
+- 想减少写库次数，就接受最多一个检查点区间的正常崩溃/刷新损失。
+- 想进一步降低损失，可以缩短间隔或让客户端保存到 IndexedDB 作为额外本地兜底，但仍不能保证 HTTP 请求一定送达服务器。
+- 生产系统还要处理多个标签页同时保存、浏览器伪造 AI 内容、恶意修改状态、请求重放、取消与后台生成等问题。**服务器不能因为前端传来了 `status: answered` 就无条件认定内容真由模型生成。**
+
+配套项目是**仅监听 `127.0.0.1`、固定演示用户**的教学工程：后端验证会话归属、乐观锁及状态流转，但没有用服务器签发的生成凭证验证每个字的来源，**不能直接放到公网**。实际生产可用服务端持久化最终结果、签名完成凭证或生成任务校验等方式强化。
+
+### 3.3 为什么不能每段 `delta` 都直接 `PUT`？
+
+原因不是不允许前端写，而是**没有必要放大 HTTP 和 SQLite 压力**。比如 200 次增量就发 200 个保存请求，容易增加延迟和竞态。我们将在第六节实现客户端检查点写入器：不丢 SSE 的即时显示，但减少数据库写入。
+
+## 四、为什么先选 SQLite？
+
+为了学习持久化，不必先搭建一个 PostgreSQL 服务。这里使用 SQLite：数据存放在本机文件中；Node.js 内置 `node:sqlite` 提供 `DatabaseSync` 与参数化语句。为减少版本差异，推荐 **Node.js 24.15+**；Node 22.16 也能运行本课，但仍可能显示 SQLite/TypeScript 实验特性警告。请以你实际运行的 Node 版本文档为准。
+
+SQL 表结构如下，和配套工程的 `server/store.ts` 对应：
+
+```sql
+CREATE TABLE conversations (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  title TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE turns (
+  id TEXT PRIMARY KEY,
+  conversation_id TEXT NOT NULL
+    REFERENCES conversations(id) ON DELETE CASCADE,
+  question TEXT NOT NULL,
+  answer TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL CHECK (
+    status IN ('waiting','streaming','answered',
+      'refused','incomplete','stopped','failed')
+  ),
+  notice TEXT NOT NULL DEFAULT '',
+  revision INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX idx_turns_by_conversation
+  ON turns(conversation_id, created_at, id);
+```
+
+两张表而不是把整段会话塞进一大块 JSON，有几个好处：单轮更新不用重写整个会话，顺序明确，也容易查询和删除。`ON DELETE CASCADE` 表示删除会话时，一并删除归属它的 Turns。注意 SQLite 的外键检查需要**每个数据库连接单独开启**。本课在 `server/store.ts` 创建 `DatabaseSync` 后执行 `db.exec("PRAGMA foreign_keys = ON")`，可用 `PRAGMA foreign_keys` 查询返回 `1` 进行确认。最好在开始事务之前设置。
+
+本课还开启 `WAL`（预写式日志）模式。它不是“数据库永久不会坏”的开关，也不是可以忽略备份的理由。SQLite 在 WAL 模式下可能有 `-wal`、`-shm` 等关联文件，复制或备份时应按 SQLite 的正规方式处理。[SQLite 官方说明](https://sqlite.org/wal.html)。
+
+## 五、发送问题：React 接收 SSE，准备保存草稿
+
+先沿用第 16 篇的 `Turn.id`：服务端创建一次问答，前端后续所有保存请求都针对这同一个 ID，重试时也不换。
+
+### 5.1 React 发一次生成请求
+
+```typescript
+async function openGeneration(conversationId: string, question: string) {
+  const controller = new AbortController();
+  const res = await fetch(`/api/conversations/${conversationId}/turns`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question }),
+    signal: controller.signal
+  });
+  if (!res.ok || !res.body) throw new Error('生成请求失败');
+  // 把 res.body 交给第 15 篇的 SSE 解码器。
+  // meta 获得固定 Turn.id 和 revision；delta 用于立即展示；
+  // end 表示生成完毕，但下一步仍要做最终 PUT。
+  return { res, controller };
+}
+```
+
+### 5.2 Node.js 先把问题写入数据库
+
+```typescript
+// server/index.ts 的核心调用
+const turn = store.addTurn(userId, conversationId, question);
+streamTurn(res, conversationId, turn); // meta、delta、end
+```
+
+`addTurn` 在数据库事务里插入 `waiting`，并检查会话属于当前用户。这样即便接下来的模型调用失败，**这次用户提问依然有机会在刷新后恢复**。SSE 只负责告知客户端模型生成进度：
+
+```text
+event: meta
+data: {"turn":{"id":"...","revision":0,"status":"waiting"}}
+
+event: delta
+data: {"text":"闭包"}
+
+event: end
+data: {"status":"answered"}
+```
+
+事件仅作示意。`end` 是生成器的状态，不是前端最终保存请求的成功回执。
+
+### 5.3 会话标题和删除仍是普通 API
+
+用户重命名时前端发送：
+
+```typescript
+await fetch(`/api/conversations/${conversationId}`, {
+  method: 'PATCH',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ title: 'React 学习笔记' })
+});
+```
+
+后端校验所有权、标题长度并更新 `conversations.title`。这就是“**前端发起业务动作，后端执行可信的数据库操作**”，与 AI 草稿的检查点 PUT 是同一个设计方向。
+
+## 六、常见的实践：前端缓冲 SSE，按时间/大小批量 PUT
+
+这一节是本次更新的重点。以前的演示由 `server/draft-writer.ts` 在后端累计增量并保存。**现在改成 `src/draft-save.ts`：前端合并回答，达到检查点时发一次 `PUT`；后端只接收、校验并更新数据库。**
+
+```text
+SSE delta「你」 → React 显示「你」          → 暂不发 PUT
+SSE delta「好」 → React 显示「你好」        → 暂不发 PUT
+SSE delta「！」 → React 显示「你好！」      → 暂不发 PUT
+约 800ms 到达   → PUT 完整快照「你好！」     → 数据库保存
+SSE delta「再见」→ React 显示「你好！再见」 → 暂不发 PUT
+SSE end         → PUT 完整快照 + answered  → 等待成功才标完成
+```
+
+检查点阈值采用 **800ms 或累计新增 2KiB UTF-8 字节（先满足哪个就写一次）**。这是用于教学的调优起点，不是所有应用必须使用的固定数值。请注意：保存的是**整段已有回答快照**，而不是只传新来的 `delta`。
+
+### 6.1 为什么要串行 PUT，还要带 revision？
+
+假设先后提交：
+
+```text
+PUT #1: answer="你好"，revision=0
+PUT #2: answer="你好世界"，revision=0
+```
+
+如果两个请求并发、第二个先写成功，第一条可能在晚到时覆盖更新。正确做法是：**把写入放进一个 Promise 队列，等 #1 返回新的 revision，#2 才发起；服务端也用 `WHERE revision = ?` 乐观锁拒绝过期更新。**
+
+配套 `BrowserDraftWriter` 真正做了这件事：
+
+```typescript
+// src/draft-save.ts 中的核心机制（与配套实现保持一致）
+append(delta: string) {
+  this.answer += delta;
+  this.pendingBytes += new TextEncoder().encode(delta).byteLength;
+  if (this.pendingBytes >= this.maxBytes) {
+    void this.checkpoint().catch(() => {});
+  } else if (!this.timer) {
+    this.timer = setTimeout(() => {
+      this.timer = undefined;
+      void this.checkpoint().catch(() => {});
+    }, this.maxDelayMs);
+  }
+}
+
+checkpoint(status: DraftStatus = 'streaming', notice = '') {
+  const snapshot = this.answer;
+  // 真实类中还会取消 timer、复位待保存字节数和记录失败。
+  this.chain = this.chain.then(async () => {
+    const saved = await this.put({
+      answer: snapshot,
+      status,
+      revision: this.revision,
+      notice
+    });
+    this.revision = saved.revision;
+  });
+  return this.chain;
+}
+```
+
+上面只摘出核心方法，省略属性声明与去重错误分支；**可复制的完整类在配套工程 `src/draft-save.ts`**。它使用 `TextEncoder` 计算新增 UTF-8 字节长度，排队串行保存、记录最后一次成功快照，并在写入失败时拒绝宣称已完成。
+
+### 6.2 前端 PUT 的真实数据格式
+
+```typescript
+async function saveAnswer(
+  conversationId: string,
+  turnId: string,
+  input: { answer: string; status: 'streaming' | 'answered' | 'incomplete';
+           notice: string; revision: number }
+) {
+  const res = await fetch(`/api/conversations/${conversationId}/turns/${turnId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input)
+  });
+  if (!res.ok) throw new Error(`草稿保存失败：HTTP ${res.status}`);
+  return (await res.json()).turn as Turn;
+}
+```
+
+这里用完整 `answer` 替换可编辑的回答快照，`question`、`id`、`createdAt` 不在这条 PUT 里修改。
+
+**后端收到 PUT 后，不能直接 `UPDATE turns SET answer = ... WHERE id = ?`。** 它至少要验证会话所有权、当前状态允许更新、输入长度、正文不得意外回退、以及 `revision` 匹配：
+
+```sql
+UPDATE turns
+SET answer = ?, status = ?, notice = ?,
+    revision = revision + 1, updated_at = ?
+WHERE id = ? AND conversation_id = ? AND revision = ?
+  AND EXISTS (
+    SELECT 1 FROM conversations c
+    WHERE c.id = turns.conversation_id AND c.user_id = ?
+  );
+```
+
+更新影响行数不是 1，就按冲突或无权限处理；配套实现位于 `server/store.ts` 的 `saveBrowserDraft` / `update`。
+
+### 6.3 结束时，最后一个 PUT 不能省
+
+```typescript
+// UI 先拼接 SSE delta，而不是等待保存才显示
+writer.append(delta);
+setTurns(prev => appendDelta(prev, turnId, delta));
+
+// 真的收到 SSE end 后：
+await writer.finish('answered');
+// 只有此时，才代表完整正文已被数据库确认保存
+setTurns(prev => setAnswered(prev, turnId));
+```
+
+这里 `appendDelta` 与 `setAnswered` 是为解释状态更新而写的示意函数；工程实际在 `src/App.tsx` 里直接用 `setTurns` 实现。`writer.finish('answered')` 是异步等待，确保前面排队中的检查点顺序完成，再提交最终回答。
+
+如果网络在收到 `end` 之后、最终 PUT 之前失败：**数据库不会自动变成 `answered`。** 后端有短暂的待确认窗口，超过后会将仍停留在 `waiting/streaming` 的记录标记为 `incomplete`；用户刷新时可以看见最后成功的检查点和“未完成”，再手动重新回答。这比“收到 end 就在 UI 直接显示永久完成”更诚实。
+
+### 6.4 方案边界：谁是可信的 AI 输出？
+
+本篇让浏览器提交 `answer`，确实能实现持久化，**但服务器在数据库里收到这段文字，并不能仅凭它证明文字由模型生成**。用户可以用浏览器开发者工具手动发 PUT，更不能把客户端 `answered` 当作安全凭据。这个教学版只展示本地单用户应用的数据流和版本控制；生产环境应在后端校验生成任务、完成标记及正文来源，或改为后端持有可信最终结果。这里需要在设计文档中明说，而不是假装风险不存在。
+
+## 七、用户正看到 AI 输出时按 F5：前端与后端怎么做？
+
+先明确：**本课采用“HTTP SSE 断开即终止本次生成”的教学方案，不支持刷新后无缝接上旧流**。刷新后能恢复的是数据库中最近一次**成功 PUT** 的快照，不是已经渲染但还没保存的所有字。
+
+### 7.1 场景：已经显示 100 字，但只保存过 80 字
+
+```text
+时间       旧 React 页面                         Node.js / SQLite
+00:00      POST /turns，收到 meta(turnId=T7)       插入 T7 waiting
+00:01      看到 40 字                              尚未写草稿
+00:02      800ms 检查点 PUT 完整 80 字             UPDATE T7，revision 0→1
+00:03      又显示了 20 字，共 100 字               DB 中仍为 80 字
+00:04      用户按 F5 → 旧 SSE Fetch 被取消         旧连接 close → abort
+00:04+                                            标记 T7 incomplete（正文 80 字）
+00:05      新 React 挂载，GET /conversations/:id   SELECT T7
+00:05      页面显示 80 字 + 未完成 + 重试入口        不会自动重新生成
+```
+
+**这次丢掉的 20 字，是客户端尚未成功提交的检查点差额。** 如果旧页面在断开前刚好启动了一条 PUT，它可能成功，也可能失败；新页面必须 GET 才能确定。不要依靠 `beforeunload` 保证 PUT 一定发完；浏览器在关闭/刷新时并不承诺它一定成功。
+
+### 7.2 React 首次挂载：恢复上次打开的会话 ID
+
+```tsx
+const LAST_ID = 'lesson17:selectedConversation';
+
+useEffect(() => {
+  let disposed = false;
+  void (async () => {
+    const res = await fetch('/api/conversations');
+    if (!res.ok) throw new Error('会话列表失败');
+    const { conversations } = await res.json();
+    if (disposed) return;
+    setConversations(conversations);
+    const savedId = localStorage.getItem(LAST_ID);
+    if (savedId && conversations.some((c: Conversation) => c.id === savedId)) {
+      await selectConversation(savedId);
+    }
+  })().catch(e => { if (!disposed) setError(String(e)); });
+  return () => {
+    disposed = true;
+    active.current?.abort(); // 取消原 SSE
+    loader.current?.abort(); // 取消旧 GET
+    draft.current?.writer.cancelTimer(); // 不再排新的检查点任务
+  };
+}, []);
+```
+
+注意：`cancelTimer()` 只能取消**尚未执行的定时器**，不能让已经发出的 PUT 消失；也不能保证一个没有完成的 PUT 最终成功。**React 内存重新建立后，必须以数据库重新 GET 的结果为准。** `localStorage` 仅保存 conversationId，不把整段 AI 正文复制进本地存储。
+
+### 7.3 React 恢复会话：只 GET，不自动 POST
+
+```tsx
+async function selectConversation(id: string) {
+  loader.current?.abort();
+  active.current?.abort();
+  draft.current?.writer.cancelTimer();
+  const controller = new AbortController();
+  loader.current = controller;
+  selectedRef.current = id;
+  setSelected(id);
+  setTurns([]);
+  setRestoring(true);
+
+  try {
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const res = await fetch(`/api/conversations/${id}`, {
+        signal: controller.signal, cache: 'no-store'
+      });
+      if (!res.ok) throw new Error('历史读取失败');
+      const { turns } = await res.json();
+      if (controller.signal.aborted || selectedRef.current !== id) return;
+      setTurns(turns);
+      localStorage.setItem(LAST_ID, id);
+      if (!turns.some((t: Turn) =>
+        t.status === 'waiting' || t.status === 'streaming')) return;
+      if (attempt < 3) await delayWithSignal(300, controller.signal);
+    }
+  } finally {
+    if (loader.current === controller) {
+      loader.current = null;
+      setRestoring(false);
+    }
+  }
+}
+```
+
+这是为解释流程缩短的代码，**完整的 `delayWithSignal`、错误处理、不同会话隔离在配套 `src/App.tsx`**。旧会话 A 的 GET 在切换到 B 后不能覆盖 B，所以除了 abort，还要比较 `selectedRef.current`。
+
+为什么最多查询四次？这是为了等待旧连接的中断清理，**不是为了等待后台模型持续输出**。四次仍没确认，前端显示“状态待确认，请重新加载”，不假装它已完成。
+
+### 7.4 旧后端连接断开：不是把所有字都保存下来
+
+在 `server/index.ts` 中，`res.close` 负责中断仍在进行中的生成；后端把**最后成功 PUT 的内容**标成 `incomplete`：
+
+```typescript
+res.on('close', () => {
+  if (!generated) controller.abort();
+});
+
+// catch 分支（示意）：
+store.markUnfinished(
+  userId, conversationId, turn.id,
+  'incomplete',
+  '流式连接中断；只保留已保存的检查点'
+);
+```
+
+`markUnfinished` **只改变状态和提示，不会制造它没收到的 20 字**。用户主动按停止按钮时则优先执行一次客户端检查点 `PUT`，然后请求后端 `/stop`，以尽量保留当前已收到的正文；如果检查点失败，至少后端先前成功保存的草稿还在。
+
+### 7.5 正常收到了 SSE end，刷新时会怎样？
+
+这取决于**最终 PUT 有没有成功**，而不是 SSE 有没有发出 `end`：
+
+| 时机 | 后端数据库 | 新页面 GET |
+| --- | --- | --- |
+| 模型生成完、前端没来得及 PUT | 可能仍为 `streaming` / 稍后 `incomplete` | 显示最后检查点；不可当作完整回答 |
+| 最终 PUT 已返回成功 | `answered` + 完整正文 | 显示完成 |
+| 最终 PUT 已发送但浏览器丢失响应 | 可能成功，也可能失败 | **重新 GET 核对**，不要马上重复创建问答 |
+| 服务进程崩溃 | 最近一次完成的 SQLite 事务 | 重启时将遗留 `waiting/streaming` 改成 `incomplete` |
+
+### 7.6 Node.js 重启时：旧 streaming 不可冒充成功
+
+仅限本篇本地单进程示例，启动时执行：
+
+```typescript
+db.prepare(`
+  UPDATE turns
+  SET status = 'incomplete',
+      notice = '服务重启后恢复：上次生成未确认完成',
+      updated_at = ?,
+      revision = revision + 1
+  WHERE status IN ('waiting', 'streaming')
+`).run(new Date().toISOString());
+```
+
+生产环境如果多个服务实例同时运行，不能因为其中一个实例重启就把别的实例运行中的任务改成失败；应使用任务所有权、过期检测和协调机制。
+
+### 7.7 还能像 ChatGPT 一样刷新后继续生成吗？
+
+**可以，但那属于另一种架构**：生成任务与浏览器 SSE 生命周期解耦，服务端维护任务进度、事件偏移量和可重新订阅的事件流。仅仅增加前端 PUT 或把 GET 轮询次数改成无限，都无法实现可靠的断线续传。这会放到第 18 篇及后续生产工程中讨论。
+
+## 八、第 16 篇的“最近 6 轮、所有状态”规则，还能继续用吗？
+
+可以，本篇不修改你确认的上下文策略。需要把**数据库读取出来的 Turn** 投影为模型输入，而不是让浏览器随意提交一份“自称是真的”的历史。
+
+```typescript
+type TextMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+function buildHistory(turns: readonly Turn[]): TextMessage[] {
+  return turns.slice(-6).flatMap((turn): TextMessage[] => {
+    const pair: TextMessage[] = [
+      { role: "user", content: turn.question }
+    ];
+
+    if (turn.answer.trim()) {
+      pair.push({ role: "assistant", content: turn.answer });
+    }
+
+    return pair;
+  });
+}
+```
+
+这里**不按 `answered` 过滤**：已停止、截断、拒绝或失败的轮次，如果存有真实助手正文，也可以被选进最近 6 轮；没有正文则只保留用户问题。`notice` 不混进模型的助手回答。模型输入仍需遵守第 16 篇的长度保护和第 11 篇的 Token 预算。
+
+注意两个边界：**当前新问题不能重复发送**。如果它已经被插入数据库，就要在取历史时排除当前 Turn，再单独加入当前问题。重新回答旧 Turn 时，还要排除那一轮自身和其后的分支历史。以及：把未完成草稿作为正常 `assistant` 消息，可能让模型误以为它是完整回复；本篇继承第 16 篇的约定，但实际产品应评估是否附加“未完成”上下文说明。
+
+## 九、把所有操作放在一张图里
+
+```text
+React 点击新建 → POST /conversations ───────────→ Node INSERT Conversation
+React 点击发送 → POST /turns（SSE）────────────→ Node INSERT waiting + 推送 delta
+React 追加文本 → 立即更新聊天气泡（不写库）
+React 达到检查点 → PUT /turns/:id ─────────────→ Node 校验 revision + 保存草稿
+React 收到 end → PUT /turns/:id (answered) ──→ Node 提交最终正文和状态
+React 点击停止 → 先 PUT 草稿，再 POST /stop ─→ Node 中止生成、保存 stopped
+React 点击重试 → POST /retry ────────────────→ Node 同 Turn.id 清空草稿再生成
+React 修改标题 → PATCH /conversations/:id ───→ Node 更新 title
+React 刷新页面 → GET /conversations/:id ─────→ Node SELECT 快照
+React 删除会话 → DELETE /conversations/:id ──→ Node 校验后删除关联数据
+```
+
+**注意两个不同的“完成”：模型生成完（SSE `end`）与回答持久化完成（最终 PUT 返回成功）。** 本方案只有两个动作都成功，UI 才显示真正保存完成。
+
+前端不需要每次收到字符就调用保存接口，但需要管理排队的 PUT。后端保存操作不是“照单全收”，仍必须校验身份、数据库版本和状态转换。**用户提供的正文来源可信性是额外的生产安全需求**，本地工程没有证明它是模型原文。
+
+## 十、停止、重试和删除，分别是什么数据库操作？
+
+| 用户操作 | 数据库该发生什么 | 特别注意 |
+| --- | --- | --- |
+| 停止生成 | 保留目前答案，更新状态为 `stopped` | 主动停止和意外断线应区分 |
+| 重新回答 | **同一个 Turn.id**，清空旧草稿并改为 `waiting` | 新请求开始前终止旧请求，旧回调不能覆盖新结果 |
+| 刷新页面 | 读取已存的 Turns，不创建新 Turn | 没有结束信号的草稿不能变成功 |
+| 删除会话 | 删除会话及其 Turns | 必须核对所属用户；进行中的流先停止或拒绝删除 |
+
+配套工程提供 `/retry` 和 `/stop` 两个接口：前者仅对已停止、失败或不完整的 Turn 开放；后者显式告诉服务端是用户主动停止。浏览器连接中断但没有收到主动停止请求时，服务端把状态记为 `incomplete`，不武断地称为用户点了停止。
+
+如果重试过程中再次失败，`Turn.id` 仍然不变。这次新的“生成尝试”由当前活动控制器在网络层隔离；没有额外保存一个生成 ID。
+
+**一个容易忽略的现实问题：重复提交。** 用户点击“发送”后如果网络断开，可能不知道后端已成功创建 Turn；直接再点一次，可能出现重复问题。本课尚未实现客户端幂等键及去重，它属于生产级需要补齐的能力。
+
+## 十一、数据安全：数据库不是只要能查到就够了
+
+真正的多用户聊天系统，不能只写：
+
+```sql
+SELECT * FROM turns WHERE conversation_id = ?;
+```
+
+至少需要确认这场会话属于**当前已认证的用户**。本课在服务端按 `user_id` 检查归属，并在更新时结合会话归属和行版本条件执行，防止仅凭猜到 ID 就读写他人的聊天记录。但配套示例只有固定本地用户，并无真实登录，这只是演示查询边界。
+
+还有三件事必须在上线前考虑：敏感数据最小化与保留期限；数据库备份、恢复与删除策略；访问日志中避免记录密钥或不必要的私密对话。OWASP 将按对象 ID 越权访问列为 API 的重要风险之一。[OWASP API1:2023](https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/)。
+
+## 十二、动手实验：刷新后到底保留了多少？
+
+下载配套工程，进入 `project`，推荐 Node.js 24.15+（Node.js 22.16+ 可做基本实验，但可能提示实验特性）。终端 A：
+
+```bash
+npm install
+npm run server
+```
+
+终端 B：
+
+```bash
+npm run dev
+```
+
+打开 `http://127.0.0.1:5173`。本课默认 `127.0.0.1:3001` 的 Node API、`./data/chats.sqlite` 数据库、**模拟生成内容**，不调用付费模型；先关闭占用相同端口的旧服务。
+
+**实验 A：正常生成。** 新建会话并提问，打开开发者工具 Network。你会看到 `POST /turns` SSE 和若干条 `PUT /turns/:id`。每一个 SSE 增量都出现在页面，但**不会每段都生成一条 PUT**；最后必须有 `status: answered` 的成功 PUT。
+
+**实验 B：800ms / 2KiB 检查点。** 观察 `PUT` 的 `answer` 传的是**累计全文**而不是仅上次 `delta`。连续 PUT 的 `revision` 应不断递增，旧 revision 写入会被拒绝。
+
+**实验 C：生成中按 F5。** 在流式输出时刷新，新页面自动恢复上次会话。它只能显示服务器收到的最后检查点，可能比旧页面短；若生成未完成，最终状态是 `incomplete`，不自动发起生成。
+
+**实验 D：用户主动停止。** 点击停止时，前端先尝试保存当前草稿，然后请求 `POST /stop`。历史中应是 `stopped`，继续点击重试时 `Turn.id` 保持不变。
+
+**实验 E：模拟最终 PUT 失败。** 在浏览器开发者工具中阻断保存请求，观察 SSE 即使生成完成，UI 也不能可靠地认定持久化完成；重新 GET 后应以数据库快照为准。
+
+**实验 F：修改标题与删除会话。** 前端发送 `PATCH` / `DELETE`，后端校验并执行；刷新后仍能看到更新后的标题，删除后不再返回关联 Turns。
+
+**实验 G：服务器异常终止。** 生成过程中强制结束 Node 进程再启动；数据库只能恢复上一次成功 PUT 的内容，启动恢复逻辑会把遗留的 `waiting/streaming` 改为 `incomplete`。
+
+项目不保证每个已显示字符都持久化，也没有实现多用户登录、客户端幂等键、跨设备同步中的版本协商或真实模型的来源验证。要上线需要继续完善。
+
+### 四道选择题
+
+**第 1 题**：本课新的保存方案中，谁负责发送 AI 回答的草稿检查点？
+
+A. 模型服务直接向数据库写入；B. 前端把 SSE 累计答案按阈值 PUT 给后端；C. SQLite 自动从 SSE 抓取。
+
+**第 2 题**：前端已经收到 SSE `end`，为什么还不能立刻认定“回答已持久化”？
+
+A. 还要等最终 PUT 成功；B. 需要强制刷新；C. 必须等下一次用户发问。
+
+**第 3 题**：前端刷新后只能看到 80 字，但刷新前显示了 100 字，最可能的解释是？
+
+A. React 自动删掉最后 20 字；B. SQLite 错误裁剪；C. 后 20 字还没成功保存到服务器。
+
+**第 4 题**：为什么要串行保存并检查 `revision`？
+
+A. 提高字体渲染速度；B. 避免迟到的旧快照覆盖新版本；C. 让 SSE 变成 WebSocket。
+
+**答案与解析：** 1B，前端管理检查点 PUT；2A，生成完成与持久化完成是两件事；3C，恢复边界是最后成功提交的数据库快照；4B，乐观锁与串行请求共同防止旧写入覆盖新写入。
+
+## 十三、学习疑问与解答
+
+**Q1：把 AI 回答交给前端保存，不是更简单吗？**  
+对小型、单用户产品很合理：前端收流并持有完整草稿，按检查点 PUT 给后端即可。它将持久化编排交给浏览器，后端仍负责校验和落库。这个方案不是天然错误，和“服务端自己保存 AI 输出”属于不同权衡。
+
+**Q2：那为什么不能每个 Token 都发 PUT？**  
+技术上能，但写入和网络开销大。我们采用 800ms/2KiB 检查点，减少请求数量。阈值越长，刷新丢失未保存尾部的风险越高。
+
+**Q3：如果 SSE `end` 到了，但最终 PUT 失败怎么办？**  
+前端不能显示持久化成功。恢复时 GET 数据库快照，若最终保存未到达，后端会把遗留的进行中记录标为 `incomplete`；必要时让用户重试。
+
+**Q4：浏览器刷新能保证最后一次 PUT 发送成功吗？**  
+不能。即使监听 `beforeunload`，请求也可能被中断，不能把“尝试发送”当作“服务器确认保存”。需要更强保证时，考虑浏览器端持久草稿、后台任务或由服务端保存权威输出。
+
+**Q5：前端能篡改自己保存的 AI 回答吗？**  
+能。浏览器不是可信执行环境，任何用户都可能自行构造请求。后端需要验证身份、版本、状态和业务限制；如果必须证明“原封不动来自模型”，就应增加服务端结果或签发的生成完成凭证。本课仅展示本机单用户流程，不提供该级别的证明。
+
+**Q6：为什么仍然保留 `revision`？**  
+因为两个检查点 PUT 可能发生延迟与竞态。客户端保证串行，并带上后端返回的新版本；后端 CAS 更新，过期版本拒绝覆盖。
+
+**Q7：为什么删除了 `position`？**  
+本课只需要按 `createdAt ASC, id ASC` 稳定展示，不支持插队和手动排序。相同毫秒内 ID 排序不保证严格真实先后，如需严格顺序再引入单调序号。
+
+**Q8：PRAGMA foreign_keys=ON 在哪里开启？**  
+在 Node.js 创建 `DatabaseSync` 后、开启事务前执行，每个连接都需设置一次；`PRAGMA foreign_keys` 返回 `1` 说明已生效。
+
+**Q9：刷新后还能继续原来的 SSE 吗？**  
+本篇不能。当前方案断线停止生成，GET 恢复的是最后成功的数据库快照。后台继续生成需要解耦任务、可恢复事件游标和重新订阅能力。
+
+**Q10：这套工程能直接部署公网吗？**  
+不能。它没有实际登录、幂等键、模型来源校验和多实例生成协调，客户端可提交自己构造的回答内容。上线前必须完善鉴权和可信状态边界。
+
+## 本篇总结
+
+> **前端发起会话动作、接收 SSE、批量 PUT 回答草稿；后端负责生成、鉴权校验与数据库提交。SSE `end` 不是保存成功，刷新后以最近一次成功写库的数据为准。**
+
+这版让两个方向都能说清楚：**使用后端持久化模型输出可以降低客户端负担；使用前端显式 PUT 也完全可行，只是要承担排队、断线与来源校验问题。** 本课按你提出的前端保存方案实现，不再将其说成错误做法。
+
+第 17 篇结束。课程进度：**17 / 40 篇（42.5%）**。
+
+**下一篇：第 18 篇《AI 聊天如何处理失败、重试与断线恢复？》**——继续完善幂等键、失败恢复、后台生成和断线续传。
+
+### 参考资料
+
+- [Node.js 官方 `node:sqlite`](https://nodejs.org/api/sqlite.html)：SQLite 连接与参数化语句。
+- [SQLite 官方 WAL 说明](https://sqlite.org/wal.html)：预写式日志。
+- [MDN：Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)：请求、AbortSignal 与响应流。
+- [OWASP API1:2023](https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/)：对象级授权。
+
+**发布注记：本篇以最终 GitHub 合并及线上验收结果为准。**

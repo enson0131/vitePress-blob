@@ -130,6 +130,7 @@ function sidebarGuide(): DefaultTheme.SidebarItem[] {
           { text: '14 · React + Node.js 第一条聊天链路', link: 'ai/chatbot-course/14-first-react-node-chat' },
           { text: '15 · 流式输出与 SSE', link: 'ai/chatbot-course/15-streaming-sse-chat' },
           { text: '16 · 消息状态与多轮会话', link: 'ai/chatbot-course/16-multiturn-message-state' },
+          { text: '17 · 会话与消息持久化', link: 'ai/chatbot-course/17-conversation-persistence' },
         ]
       },
       {

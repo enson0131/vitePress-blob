@@ -1,0 +1,23 @@
+{
+  "examples/chatbot-course/lesson17/README.md": "ba796878f6c591269f85b54bf38f61a7aa2464861f635391256c2cf7c4ae620e",
+  "examples/chatbot-course/lesson17/index.html": "d85a4837c6f7fe7d3cc4a5b05d0f4c7606927ea7c34b51dad6c717e38b04be1a",
+  "examples/chatbot-course/lesson17/package.json": "4fbe57dd482379424f6fd8c7c23b21db0f6586a28dc56cb30883d03e6594962a",
+  "examples/chatbot-course/lesson17/server/index.ts": "6625f8f9de9891adf247a91993068a3fc8a7e449906e4dd91a2dff47856662cb",
+  "examples/chatbot-course/lesson17/server/store.ts": "15731db99a4ba54976fb0e9bfcb173b7f379ad5afa7e949fb2846985bd42b8f1",
+  "examples/chatbot-course/lesson17/src/App.tsx": "f7edc5583b0ecc457a99198dfe246ed63217a59e52a87af9c447fc147b9d8d71",
+  "examples/chatbot-course/lesson17/src/draft-save.ts": "e945d2d89a1e6072ea6bdb96b0058de0a79f36814d762708cfee1633b0f14435",
+  "examples/chatbot-course/lesson17/src/main.tsx": "26a8af478cea14f5b0b9ca39c19006ac79e53c7c3860abf3d123490d6e1c6c8a",
+  "examples/chatbot-course/lesson17/src/style.css": "a539a8c6fb19d603558667b5b06e02032aa687e49b8bedfdf7f54e8c3130fe1a",
+  "examples/chatbot-course/lesson17/tests/browser-draft-save.test.ts": "2f542a41810f2f618dd013f9cb9dc10a9a184257ac0b3cee728c30f824fcda3b",
+  "examples/chatbot-course/lesson17/tests/http-recovery.test.ts": "d47df0b5fca38080e3557e5c928d4f1e7678d39d8942145d17a08e4903da8371",
+  "examples/chatbot-course/lesson17/tests/store.test.ts": "d113a119a44dbdb9c2103bb6c5b96b73fb9aeef36b76a207df205dc355432a39",
+  "examples/chatbot-course/lesson17/tsconfig.json": "08394f8b3d6918f2d7efe57b79999a4da7d567ab4b1b10c70d4ffcf4179efd0b",
+  "examples/chatbot-course/lesson17/vite.config.ts": "b0e16918d18375ff54614da7e176ea78dc50697f85c99c5292ffbfbf96e48e12",
+  "docs/.vitepress/theme/components/lesson17/article.html": "0a916571d7bff5bee65cca0095b81e7aae9b6a6b6730e24dd91e60ffb73f7bd6",
+  "docs/.vitepress/theme/components/lesson17/ConversationPersistenceLesson.vue": "c6033ea408d8e36174f024643047cf6430246356ccd2f8da20a2e27b24fe6bd6",
+  "docs/.vitepress/theme/components/lesson17/quiz.json": "fed17244491125d31b9e89f6a47c3f598fc7acce4be79563a7df507d0ab28ff3",
+  "docs/.vitepress/theme/components/lesson17/page.css": "482b5b3bc13e8c88baca968ba583d7b7d21697da69a3d1f1f02bdaf5162329db",
+  "docs/guide/ai/chatbot-course/17-conversation-persistence.md": "65ff8da58d008928152ff2d308e52d162e618fcce5899e698778e698569e1b8a",
+  "docs/.vitepress/theme/components/lesson17/article.md": "d822ba0140b8404317f06bc156fb94403644961f115330afdf072543788ec311",
+  "docs/.vitepress/theme/components/lesson17/standalone.html": "facfad21e249efe092569f2cf86d26a609630dcd9e6766c615b9c31583de26db"
+}
