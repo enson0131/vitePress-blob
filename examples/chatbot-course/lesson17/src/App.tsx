@@ -109,7 +109,7 @@ export default function App(){
   if(active.current||!selectedRef.current||(!retryTurnId&&!question.trim()))return;
   const id=selectedRef.current;
   const ctl=new AbortController();active.current=ctl;setBusy(true);setError('');
-  let writer:BrowserDraftWriter|null=null;
+  const writerRef:{current:BrowserDraftWriter|null}={current:null};
   let ended=false;
   try {
    let streamedTurnId=retryTurnId || '';
@@ -124,7 +124,7 @@ export default function App(){
       const t=data.turn as Turn;streamedTurnId=t.id;
       // Save requests are intentionally independent from the SSE controller.
       // They are serial and compare the latest revision returned by SQLite.
-      writer=new BrowserDraftWriter(t,async input=>{
+      writerRef.current=new BrowserDraftWriter(t,async input=>{
         const result=await json<{turn:Turn}>(`/api/conversations/${id}/turns/${t.id}`,{
           method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(input)
         });
@@ -132,24 +132,24 @@ export default function App(){
           setTurns(prev=>prev.map(item=>item.id===t.id?{...item,revision:result.turn.revision}:item));
         return result.turn;
       });
-      draft.current={controller:ctl,writer};
+      draft.current={controller:ctl,writer:writerRef.current};
       setTurns(prev=>retryTurnId?prev.map(x=>x.id===t.id?t:x):[...prev,t]);
     } else if(kind==='delta') {
-      writer?.append(String(data.text)); // UI update is immediate; PUT is debounced.
+      writerRef.current?.append(String(data.text)); // UI update is immediate; PUT is debounced.
       setTurns(prev=>prev.map(t=>t.id===streamedTurnId&&(t.status==='waiting'||t.status==='streaming')?
         {...t,answer:t.answer+String(data.text),status:'streaming'}:t));
     } else if(kind==='end') {
       ended=true; // End of generation, NOT end of persistence.
     }
    },ctl.signal);
-   if(!ended||!writer)throw new Error('缺少完整 end；不能保存成 answered');
-   await writer.finish('answered'); // Always await the final PUT.
+   if(!ended||!writerRef.current)throw new Error('缺少完整 end；不能保存成 answered');
+   await writerRef.current.finish('answered'); // Always await the final PUT.
    if(active.current===ctl&&selectedRef.current===id)
-     setTurns(prev=>prev.map(t=>t.id===streamedTurnId?{...t,answer:writer!.text,status:'answered',notice:''}:t));
+     setTurns(prev=>prev.map(t=>t.id===streamedTurnId?{...t,answer:writerRef.current!.text,status:'answered',notice:''}:t));
   }catch(e){
     if(!ctl.signal.aborted)setError('生成或保存失败：'+(e instanceof Error?e.message:String(e))+'；请重新加载核对数据库。');
   }finally{
-    writer?.cancelTimer();
+    writerRef.current?.cancelTimer();
     if(draft.current?.controller===ctl)draft.current=null;
     if(active.current===ctl){active.current=null;setBusy(false);await selectConversation(id).catch(()=>{})}
     void reloadList();
@@ -157,7 +157,7 @@ export default function App(){
  }
  async function stop(){
   const id=selectedRef.current,ctl=active.current;
-  const inProgress=turns.findLast(t=>['waiting','streaming'].includes(t.status));
+  const inProgress=[...turns].reverse().find((t:Turn)=>['waiting','streaming'].includes(t.status));
   if(!ctl||!inProgress)return;
   try {
     // Flush browser's latest accumulated text BEFORE asking the server to stop.
