@@ -1,0 +1,25 @@
+
+.lesson17{min-width:0;line-height:1.8;overflow-wrap:anywhere}
+.lesson17 .original h1{font-size:29px;line-height:1.4;margin:24px 0}
+.lesson17 .original h2{font-size:23px;border-top:1px solid var(--vp-c-divider);margin:38px 0 16px;padding-top:18px}
+.lesson17 .original h3{font-size:18px;margin:22px 0 10px}
+.lesson17 .original p{margin:12px 0}
+.lesson17 .original table{display:block;max-width:100%;overflow-x:auto;border-collapse:collapse}
+.lesson17 .original th,.lesson17 .original td{border:1px solid var(--vp-c-divider);padding:9px 11px;vertical-align:top}
+.lesson17 .original th,.lesson17 .original pre,.lesson17 .original blockquote{background:var(--vp-c-bg-soft)}
+.lesson17 .original pre{padding:38px 16px 16px;position:relative;overflow-x:auto;border:1px solid var(--vp-c-divider);border-radius:12px}
+.lesson17 .original pre code{color:var(--vp-c-text-1);font-size:13px;line-height:1.62;background:none;white-space:pre}
+.lesson17 .original blockquote{border-left:4px solid var(--vp-c-brand-1);padding:8px 18px}
+.lesson17 .original ul{list-style:disc;padding-left:24px}
+.lesson17 .original a{color:var(--vp-c-brand-1);text-decoration:underline}
+.lesson17 .copy17{position:absolute;top:7px;right:8px;border:1px solid var(--vp-c-divider);border-radius:7px;padding:2px 10px;background:var(--vp-c-bg);color:var(--vp-c-text-1);font-size:12px;cursor:pointer}
+.lesson17 .lab,.lesson17 .quiz{border-top:1px solid var(--vp-c-divider);margin:35px 0;padding-top:20px}
+.lesson17 .lab-panels{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.lesson17 .lab-panels>div{background:var(--vp-c-bg-soft);padding:15px;border-radius:12px;border:1px solid var(--vp-c-divider);min-height:130px;overflow-wrap:anywhere}
+.lesson17 .lab-panels p{white-space:pre-wrap}.lesson17 .lab-panels small,.lesson17 .hint{color:var(--vp-c-text-2)}
+.lesson17 .buttons{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.lesson17 .buttons button{padding:7px 13px;border:1px solid var(--vp-c-divider);background:var(--vp-c-bg-soft);color:var(--vp-c-text-1);border-radius:8px}
+.lesson17 .buttons button:disabled{opacity:.42}
+.lesson17 .quiz fieldset{border:1px solid var(--vp-c-divider);padding:15px;border-radius:12px;margin:15px 0}
+.lesson17 .quiz label{display:block;padding:6px 2px}.lesson17 .quiz input{margin-right:9px}
+@media(max-width:600px){.lesson17 .original h1{font-size:24px}.lesson17 .original h2{font-size:20px}.lesson17 .lab-panels{grid-template-columns:1fr}}

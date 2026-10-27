@@ -1,0 +1,81 @@
+name: Chapter 17 frontend persistence fidelity
+on:
+  pull_request:
+    branches: [master]
+    paths:
+      - 'docs/.vitepress/theme/components/lesson17/**'
+      - 'docs/guide/ai/chatbot-course/17-conversation-persistence.md'
+      - 'examples/chatbot-course/lesson17/**'
+      - 'scripts/verify-lesson17.mjs'
+      - 'scripts/lesson17-source-hashes.json'
+      - '.github/workflows/lesson17-fidelity.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'docs/.vitepress/theme/components/lesson17/**'
+      - 'docs/guide/ai/chatbot-course/17-conversation-persistence.md'
+      - 'examples/chatbot-course/lesson17/**'
+      - 'scripts/verify-lesson17.mjs'
+      - 'scripts/lesson17-source-hashes.json'
+      - '.github/workflows/lesson17-fidelity.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Test 17 backend/frontend checkpoint and build React
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p lesson17-verification
+          cd examples/chatbot-course/lesson17
+          npm install
+          npm test 2>&1 | tee "$GITHUB_WORKSPACE/lesson17-verification/tests.log"
+          npm run build 2>&1 | tee "$GITHUB_WORKSPACE/lesson17-verification/react-build.log"
+      - name: Build complete VitePress site
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --global yarn
+          yarn install --ignore-engines
+          yarn build 2>&1 | tee lesson17-verification/vitepress-build.log
+      - name: Install browser verification
+        run: |
+          npm install --prefix "$RUNNER_TEMP/lesson17-tools" playwright
+          "$RUNNER_TEMP/lesson17-tools/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Verify lesson 17 source and browser interactions
+        shell: bash
+        env:
+          REPORT_DIR: lesson17-verification/local
+        run: |
+          set -euo pipefail
+          export LESSON_TOOLS="$RUNNER_TEMP/lesson17-tools"
+          ./node_modules/.bin/vitepress preview docs --port 4173 >/tmp/lesson17-preview.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/vitePress-blob/ >/dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/verify-lesson17.mjs
+      - name: Verify deployed GitHub Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        env:
+          WAIT_FOR_PAGES: 'true'
+          LESSON_URL: https://enson0131.github.io/vitePress-blob/guide/ai/chatbot-course/17-conversation-persistence
+          REPORT_DIR: lesson17-verification/live
+        run: |
+          set -euo pipefail
+          export LESSON_TOOLS="$RUNNER_TEMP/lesson17-tools"
+          node scripts/verify-lesson17.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lesson17-verification-${{ github.run_id }}
+          path: lesson17-verification/
+          retention-days: 14
