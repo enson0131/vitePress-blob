@@ -1,0 +1,18 @@
+/* VitePress integration only: approved article, code and standalone CSS stay unchanged. */
+.vp-doc .lesson16 .original blockquote,
+.vp-doc .lesson16 .original blockquote p,
+.vp-doc .lesson16 .original blockquote strong,
+.vp-doc .lesson16 .original blockquote code {
+  color: var(--ink);
+}
+.vp-doc .lesson16 .original table tr {
+  background: var(--paper);
+}
+.vp-doc .lesson16 .original table th {
+  background: var(--soft);
+  color: var(--ink);
+}
+.vp-doc .lesson16 .original pre,
+.vp-doc .lesson16 .original pre code {
+  color: var(--ink);
+}
