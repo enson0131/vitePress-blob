@@ -3,6 +3,7 @@ import { h, onMounted, watch, nextTick } from 'vue'
 import { useRoute } from 'vitepress'
 import CourseLessonMeta from './components/CourseLessonMeta.vue'
 import './zoom.css'
+import './components/lesson16/vitepress-adapter.css'
 
 let hasImageViewerListener = false
 let viewerScale = 1
